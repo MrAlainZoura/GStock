@@ -21,7 +21,18 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'genre',
+        'naissance',
+        'fonction',
+        'niveauEtude',
+        'option',
+        'adresse',
+        'tel'
     ];
+
+    public function depot(){
+        return $this->hasMany(Depot::class);
+    }
 
     /**
      * The attributes that should be hidden for serialization.
