@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Categorie;
+use App\Models\Marque;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -33,18 +34,28 @@ class CategorieController extends Controller
         $validateDate = Validator::make($request->all(),
         [
             'libele'=>'required|string|max:255',
+            'user_id'=>'required|string|max:255',
+            'marque'=>'array',
         ]);
 
         if($validateDate->fails()){
             return $validateDate->errors();
         }
+
         $data = [
             'libele'=>$request->libele,
         ];
 
         $cat = Categorie::create($data);
-        return response()->json(['success'=>true, 'data'=>$cat]);
-
+        if($cat){
+           foreach($request->marque as $k=>$v){
+                if($v!=null)
+                {
+                    $marque = Marque::create(['libele'=>$v,'categorie_id'=>$cat->id]);
+                }  
+           }
+        }
+        return back()->with('success',"success enregistrment");
     }
 
     /**

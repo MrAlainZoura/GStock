@@ -19,4 +19,8 @@ class Produit extends Model
     public function marque(){
         return $this->belongsTo(Marque::class);
     }
+    public function depot(){
+        return $this->belongsTo(Depot::class);
+    }
+
 }

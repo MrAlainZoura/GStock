@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
@@ -133,11 +134,23 @@ class UserController extends Controller
         return response()->json(['success'=>true, 'data'=>'Suppression reussie!']);
     }
 
-    public function login(){
-        
+    public function login(Request $request){
+        $daliation = Validator::make($request->all(),[
+            'email'=>'required|email',
+            'password'=>'required|min:4'
+        ]);
+        if($daliation->fails()){
+            return back()->with('echec',$daliation->errors());
+        }
+        $data = ['email'=>$request->email, 'password'=>$request->password];
+        if(Auth::attempt($data)){
+            $request->session()->regenerate();
+            return to_route('dashboard'); 
+        }
+       return back()->with('echec','email ou mot de passe incorrect');
     }
-
     public function logout(){
-
+        Auth::logout();
+        return redirect(url("/"));
     }
 }

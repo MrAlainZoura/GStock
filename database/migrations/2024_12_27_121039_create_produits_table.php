@@ -17,10 +17,14 @@ return new class extends Migration
                 ->constrained()
                 ->noActionOnDelete()
                 ->cascadeOnUpdate();
+            $table->foreignId('depot_id')
+                ->constrained()
+                ->noActionOnDelete()
+                ->cascadeOnUpdate();
             $table->string('libele');
             $table->string('description');
             $table->string('prix');
-            $table->integer('quatité')->nullable();
+            $table->integer('quatite')->nullable();
             $table->string('etat');
             $table->string('image')->nullable();
             $table->timestamps();

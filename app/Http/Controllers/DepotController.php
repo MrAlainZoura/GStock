@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Categorie;
 use App\Models\User;
 use App\Models\Depot;
 use Illuminate\Http\Request;
@@ -47,7 +48,7 @@ class DepotController extends Controller
         ];
 
         $depot = Depot::create($data);
-        return response()->json(['success'=>true, 'data'=>$depot]);
+        return back()->with('success','Depot ajouté avec success');
     }
 
     /**
@@ -55,8 +56,10 @@ class DepotController extends Controller
      */
     public function show(string $id)
     {
-        $depot = Depot::where("id",$id)->get();
-        return response()->json(['success'=>true, 'data'=>$depot]);
+        $depot = Depot::where("id",$id)->first();
+        $user = auth()->user();
+        $cat= Categorie::all();
+        return view('depot.show',compact('depot','user','cat'));
     }
 
     /**
