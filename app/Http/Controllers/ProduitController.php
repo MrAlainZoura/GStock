@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Approvisionnement;
 use App\Models\Produit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Storage;
 
 class ProduitController extends Controller
 {
@@ -30,32 +32,69 @@ class ProduitController extends Controller
      */
     public function store(Request $request)
     {
+        // dd($request->all());
+        $dossier = 'produits';
+
+        // Vérifier si le dossier existe, sinon le créer
+        if (!Storage::disk('public')->exists($dossier)) {
+            
+            Storage::disk('public')->makeDirectory($dossier);
+            // dd('non');
+        }
+        // dd('existe');
         $validateDate = Validator::make($request->all(),
         [
             'libele'=>'required|string|max:255',
             'marque_id'=>'required|exists:marques,id',
+            'depot_id'=>'required|exists:depots,id',
             'description'=>'required|string|max:255',
             'prix'=>'required|string|max:255',
-            'quatité'=>'required|int|max:255',
+            'quatite'=>'int|max:255',
             'etat'=>'required|string|max:255',
-            'image'=>'file|mimes:jpg, jpeg, png, gift'
+            'image'=>'file|mimes:jpg, jpeg, png, gift, jfif'
         ]);
 
         if($validateDate->fails()){
-            return $validateDate->errors();
+            return back()->with('echec',$validateDate->errors());
+
         }
+
+        $fichier = $request->file('image');
+        $type = $fichier->getClientOriginalExtension();
+
         $data = [
-            'libele'=>$request->libele,
+            'depot_id'=>$request->depot_id,
             'marque_id'=>$request->marque_id,
+            'libele'=>$request->libele,
             'description'=>$request->description,
             'prix'=>$request->prix,
-            'quatité'=>$request->quatité,
+            'quatite'=>$request->quantite,
             'etat'=>$request->etat,
-            'image'=>$request->image
+            'image'=>($request->file('image')!=null)? "$request->libele.$type":null,
         ];
-
+// dd($data);
         $produit = Produit::create($data);
-        return response()->json(['success'=>true, 'data'=>$produit]);
+        if($produit){
+            $dataApro = [
+                'user_id'=>auth()->user()->id,
+                'depot_id'=>$request->depot_id,
+                'produit_id'=>$produit->id,
+                'quantite'=>$produit->quatite,
+                'confirm'=>false,
+                'receptionUser'=>null
+            ];
+            $approvisionnement = Approvisionnement::create($dataApro);
+            if($request->file('image') != null){
+                
+                $fichier = $request->file('image')->storeAs('produits',"$produit->libele.$type",'public');
+             
+            }
+        }else{
+            return back()->with('echec',"Enregistrement n'a pas abouti !");
+
+        }
+        
+        return back()->with('success','Enregistrement reussi avec succès !');
    
     }
 

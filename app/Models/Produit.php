@@ -8,10 +8,11 @@ class Produit extends Model
 {
     protected $fillable = [
         'marque_id',
+        'depot_id',
         'libele',
         'description',
         'prix',
-        'quatité',
+        'quatite',
         'etat',
         'image'
     ];
@@ -22,5 +23,10 @@ class Produit extends Model
     public function depot(){
         return $this->belongsTo(Depot::class);
     }
+    public function user(){
+        return $this->belongsTo(User::class);
+    }
+
+
 
 }
