@@ -7,11 +7,18 @@
 
 @section('main')
 <section class="mt-10 p-20 gap-5 w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-@include('composant.card', ['image'=>'pc.jpg','description'=>'hp probook G4 Ram 4G Rom 500G processeur 2.50G i3 8th','prix'=>'232 000Fc'])
-@include('composant.card', ['image'=>'samA.jpg','description'=>'Samsung galaxy A1 ram 8 Rom 128G version 14','prix'=>'832 000Fc'])
-@include('composant.card', ['image'=>'samsung.jpg','description'=>'Samsung Galaxy A2 ram 8 Rom 256G version 14','prix'=>'532 000Fc'])
-@include('composant.card', ['image'=>'supphone.jpg','description'=>'Support telephone','prix'=>'532 000Fc'])
+<!-- @include('composant.card', ['image'=>'produit/pc.jpg','description'=>'hp probook G4 Ram 4G Rom 500G processeur 2.50G i3 8th','prix'=>'232 000Fc','depot'=>"samu"])
+@include('composant.card', ['image'=>'produit/samA.jpg','description'=>'Samsung galaxy A1 ram 8 Rom 128G version 14','prix'=>'832 000Fc','depot'=>"samu"])
+@include('composant.card', ['image'=>'produit/samsung.jpg','description'=>'Samsung Galaxy A2 ram 8 Rom 256G version 14','prix'=>'532 000Fc','depot'=>"samu"])
+@include('composant.card', ['image'=>'produit/supphone.jpg','description'=>'Support telephone','prix'=>'532 000Fc','depot'=>"samu"]) -->
+
+@foreach($produit as $key=>$value)
+@include('composant.card', ['image'=>"storage/produit/$value->image",'description'=>$value->description,'prix'=>"$value->prix $", 'depot'=>$value->depot->libele])
+@endforeach
+<!-- Pagination -->
+
 </section>
+<div class="justify-between flex p-5 gap-5">{{ $produit->links() }} </div>
 <section class="p-5 bg-gray-200">
     @if(session('echec'))
     <div id="alert-2" class="flex items-center p-4 mb-4 text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" role="alert">

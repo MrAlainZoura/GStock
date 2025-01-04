@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Depot;
+use App\Models\Produit;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -13,4 +14,10 @@ class HomeController extends Controller
         $user = auth()->user();
         return view('dashboard', compact('depot', 'user'));
     }
+    public function home(){
+        $produit = Produit::with('depot')->paginate(5);
+        return view('home', compact('produit'));
+    }
+
+    
 }
