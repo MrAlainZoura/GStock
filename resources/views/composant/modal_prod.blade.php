@@ -21,17 +21,23 @@
                 <form class="space-y-4" action="{{route($action)}}" method="post" enctype="multipart/form-data">
                     @csrf 
                     @method('post')
-                        
-                        <div class="max-w-sm mx-auto">
-                        <label for="countries" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Selectionner Marque {{$libele}}</label>
-                        <select required name="marque_id" id="countries" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                            <option selected value="">Choisir une marque</option>
-                            @foreach($tab as $k=>$v)
-                            <option value="{{$v->id}}">{{$v->libele}}</option>
-                            @endforeach
-                        </select>
+                        <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+                            <div class="mb-5">
+                                <label for="countries" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Selectionner Categorie {{$libele}}</label>
+                                <select required name="" id="categories" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                                    <option selected value="0">Choisir une categorie</option>
+                                    @foreach($tab as $k=>$v)
+                                    <option value="{{$k}}">{{$v->libele}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="mb-5" id="container_select">
+                                <label for="countries" id="label_marque" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Selectionner Marque {{$libele}}</label>
+                                <select required name="marque_id" id="countries" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                                    <option selected value="">Choisir une marque</option>
+                                </select>
+                            </div>
                         </div>
-
                     
                     <div class="hidden">
                         <input type="password" name="depot_id" value="{{$depot_id}}" placeholder="" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"  />
@@ -131,4 +137,34 @@
             imagePreview.classList.add('hidden'); // Cache l'image si aucun fichier
         }
     });
+
+
+    document.getElementById('categories').addEventListener('change', function() {
+            // Récupérer l'élément select
+            var select = document.getElementById('categories');
+            // Récupérer la valeur sélectionnée
+            const valeur = parseInt (select.value);
+            const tabCab = @json($tab)
+
+            const options = tabCab[valeur].marque
+
+            const selectElement = document.createElement('select');
+                selectElement.name='marque_id'
+                selectElement.className = "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+        // Remplir le select avec les options du tableau
+        options.forEach(option => {
+            const optionElement = document.createElement('option');
+            optionElement.value = option.id;  // Définir la valeur de l'option
+            optionElement.textContent = option.libele;  // Définir le texte affiché
+            selectElement.appendChild(optionElement);  // Ajouter l'option au select
+        });
+        const label_marque = document.getElementById('label_marque')
+        // Ajouter le select au conteneur dans le DOM
+        document.getElementById('container_select').innerHTML = '';
+
+        document.getElementById('container_select').appendChild(label_marque);
+        document.getElementById('container_select').appendChild(selectElement);
+        //    console.log(tabCab[valeur].marque, typeof(valeur), valeur)
+    });
+        
 </script>
