@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Categorie extends Model
 {
-    protected $fillable = ['libele'];
+    protected $fillable = ['libele','image'];
 
     public function marque(){
         return $this->hasMany(Marque::class);

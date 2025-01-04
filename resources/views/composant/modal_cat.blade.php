@@ -18,12 +18,21 @@
             </div>
             <!-- Modal body -->
             <div class="p-4 md:p-5">
-                <form class="space-y-4" action="{{route($action)}}" method="post">
+                <form class="space-y-4" action="{{route($action)}}" method="post" enctype="multipart/form-data">
                     @csrf 
                     @method('post')
                     <div>
                         <label for="cat" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Libele {{$libele}}</label>
                         <input type="text" name="libele" id="cat" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" placeholder="" required />
+                    </div>
+                    <div class="mb-5">
+                                                 
+                        <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white" for="file_input">Prendre une image</label>
+                        <input class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" 
+                            aria-describedby="file_input_help" 
+                            id="file_input1" type="file" name="image" accept=".jpg, .jpeg, .png, .gif, .jfif" />
+                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-300" id="file_input_help">SVG, PNG, JPG ou GIF (MAX. 800x400px).</p>
+                        <img id="imagePreview1" class="w-20 h-20 rounded" src="#" alt="Voir">
                     </div>
                     <div class="hidden">
                         <label for="pass" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Your password</label>
@@ -87,6 +96,24 @@
 ;
             newInputContainer.appendChild(newInput);
             form.appendChild(newInputContainer);
+        }
+    });
+
+    const imageInput1 = document.getElementById('file_input1');
+    const imagePreview1 = document.getElementById('imagePreview1');
+
+    imageInput1.addEventListener('change', function() {
+        const file = this.files[0];
+
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                imagePreview1.setAttribute('src', event.target.result);
+                imagePreview1.classList.remove('hidden'); // Affiche l'image
+            }
+            reader.readAsDataURL(file);
+        } else {
+            imagePreview1.classList.add('hidden'); // Cache l'image si aucun fichier
         }
     });
 </script>

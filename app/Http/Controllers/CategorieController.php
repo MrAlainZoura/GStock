@@ -6,6 +6,7 @@ use App\Models\Categorie;
 use App\Models\Marque;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Storage;
 
 class CategorieController extends Controller
 {
@@ -35,27 +36,40 @@ class CategorieController extends Controller
         [
             'libele'=>'required|string|max:255',
             'user_id'=>'required|string|max:255',
+            'image'=>'required|file|mimes:jpg, jpeg, png, gift, jfif',
             'marque'=>'array',
         ]);
 
         if($validateDate->fails()){
-            return $validateDate->errors();
-        }
+            return back()->with('echec',$validateDate->errors());
 
+        }
+        $dossier = 'cat';
+        // Vérifier si le dossier existe, sinon le créer
+        if (!Storage::disk('public')->exists($dossier)) {
+            Storage::disk('public')->makeDirectory($dossier);
+        }
+        $fichier = $request->file('image');
+        $type = $fichier->getClientOriginalExtension();
         $data = [
             'libele'=>$request->libele,
+            'image'=>($request->file('image')!=null)? "$request->libele.$type":null
         ];
 
         $cat = Categorie::create($data);
         if($cat){
+            if($request->file('image') != null){
+                $fichier = $request->file('image')->storeAs($dossier,"$cat->libele.$type",'public');
+            }
            foreach($request->marque as $k=>$v){
                 if($v!=null)
                 {
                     $marque = Marque::create(['libele'=>$v,'categorie_id'=>$cat->id]);
                 }  
            }
+           return back()->with('success',"success enregistrment");
         }
-        return back()->with('success',"success enregistrment");
+        return back()->with('echec',"Enregistrement n'a pas abouti");
     }
 
     /**

@@ -32,16 +32,11 @@ class ProduitController extends Controller
      */
     public function store(Request $request)
     {
-        // dd($request->all());
-        $dossier = 'produits';
-
+        $dossier = 'produit';
         // Vérifier si le dossier existe, sinon le créer
         if (!Storage::disk('public')->exists($dossier)) {
-            
             Storage::disk('public')->makeDirectory($dossier);
-            // dd('non');
         }
-        // dd('existe');
         $validateDate = Validator::make($request->all(),
         [
             'libele'=>'required|string|max:255',
@@ -85,9 +80,7 @@ class ProduitController extends Controller
             ];
             $approvisionnement = Approvisionnement::create($dataApro);
             if($request->file('image') != null){
-                
-                $fichier = $request->file('image')->storeAs('produits',"$produit->libele.$type",'public');
-             
+                $fichier = $request->file('image')->storeAs($dossier,"$produit->libele.$type",'public');
             }
         }else{
             return back()->with('echec',"Enregistrement n'a pas abouti !");
