@@ -1,5 +1,5 @@
 @extends('base')
-@section('title', "Tableau de bord")
+@section('title', "Accueil")
 
 @section('header')
   @include('composant.hearder', ['user_email'=>"$user->email", 'user_name'=>"$user->name"])
@@ -17,9 +17,11 @@
         @include('composant.alert_echec', ['message'=>session('echec')])
     </div>
     @endif
+    
+
     <section class="p-10 gap-5 w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
         @foreach($cat as $key=>$v)
-            @include('composant.cat', ['image'=>"$v->libele.jpg" ,'libele'=>"$v->libele",'marque'=>count($v->marque),'tab'=>$v->marque])
+            @include('composant.cat', ['image'=>"$v->image" ,'libele'=>"$v->libele",'marque'=>count($v->marque),'tab'=>$v->marque])
         @endforeach   
         
         @include('composant.modal_cat',['libele'=>'Catégorie de produit', 'action'=>"cat-pro.store",'user_id'=> $user->id ]) 
@@ -56,6 +58,8 @@
    
 
    </section>
+
+   @include('composant.sidebar')
 @endsection
 
 

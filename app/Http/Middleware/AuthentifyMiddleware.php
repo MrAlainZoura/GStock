@@ -21,4 +21,3 @@ class AuthentifyMiddleware
             return redirect(url("/"));
         }
     }
-}
