@@ -8,6 +8,9 @@
     <link rel="stylesheet" href="{{asset('build/assets/app-Bi08MZ8-.js')}}">
     <link rel="stylesheet" href="{{asset('build/assets/app-wVnth9Db.css')}}">
     <link rel="stylesheet" href="{{asset('build/manifest.json')}}">
+    
+    <script src="https://cdn.jsdelivr.net/npm/simple-datatables@9.0.3"></script>
+
 </head>
 <body>
     <header>

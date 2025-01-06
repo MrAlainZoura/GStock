@@ -54,7 +54,8 @@
         @endforeach
         
     </div>
-   
+    @include('composant.dataTable')
+
    
 
    </section>
@@ -66,3 +67,5 @@
 @section('footer')
     @include('composant.footer')
 @endsection
+
+<script src="https://cdn.jsdelivr.net/npm/simple-datatables@9.0.3"></script>
