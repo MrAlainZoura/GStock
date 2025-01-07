@@ -12,13 +12,13 @@
     <script src="https://cdn.jsdelivr.net/npm/simple-datatables@9.0.3"></script>
 
 </head>
-<body>
+<body class="max-w-screen-full">
     <header>
         <!-- @include('composant.nav') -->
          @yield('header')
     </header>
 
-    <main class="w-full bg-gray-100">
+    <main class="w-full bg-gray-100 ">
         @yield('main')
     </main>
 
