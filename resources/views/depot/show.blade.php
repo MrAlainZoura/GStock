@@ -60,7 +60,7 @@
 
    </section>
 
-   @include('composant.sidebar')
+   @include('composant.sidebar',['depot_id'=> $depot->id])
 @endsection
 
 

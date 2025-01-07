@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ApprovisionnementController;
 use App\Http\Controllers\CategorieController;
 use App\Http\Controllers\DepotController;
 use Illuminate\Support\Facades\Route;
@@ -20,4 +21,4 @@ Route::post('logout',[UserController::class, 'logout'])->name('logout')->middlew
 Route::resource('depot', DepotController::class)->middleware(AuthentifyMiddleware::class);
 Route::resource('cat-pro', CategorieController::class)->middleware(AuthentifyMiddleware::class);
 Route::resource('prod', ProduitController::class)->middleware(AuthentifyMiddleware::class);
-Route::resource('produit', ProduitController::class)->middleware(AuthentifyMiddleware::class);
+Route::get('approvisionnement/{$depot_id}', [ApprovisionnementController::class,'showDepotAppro'])->name('aproDepot'); //->middleware(AuthentifyMiddleware::class);
