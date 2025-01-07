@@ -18,7 +18,7 @@ Route::get('dashbord',[HomeController::class, 'dashboard'])->name('dashboard')->
 Route::post('login',[UserController::class, 'login'])->name('login');
 Route::post('logout',[UserController::class, 'logout'])->name('logout')->middleware(AuthentifyMiddleware::class);
 
+Route::get('approvisionnement/{depot_id}', [ApprovisionnementController::class,'showDepotAppro'])->name('aproDepot'); //->middleware(AuthentifyMiddleware::class);
 Route::resource('depot', DepotController::class)->middleware(AuthentifyMiddleware::class);
 Route::resource('cat-pro', CategorieController::class)->middleware(AuthentifyMiddleware::class);
 Route::resource('prod', ProduitController::class)->middleware(AuthentifyMiddleware::class);
-Route::get('approvisionnement/{$depot_id}', [ApprovisionnementController::class,'showDepotAppro'])->name('aproDepot'); //->middleware(AuthentifyMiddleware::class);

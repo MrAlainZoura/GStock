@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Approvisionnement;
+use App\Models\Depot;
 use Illuminate\Http\Request;
 
 class ApprovisionnementController extends Controller
@@ -36,9 +37,12 @@ class ApprovisionnementController extends Controller
      */
     public function showDepotAppro($depot_id)
     {
-        dd($depot_id);
+        // dd($depot_id);
         $appro=Approvisionnement::where("depot_id",$depot_id)->get();
-        return view("appro.index",compact("appro"));
+        $depot=Depot::where("id",$depot_id)->first();
+        $user = auth()->user();
+
+        return view("appro.index",compact("appro","user","depot"));
     }
 
     /**
