@@ -1,5 +1,5 @@
 @extends('base')
-@section('title', "Accueil")
+@section('title', "Approvisionnement $depot->libele")
 
 @section('header')
   @include('composant.hearder', ['user_email'=>"$user->email", 'user_name'=>"$user->name"])

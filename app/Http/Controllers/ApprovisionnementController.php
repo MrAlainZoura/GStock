@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Approvisionnement;
 use App\Models\Depot;
+use App\Models\Produit;
 use Illuminate\Http\Request;
 
 class ApprovisionnementController extends Controller
@@ -19,9 +20,12 @@ class ApprovisionnementController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create($depot)
     {
-        //
+        $depot=Depot::where("libele",$depot)->first();
+        $user = auth()->user();
+        $produit = Produit::orderByDesc("marque_id")->get();
+        return view("appro.create", compact("depot","user", "produit"));
     }
 
     /**
