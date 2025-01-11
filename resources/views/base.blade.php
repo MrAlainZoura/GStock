@@ -14,7 +14,6 @@
 </head>
 <body class="max-w-screen-full">
     <header>
-        <!-- @include('composant.nav') -->
          @yield('header')
     </header>
 

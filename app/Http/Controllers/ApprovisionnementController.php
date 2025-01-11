@@ -35,14 +35,11 @@ class ApprovisionnementController extends Controller
     /**
      * Display the specified resource.
      */
-    public function showDepotAppro($depot_id)
+    public function showDepotAppro($depot)
     {
-        // dd($depot_id);
-        $appro=Approvisionnement::where("depot_id",$depot_id)->get();
-        $depot=Depot::where("id",$depot_id)->first();
+        $depot=Depot::where("libele",$depot)->first();
         $user = auth()->user();
-
-        return view("appro.index",compact("appro","user","depot"));
+        return view("appro.index",compact("user","depot"));
     }
 
     /**

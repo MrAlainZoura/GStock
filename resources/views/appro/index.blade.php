@@ -19,22 +19,15 @@
     @endif
     
 
-    <section class="p-10 gap-5 w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
+    <section class="p-10 gap-5 w-full">
      
-        
+        @include('composant.dataTableAppro', ['data'=>$depot->approvisionnement])
+       
     </section>
-    <section class="p-10">
-   <div class="title"> 
-       <h1 class="mb-4 text-3xl font-extrabold text-gray-900 dark:text-white md:text-5xl lg:text-6xl"><span class="text-transparent bg-clip-text bg-gradient-to-r to-orange-600 from-blue-400">Liste d'Approvisionnement de produit DEpotName </span></h1>
-    </div> 
+    
 
-
-   
-
-   </section>
-
-   @include('composant.sidebar',['depot_id'=> $depot->id])
-@endsection
+    @include('composant.sidebar',['depot'=> $depot->libele])
+    @endsection
 
 
 @section('footer')
