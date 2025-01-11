@@ -15,4 +15,7 @@ class Depot extends Model
     public function produit(){
         return $this->hasMany(Produit::class);
     }
+    public function approvisionnement(){
+        return $this->hasMany(Approvisionnement::class);
+    }
 }

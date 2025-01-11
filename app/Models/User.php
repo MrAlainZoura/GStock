@@ -33,6 +33,9 @@ class User extends Authenticatable
     public function depot(){
         return $this->hasMany(Depot::class);
     }
+    public function approvisionnement(){
+        return $this->hasMany(Approvisionnement::class);
+    }
 
     /**
      * The attributes that should be hidden for serialization.

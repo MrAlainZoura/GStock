@@ -12,7 +12,8 @@ class Approvisionnement extends Model
         'produit_id',
         'quantite',
         'confirm',
-        'receptionUser'
+        'receptionUser',
+        'origine'
     ];
 
     public function user(){
@@ -21,4 +22,8 @@ class Approvisionnement extends Model
     public function depot(){
         return $this->belongsTo(Depot::class);
     }
+    public function produit(){
+        return $this->belongsTo(Produit::class);
+    }
+
 }
