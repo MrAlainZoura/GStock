@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Approvisionnement;
 use App\Models\Depot;
 use App\Models\Produit;
+use App\Models\ProduitDepot;
 use Illuminate\Http\Request;
+use App\Models\Approvisionnement;
+use Illuminate\Support\Facades\Validator;
 
 class ApprovisionnementController extends Controller
 {
@@ -24,7 +26,7 @@ class ApprovisionnementController extends Controller
     {
         $depot=Depot::where("libele",$depot)->first();
         $user = auth()->user();
-        $produit = Produit::orderByDesc("marque_id")->get();
+        $produit = Produit::orderByDesc("marque_id")->with('marque')->get();
         return view("appro.create", compact("depot","user", "produit"));
     }
 
@@ -33,7 +35,44 @@ class ApprovisionnementController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        
+        $validateDate = Validator::make($request->all(),
+        [
+            'produits'=>'required',
+            'depot_id'=>'required|exists:depots,id',
+            'user_id'=>'required|exists:users,id',
+        ]);
+
+        if($validateDate->fails()){
+            return back()->with('echec',$validateDate->errors());
+
+        }
+        foreach($request->produits as $key => $value){
+            $findProduit = Produit::where('id',$key)->first();
+            if($findProduit != null){
+                $dataApro =  [
+                    'user_id' =>$request->user_id,
+                    'depot_id' =>$request->depot_id,
+                    'produit_id' =>$key,
+                    'quantite' =>$value
+                ];
+                $createAppro = Approvisionnement::createOrFirst($dataApro);
+                if($createAppro){
+                    $findDepotProduit = ProduitDepot::where('depot_id',$request->depot_id)->where('produit_id',$key)->first();
+                    if($findDepotProduit != null){
+                        $setQt =$value + $findDepotProduit->quantite;
+                        $findDepotProduit->update(['quantite'=> $setQt]);
+                    }else{
+                        $dataDepotProduit = ['depot_id'=>$request->depot_id,
+                                            'produit_id'=>$key,
+                                            'quantite'=>$value] ;
+                        $createProduit = ProduitDepot::createOrFirst($dataDepotProduit);
+                    }
+
+                }
+            }
+        }
+        return back()->with('success',"Approvisionnement effectué avec succcès");
     }
 
     /**
