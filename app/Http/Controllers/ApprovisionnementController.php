@@ -56,7 +56,7 @@ class ApprovisionnementController extends Controller
                     'produit_id' =>$key,
                     'quantite' =>$value
                 ];
-                $createAppro = Approvisionnement::createOrFirst($dataApro);
+                $createAppro = Approvisionnement::create($dataApro);
                 if($createAppro){
                     $findDepotProduit = ProduitDepot::where('depot_id',$request->depot_id)->where('produit_id',$key)->first();
                     if($findDepotProduit != null){
@@ -82,7 +82,8 @@ class ApprovisionnementController extends Controller
     {
         $depot=Depot::where("libele",$depot)->first();
         $user = auth()->user();
-        return view("appro.index",compact("user","depot"));
+        $appro = Approvisionnement::all()->count();
+        return view("appro.index",compact("user","depot","appro"));
     }
 
     /**

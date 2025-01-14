@@ -8,11 +8,9 @@ class Produit extends Model
 {
     protected $fillable = [
         'marque_id',
-        'depot_id',
         'libele',
         'description',
         'prix',
-        'quatite',
         'etat',
         'image'
     ];
@@ -20,12 +18,7 @@ class Produit extends Model
     public function marque(){
         return $this->belongsTo(Marque::class);
     }
-    public function depot(){
-        return $this->belongsTo(Depot::class);
-    }
-    public function user(){
-        return $this->belongsTo(User::class);
-    }
+
     public function approvisionnement(){
         return $this->hasMany(Approvisionnement::class);
     }

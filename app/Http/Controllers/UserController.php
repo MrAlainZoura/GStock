@@ -145,7 +145,8 @@ class UserController extends Controller
         $data = ['email'=>$request->email, 'password'=>$request->password];
         if(Auth::attempt($data)){
             $request->session()->regenerate();
-            return to_route('dashboard'); 
+            // return to_route('dashboard'); 
+            return redirect()->intended('dashbord');
         }
        return back()->with('echec','email ou mot de passe incorrect');
     }

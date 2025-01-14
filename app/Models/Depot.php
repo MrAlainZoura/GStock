@@ -12,9 +12,6 @@ class Depot extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function produit(){
-        return $this->hasMany(Produit::class);
-    }
     public function approvisionnement(){
         return $this->hasMany(Approvisionnement::class);
     }

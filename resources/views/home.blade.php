@@ -13,7 +13,7 @@
 @include('composant.card', ['image'=>'produit/supphone.jpg','description'=>'Support telephone','prix'=>'532 000Fc','depot'=>"samu"]) -->
 
 @foreach($produit as $key=>$value)
-@include('composant.card', ['image'=>"storage/produit/$value->image",'description'=>$value->description,'prix'=>"$value->prix $", 'depot'=>$value->depot->libele])
+@include('composant.card', ['image'=>"storage/produit/$value->image",'description'=>$value->description,'prix'=>"$value->prix $", 'depot'=>"ujisha"])
 @endforeach
 <!-- Pagination -->
 
