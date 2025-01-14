@@ -43,31 +43,31 @@
         <tr>
             <td class="font-medium text-gray-900  dark:text-white">
                 <div class="flex gap-2 sm:bloc">
-                    <img class="w-10 h-10 rounded" src="{{asset('storage/produit/'.$item->image)}}" alt="Small avatar">
-                    {{$item->libele}} <br/>
-                    {{$item->etat}}
+                    <img class="w-10 h-10 rounded" src="{{asset('storage/produit/'.$item->produit->image)}}" alt="Small avatar">
+                    {{$item->produit->libele}} <br/>
+                    {{$item->produit->etat}}
                 </div>
             </td>
             <td >
-                {{$item->marque->categorie->libele}}
-                {{$item->marque->libele}}
+                {{$item->produit->marque->categorie->libele}}
+                {{$item->produit->marque->libele}}
             </td>
             <td>
                 
-            {{$val->quatite}} 
-                    @if($item->quatite >=2 )
+            {{$item->quantite}} 
+                    @if($item->quantite >=2 )
                     pièces
-                    @elseif ($val->quatite==null) 
+                    @elseif ($item->quantite==null) 
                     0 pièce
                     @else
                     pièce
                     @endif
                     <br/>
-                {{$item->prix}} $
+                {{$item->produit->prix}} $
             </td>
             <td > 
                 <div class="max-w-sm bg-red-100">
-                    {{$item->description}}
+                    {{$item->produit->description}}
                 </div> 
             </td>
            

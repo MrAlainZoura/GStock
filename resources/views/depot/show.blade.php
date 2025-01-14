@@ -28,36 +28,13 @@
         @include('composant.modal_prod',['libele'=>'Produit', 'action'=>"prod.store",'depot_id'=> $depot->id, 'tab'=>$cat ]) 
     </section>
     <section class="p-10">
-   <!-- {{$depot->produit}} -->
-   <div class="title"> 
+
+  
+    <div class="title"> 
        <h1 class="mb-4 text-3xl font-extrabold text-gray-900 dark:text-white md:text-5xl lg:text-6xl"><span class="text-transparent bg-clip-text bg-gradient-to-r to-orange-600 from-blue-400">Liste de produit de {{$depot->libele}}</span></h1>
     </div> 
-    <div class="p-2 gap-5 w-full grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-        <!-- @foreach($depot->produit as $k=>$val)
-
-        <div class="flex items-center gap-4 border border-blue-300 rounded-lg">
-            <img class="w-20 h-20 rounded" src="{{asset('storage/produit/'.$val->image)}}" alt="Large avatar">
-            <div class="font-medium dark:text-white">
-                <div>{{$val->libele}}</div>
-                <div>Marque {{$val->marque->libele}}</div>
-                <div class="text-sm text-gray-500 dark:text-gray-400">{{$val->prix}} $</div>
-                <div class="text-sm text-gray-500 dark:text-gray-400">
-                    {{$val->quatite}} 
-                    @if($val->quatite >=2 )
-                    pièces
-                    @else 
-                    pièce
-                    @endif
-                </div>
-            </div>
-        </div>
-        @endforeach -->
-        
-    </div>
-    @include('composant.dataTable', ['data'=>$depot->produit])
-
    
-
+    @include('composant.dataTable',['data'=>$depot->produitDepot])
    </section>
 
    @include('composant.sidebar',['depot'=> $depot->libele])

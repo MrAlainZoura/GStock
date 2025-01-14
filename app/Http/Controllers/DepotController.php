@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Categorie;
 use App\Models\User;
 use App\Models\Depot;
+use App\Models\ProduitDepot;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -59,7 +60,8 @@ class DepotController extends Controller
         $depot = Depot::where("id",$id)->first();
         $user = auth()->user();
         $cat= Categorie::all();
-        return view('depot.show',compact('depot','user','cat'));
+        $prodDepot = ProduitDepot::where("depot_id",$id)->with('produit')->get();
+        return view('depot.show',compact('prodDepot','depot','user','cat'));
     }
 
     /**
