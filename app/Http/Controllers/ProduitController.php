@@ -41,10 +41,8 @@ class ProduitController extends Controller
         [
             'libele'=>'required|string|max:255',
             'marque_id'=>'required|exists:marques,id',
-            'depot_id'=>'required|exists:depots,id',
             'description'=>'required|string|max:255',
             'prix'=>'required|string|max:255',
-            'quatite'=>'int|max:255',
             'etat'=>'required|string|max:255',
             'image'=>'file|mimes:jpg, jpeg, png, gift, jfif'
         ]);
@@ -58,23 +56,21 @@ class ProduitController extends Controller
         $type = $fichier->getClientOriginalExtension();
 
         $data = [
-            'depot_id'=>$request->depot_id,
             'marque_id'=>$request->marque_id,
             'libele'=>$request->libele,
             'description'=>$request->description,
             'prix'=>$request->prix,
-            'quatite'=>$request->quantite,
             'etat'=>$request->etat,
-            'image'=>($request->file('image')!=null)? "$request->libele.$type":null,
+            'image'=>($request->file('image')!=null)? "$request->libele.$type":"prodDefaut.JPEG",
         ];
 // dd($data);
         $produit = Produit::create($data);
-        if($produit){
+        if($produit && $request->quantite != null){
             $dataApro = [
                 'user_id'=>auth()->user()->id,
                 'depot_id'=>$request->depot_id,
                 'produit_id'=>$produit->id,
-                'quantite'=>$produit->quatite,
+                'quantite'=>$request->quantite,
                 'confirm'=>false,
                 'receptionUser'=>null
             ];

@@ -61,7 +61,8 @@
                 </div>
             </td>
             <td >
-                {{$item->user->name}}
+                {{$item->user->name}} <br/>
+                {{$item->created_at}}
             </td>
             <td >
                 @if ($item->receptionUser==null)
@@ -83,6 +84,8 @@
                 <span class="sr-only">Confirmé</span>
                 </span>
                 {{$item->receptionUser}}
+                <br/>
+                {{$item->update_at}}
                 @endif
             </td>
             <td>
@@ -97,7 +100,7 @@
                 <div class="max-w-sm bg-red-100">
                     {{$item->produit->libele}}
                 </div>
-                <button id="dropdownMenuIconButton{{$item->id}}" data-dropdown-toggle="dropdownDots{{$item->id}}" class="inline-flex items-center p-2 text-sm font-medium text-center text-gray-900 bg-white rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none dark:text-white focus:ring-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-600" type="button">
+                <button  title="{{$item->produit->libele}}" id="dropdownMenuIconButton{{$item->id}}" data-dropdown-toggle="dropdownDots{{$item->id}}" class="inline-flex items-center p-2 text-sm font-medium text-center text-gray-900 bg-white rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none dark:text-white focus:ring-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-600" type="button">
                     <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 4 15">
                     <path d="M3.5 1.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm0 6.041a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm0 5.959a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z"/>
                     </svg>

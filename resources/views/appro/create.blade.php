@@ -104,7 +104,7 @@ function renderOptions(options) {
 
   options.forEach((user,indice) => {
     newHtml += `<div
-      onclick="selectOption('${user.marque.libele}', '${user.id}', '${indice}')"
+      onclick="selectOption('${user.marque.libele} ${user.libele}', '${user.id}', '${indice}')"
       class="px-5 py-3 border-b border-gray-200 text-stone-600 cursor-pointer hover:bg-slate-100 transition-colors"
     >
       ${user.marque.libele} ${user.libele}
