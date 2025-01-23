@@ -18,6 +18,7 @@ return new class extends Migration
                 ->cascadeOnUpdate();
             $table->string('postnom')->nullable();
             $table->string('prenom')->nullable();
+            $table->string('image')->nullable();
         });
     }
 

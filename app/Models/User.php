@@ -30,7 +30,8 @@ class User extends Authenticatable
         'tel',
         'depot_id',
         'postnom',
-        'prenom'
+        'prenom',
+        'image'
     ];
 
     public function depot(){

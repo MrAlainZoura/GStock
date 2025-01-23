@@ -61,7 +61,7 @@ class ProduitController extends Controller
             'description'=>$request->description,
             'prix'=>$request->prix,
             'etat'=>$request->etat,
-            'image'=>($request->file('image')!=null)? "$request->libele.$type":"prodDefaut.JPEG",
+            'image'=>($request->file('image')!=null)? "$request->libele.$type":null,
         ];
 // dd($data);
         $produit = Produit::create($data);

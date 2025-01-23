@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Depot;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
@@ -15,8 +17,8 @@ class UserController extends Controller
      */
     public function index()
     {
-        $user = User::latest()->get();
-        return response()->json(['success'=>true, 'data'=>$user]);
+        $user = User::orderBy("depot_id")->with('depot')->get();
+        return view('users.index', compact('user'));
     }
 
     /**
@@ -24,7 +26,8 @@ class UserController extends Controller
      */
     public function create()
     {
-      return view('users.create');
+        $depot = Depot::orderBy('libele')->get();
+        return view('users.create',compact('depot'));
     }
 
     /**
@@ -32,39 +35,57 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        dd($request->all());
+        // dd($request->all());
         $validateDate = Validator::make($request->all(),
         [
             'name'=>'required',
             'email'=>'required|email|max:255|unique:users',
-            'password'=>'required',
             'genre'=>'string',
             'naissance'=>'string',
             'fonction'=>'string',
             'niveauEtude'=>'string',
             'option'=>'string',
             'adresse'=>'string',
-            'tel'=>'string'
+            'tel'=>'string',
+            'depot_id'=>'required|exists:depots,id',
+            'postnom'=>'string',
+            'prenom'=>'string',
+            'image'=>'file|mimes:jpg, jpeg, png, gift, jfif'
         ]);
 
         if($validateDate->fails()){
-            return $validateDate->errors();
+            return back()->with('echec',$validateDate->errors());
         }
+        $fichier = $request->file('image');
+        $type = $fichier->getClientOriginalExtension();
         $data = [
             'name'=>$request->name,
             'email'=>$request->email,
-            'password'=>Hash::make($request->password),
+            'password'=>Hash::make('0000'),
             'genre'=>$request->genre,
             'naissance'=>$request->naissance,
             'fonction'=>$request->fonction,
             'niveauEtude'=>$request->niveauEtude,
             'option'=>$request->option,
             'adresse'=>$request->adresse,
-            'tel'=>$request->tel
+            'tel'=>$request->tel,
+            'depot_id'=>$request->depot_id,
+            'postnom'=>$request->postnom,
+            'prenom'=>$request->teprenoml,
+            'image'=>($request->file('image')!=null)? "$request->name$request->postnom.$type":null,
         ];
 
         $user = User::create($data);
-        return response()->json(['success'=>true, 'data'=>$user]);
+        if($user){
+            $dossier = 'users';
+        if (!Storage::disk('public')->exists($dossier)) {
+            Storage::disk('public')->makeDirectory($dossier);
+        }if($request->file('image') != null){
+            $fichier = $request->file('image')->storeAs($dossier,"$user->name$user->postnom.$type",'public');
+        }
+        return back()->with('success',"Enregistrement de $user->name $user->postnom a reussi !");
+        }
+        return back()->with('echec',"Une erreur inattendue s'est produite reessayer plus tard");
     }
 
     /**
