@@ -36,7 +36,6 @@ class DepotController extends Controller
         
         $validateDate = Validator::make($request->all(),
         [
-            'user_id'=>'required|exists:users,id',
             'libele'=>'required|string|max:255',
         ]);
 
@@ -44,7 +43,6 @@ class DepotController extends Controller
             return $validateDate->errors();
         }
         $data = [
-            'user_id'=>$request->user_id,
             'libele'=>$request->libele,
         ];
 
