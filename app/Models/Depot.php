@@ -9,7 +9,7 @@ class Depot extends Model
     protected $fillable = ['user_id','libele'];
 
     public function user(){
-        return $this->belongsTo(User::class);
+        return $this->hasMany(User::class);
     }
 
     public function approvisionnement(){

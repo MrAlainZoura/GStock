@@ -27,11 +27,14 @@ class User extends Authenticatable
         'niveauEtude',
         'option',
         'adresse',
-        'tel'
+        'tel',
+        'depot_id',
+        'postnom',
+        'prenom'
     ];
 
     public function depot(){
-        return $this->hasMany(Depot::class);
+        return $this->belongsTo(Depot::class);
     }
     public function approvisionnement(){
         return $this->hasMany(Approvisionnement::class);
