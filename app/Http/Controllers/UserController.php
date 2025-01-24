@@ -91,18 +91,26 @@ class UserController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(string $userShow)
     {
-        $user = User::where("id",$id)->get();
-        return response()->json(['success'=>true, 'data'=>$user]);
-    }
+        $string = $userShow;
+        $id = "";
+        $name="";
+        $parts = explode(" ", $string);
+        if (count($parts) == 2) {
+            $name = $parts[0];
+            $id = $parts[1]/6789012345;
+        }
+                $user= User::where("id","=", $id)->where('name',$name)->first();
+                return response()->json(['success'=>true, 'data'=>$user]);
+            }
 
     /**
      * Show the form for editing the specified resource.
      */
     public function edit(string $id)
     {
-        //
+        return response()->json(['success'=>true,'data'=>'Edition encours...']);
     }
 
     /**
@@ -149,6 +157,8 @@ class UserController extends Controller
      */
     public function destroy(string $id)
     {
+        return response()->json(['success'=>true,'data'=>'Supression encours...']);
+
         $delete = User::where('id',$id)->delete();
         if(!$delete){
             return response()->json(['success'=>true, 'data'=>'echec de suppression']);
