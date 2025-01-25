@@ -102,15 +102,24 @@ class UserController extends Controller
             $id = $parts[1]/6789012345;
         }
                 $user= User::where("id","=", $id)->where('name',$name)->first();
-                return response()->json(['success'=>true, 'data'=>$user]);
+                return back()->with('success',"Voir plus, Bientot disponible !");
             }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(string $userEdit)
     {
-        return response()->json(['success'=>true,'data'=>'Edition encours...']);
+        $string = $userEdit;
+        $id = "";
+        $name="";
+        $parts = explode(" ", $string);
+        if (count($parts) == 2) {
+            $name = $parts[0];
+            $id = $parts[1]/6789012345;
+        }
+        $user= User::where("id","=", $id)->where('name',$name)->first();
+        return back()->with('success',"Edition, Bientot disponible !");
     }
 
     /**
@@ -155,15 +164,24 @@ class UserController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(string $userDelete)
     {
-        return response()->json(['success'=>true,'data'=>'Supression encours...']);
-
-        $delete = User::where('id',$id)->delete();
-        if(!$delete){
-            return response()->json(['success'=>true, 'data'=>'echec de suppression']);
+        $string = $userDelete;
+        $id = "";
+        $name="";
+        $parts = explode(" ", $string);
+        if (count($parts) == 2) {
+            $name = $parts[0];
+            $id = $parts[1]/6789012345;
         }
-        return response()->json(['success'=>true, 'data'=>'Suppression reussie!']);
+        $user= User::where("id","=", $id)->where('name',$name)->first();
+        return back()->with('success',"Bientot disponible !");
+
+        // $delete = User::where('id',$id)->delete();
+        // if(!$delete){
+        //     return response()->json(['success'=>true, 'data'=>'echec de suppression']);
+        // }
+        // return response()->json(['success'=>true, 'data'=>'Suppression reussie!']);
     }
 
     public function login(Request $request){

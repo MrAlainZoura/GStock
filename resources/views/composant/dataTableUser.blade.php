@@ -77,7 +77,7 @@
             {{$item->depot->libele}}  
             </td>
             <td> 
-                @include('composant.actionLink', ['seeRoute'=>'user.show','seeParam'=>"$item->name ".$item->id*6789012345, 'deleteRoute'=>"user.destroy",'deleteParam'=>"$item->name ".$item->id*6789012345, 'editeRoute'=>"user.edit",'editParam'=>"$item->name ".$item->id*6789012345])
+                @include('composant.actionLink', ['itemName'=>$item->name,'seeRoute'=>'user.show','seeParam'=>"$item->name ".$item->id*6789012345, 'deleteRoute'=>"user.destroy",'deleteParam'=>"$item->name ".$item->id*6789012345, 'editeRoute'=>"user.edit",'editParam'=>"$item->name ".$item->id*6789012345])
             </td>
            
         </tr>
@@ -86,6 +86,7 @@
     </tbody>
 </table>
 
+@include('composant.modalDelete')
 
 
 <script>
@@ -99,6 +100,18 @@ if (document.getElementById("search-table") && typeof simpleDatatables.DataTable
         sortable: true
     });
 }
+   //modal suppression item
+    const deleteLink = document.querySelectorAll('#linkDelete');
 
-
+    deleteLink.forEach(link => {
+    link.addEventListener('click', (event) => {
+    event.preventDefault();
+    const hrefClicked = event.currentTarget.getAttribute('href');
+    const formDelete =document.getElementById('deleteForm');
+    const textDeleteItem =document.getElementById('textDeleteItem');
+    const itemName = event.currentTarget.getAttribute('itemName') ;
+    textDeleteItem.textContent= `Confirmer la suppression de (d') ${itemName}`;
+    formDelete.setAttribute('action',hrefClicked);
+  });
+});
 </script>
