@@ -7,6 +7,8 @@ use App\Models\Produit;
 use App\Models\ProduitDepot;
 use Illuminate\Http\Request;
 use App\Models\Approvisionnement;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class ApprovisionnementController extends Controller
@@ -89,9 +91,38 @@ class ApprovisionnementController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Approvisionnement $approvisionnement)
+    public function edit(string $appro)
     {
         //
+    }
+
+    public function show(string $appro){
+
+    }
+    public function confirm(string $appro){
+
+        $date = Carbon::now("Africa/Kinshasa");
+        $string = $appro;
+        $id = "";
+        $name="";
+        $libele="";
+        // dd($appro);
+        $parts = explode("adft", $string);
+        $size = count($parts);
+        $prod_id = $parts[0]/56745264509;
+        $id = $parts[1]/6789012345;
+        $userName = Auth::user()->name;
+        $userPrenom = (Auth::user()->prenom!=null) ? Auth::user()->prenom : Auth::user()->postnom;
+        $data=[
+            'confirm'=>true,
+            'produit_id'=>(int)$prod_id, 
+            'receptionUser'=> "$userName $userPrenom",
+            'updated_at'=>$date->format('Y-m-d H:i:s')];
+        $updateConfirm = Approvisionnement::where('id',$id)->where('produit_id',$prod_id)->where('confirm',false)->update($data);
+        if($updateConfirm){
+        return back()->with('success',"Approvisionnement confirmé avec succcès par $userName $userPrenom");
+        }
+        return back()->with('echec',"Desolé une erreur inattendue s'est produite, réessayez plus tard");
     }
 
     /**
