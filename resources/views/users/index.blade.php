@@ -26,7 +26,7 @@
     </section>
     
 
-    @include('composant.sidebar',['depot'=> "null"])
+    @include('composant.sidebar',['depot'=> session('depot')])
     @endsection
 
 

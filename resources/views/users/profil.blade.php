@@ -187,7 +187,7 @@
 
     </section>
 
-        @include('composant.sidebar',['depot'=> "NULL"])
+        @include('composant.sidebar',['depot'=>session('depot')])
     @endsection
 
 
