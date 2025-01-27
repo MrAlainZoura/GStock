@@ -65,26 +65,30 @@ class ProduitController extends Controller
         ];
 // dd($data);
         $produit = Produit::create($data);
-        if($produit && $request->quantite != null){
-            $dataApro = [
-                'user_id'=>auth()->user()->id,
-                'depot_id'=>$request->depot_id,
-                'produit_id'=>$produit->id,
-                'quantite'=>$request->quantite,
-                'confirm'=>false,
-                'receptionUser'=>null
-            ];
-            $approvisionnement = Approvisionnement::create($dataApro);
-            if($request->file('image') != null){
-                $fichier = $request->file('image')->storeAs($dossier,"$produit->libele.$type",'public');
-            }
-        }else{
-            return back()->with('echec',"Enregistrement n'a pas abouti !");
-
+        if($request->file('image') != null){
+            $fichier = $request->file('image')->storeAs($dossier,"$produit->libele.$type",'public');
         }
-        
-        return back()->with('success','Enregistrement reussi avec succès !');
-   
+        if($produit){
+
+            if($request->quantite != null){
+                $dataApro = [
+                    'user_id'=>auth()->user()->id,
+                    'depot_id'=>$request->depot_id,
+                    'produit_id'=>$produit->id,
+                    'quantite'=>$request->quantite,
+                    'confirm'=>false,
+                    'receptionUser'=>null
+                ];
+                $approvisionnement = Approvisionnement::create($dataApro);
+                
+            }else{
+                return back()->with('success',"Enregistrement reussi sans approvisionnement !");
+            }
+            
+            return back()->with('success','Enregistrement reussi avec succès plus approvisionnement !');
+            
+        }
+        return back()->with('echec',"Enregistrement n'a pas abouti !");
     }
 
     /**

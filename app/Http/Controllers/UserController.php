@@ -118,14 +118,15 @@ class UserController extends Controller
             $name = $parts[0];
             $id = $parts[1]/6789012345;
         }
+        $depot = Depot::orderBy('libele')->get();
         $user= User::where("id","=", $id)->where('name',$name)->first();
-        return back()->with('success',"Edition, Bientot disponible !");
+        return view('users.profil',compact('user','depot'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, string $user)
     {
         $validateDate = Validator::make($request->all(),
         [
@@ -138,11 +139,29 @@ class UserController extends Controller
             'option'=>'string',
             'adresse'=>'string',
             'tel'=>'string',
-            'id'=>'required'
+            'depot_id'=>'required|exists:depots,id',
+            'postnom'=>'string',
+            'image'=>'file|mimes:jpg, jpeg, png, gift, jfif'
         ]);
 
         if($validateDate->fails()){
-            return $validateDate->errors();
+            return back()->with('echec',$validateDate->errors());
+        }
+        $id =$user/652062511003;
+        $findUser = User::where('id', $id)->first();
+        $image = $findUser->image;
+
+        $dossier="users";
+        $fichier = $request->file('image');
+        $type = ($request->file('image')!=null)?$fichier->getClientOriginalExtension():null;
+
+        if($findUser->name!= $request->name || $request->postnom != $findUser->postnom) {
+            $image=($request->file('image')!=null)? "$request->name$request->postnom.$type":$findUser->image;
+            Storage::move("public/$dossier/$findUser->image", "public/$dossier/$image");
+        }
+        if($request->file("image")!=null) {
+            Storage::delete("public/$dossier/$findUser->image");
+            $fichier = $request->file('image')->storeAs($dossier,$image,'public');
         }
         $data = [
             'name'=>$request->name,
@@ -153,14 +172,40 @@ class UserController extends Controller
             'niveauEtude'=>$request->niveauEtude,
             'option'=>$request->option,
             'adresse'=>$request->adresse,
-            'tel'=>$request->tel
+            'tel'=>$request->tel,
+            'depot_id'=>$request->depot_id,
+            'postnom'=>$request->postnom,
+            'prenom'=>$request->teprenoml,
+            'image'=>$image,
         ];
 
         $data2 = array_filter($data, function($val){return !is_null($val);});
-        $user = User::where('id', $id)->update($data2);
-        return response()->json(['success'=>true, 'data'=>User::find($id)]);
+        $userUpdate = User::where('id', $id)->update($data2);
+        if($userUpdate) {
+            return back()->with('success',"Profil mis à jour avec succès !");
+        }
+        return back()->with('echec',"Aucune modification apportée à ce profil !");
     }
-
+    public function updataPass(Request $request, $user){
+        $id = $user/652062511003;
+        $getPassword = User::where("id", $id)->first();
+        if (Hash::check($request->holdPass,  $getPassword->password)){
+            $updatePass = $getPassword->update(["password"=>Hash::make($request->password)]);
+            if($updatePass){
+                return back()->with('success',"Mot de passe mis à jour avec succès !");
+            }
+        }
+        return back()->with('echec',"Ancien mot de passe incorrect !");
+    }
+    public function resetPass($user){
+        $id =$user/652062511003;
+        $getPassword = User::where("id", $id)->first();
+        $updatePass = $getPassword->update(["password"=>Hash::make('0000')]);
+        if($updatePass){
+            return back()->with('success',"Mot de passe reinitialisé avec succès !");
+        }
+        
+    }
     /**
      * Remove the specified resource from storage.
      */

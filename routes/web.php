@@ -17,6 +17,8 @@ Route::get('dashbord',[HomeController::class, 'dashboard'])->name('dashboard')->
 
 Route::post('login',[UserController::class, 'login'])->name('login');
 Route::post('logout',[UserController::class, 'logout'])->name('logout')->middleware(AuthentifyMiddleware::class);
+Route::put('update-password-user/{user}',[UserController::class, 'updataPass'])->name('updataPass')->middleware(AuthentifyMiddleware::class);
+Route::put('reset-password-user/{user}',[UserController::class, 'resetPass'])->name('resetPass')->middleware(AuthentifyMiddleware::class);
 
 Route::resource('user', UserController::class)->middleware(AuthentifyMiddleware::class);;
 Route::get('approvisionnement/{depot}', [ApprovisionnementController::class,'showDepotAppro'])->name('aproDepot')->middleware( AuthentifyMiddleware::class);
