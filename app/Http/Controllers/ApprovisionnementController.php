@@ -118,7 +118,12 @@ class ApprovisionnementController extends Controller
             'produit_id'=>(int)$prod_id, 
             'receptionUser'=> "$userName $userPrenom",
             'updated_at'=>$date->format('Y-m-d H:i:s')];
-        $updateConfirm = Approvisionnement::where('id',$id)->where('produit_id',$prod_id)->where('confirm',false)->update($data);
+        $updateConfirm = Approvisionnement::where('id',$id)->where('produit_id',$prod_id)->where('confirm',false)->first();
+        if($updateConfirm->user_id==Auth::user()->id)
+        {
+            return back()->with('echec',"Desolé, vous ne pouvez pas confirmé votre prore approvisionnement");
+        }
+        $updateConfirm->update($data);
         if($updateConfirm){
         return back()->with('success',"Approvisionnement confirmé avec succcès par $userName $userPrenom");
         }

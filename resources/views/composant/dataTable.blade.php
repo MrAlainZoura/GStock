@@ -43,7 +43,11 @@
         <tr>
             <td class="font-medium text-gray-900  dark:text-white">
                 <div class="flex gap-2 sm:bloc">
-                    <img class="w-10 h-10 rounded" src="{{asset('storage/produit/'.$item->produit->image)}}" alt="Small avatar">
+                    @if ($item->produit->image == null)
+                        <img class="w-10 h-10 rounded" src="{{asset('produit/prodDefaut.jpeg')}}" alt="Produit">
+                    @else
+                        <img class="w-10 h-10 rounded" src="{{asset('storage/produit/'.$item->produit->image)}}" alt="Produit">
+                    @endif
                     {{$item->produit->libele}} <br/>
                     {{$item->produit->etat}}
                 </div>
