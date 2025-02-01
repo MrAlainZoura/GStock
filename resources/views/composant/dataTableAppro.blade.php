@@ -63,14 +63,15 @@
                     @if ($item->origine==null)
                         Fournisseur
                     @else
-                    {{$item->rigine}}
+                    Transfert N°<br/>
+                    {{$item->origine}}
                     @endif
                     
                 </div>
             </td>
             <td >
-                {{$item->user->name}} <br/>
-                {{$item->created_at}}
+                {{$item->created_at}}<br/>
+                {{$item->user->name}}   
             </td>
             <td >
                 @if ($item->receptionUser==null)
