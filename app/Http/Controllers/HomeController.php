@@ -15,7 +15,7 @@ class HomeController extends Controller
         return view('dashboard', compact('depot', 'user'));
     }
     public function home(){
-        $produit = Produit::latest()->paginate(5);
+        $produit = Produit::latest()->paginate(10);
         return view('home', compact('produit'));
     }
 
