@@ -21,5 +21,9 @@ class Transfert extends Model
         public function depot(){
             return $this->belongsTo(Depot::class);
         }
+
+        public function produitTransfert(){
+            return $this->hasMany(ProduitTransfert::class);
+        }
    
 }

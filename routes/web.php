@@ -35,6 +35,7 @@ Route::post('transfert/{depot}/store', [TransfertController::class,'store'])->na
 Route::post('transfert/{transfert}/confirmation', [TransfertController::class,'confirm'])->name('transConfirm')->middleware( AuthentifyMiddleware::class);
 Route::get('transfert/{transfert}/show', [TransfertController::class,'show'])->name('transShow')->middleware( AuthentifyMiddleware::class);
 Route::get('transfert/{transfert}/edit', [TransfertController::class,'edit'])->name('transEdit')->middleware( AuthentifyMiddleware::class);
+Route::delete('transfert/{transfert}/delete', [TransfertController::class,'destroy'])->name('transDelete')->middleware( AuthentifyMiddleware::class);
 
 Route::resource('depot', DepotController::class)->middleware(AuthentifyMiddleware::class);
 Route::resource('cat-pro', CategorieController::class)->middleware(AuthentifyMiddleware::class);

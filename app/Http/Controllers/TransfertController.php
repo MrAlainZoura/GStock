@@ -123,21 +123,22 @@ class TransfertController extends Controller
      * Display the specified resource.
      */
     public function showDepotTrans($depot){
-        // $transfert = Deff::where("",$depot)->first();
-        return $depot;
+        $findDepotId = Depot::where('libele',$depot)->first();
+        $findTransDepot = Transfert::where('depot_id',$findDepotId->id)->with('produitTransfert')->get();
+        return view('transfert.index',compact('findTransDepot'));
 
     }
-    public function show(Transfert $transfert)
+    public function show( $transfert)
     {
-        //
+        return $transfert;
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Transfert $transfert)
+    public function edit( $transfert)
     {
-        //
+        return $transfert;
     }
 
     /**
@@ -151,8 +152,8 @@ class TransfertController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Transfert $transfert)
+    public function destroy( $transfert)
     {
-        //
+        return back()->with('success',"Bientot disponible !");
     }
 }
