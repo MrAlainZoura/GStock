@@ -128,9 +128,16 @@ class TransfertController extends Controller
         return view('transfert.index',compact('findTransDepot'));
 
     }
-    public function show( $transfert)
+    public function show($transfert)
     {
-        return $transfert;
+        // dd($transfert);
+        
+        $parts = explode("adft", $transfert);
+        $size = count($parts);
+        $code = $parts[0];
+        $id = $parts[1]/6789012345;
+        $findTransDetails = Transfert::where("id",$id)->where('code', $code)->first();
+        return view('transfert.show',compact('findTransDetails'));
     }
 
     /**

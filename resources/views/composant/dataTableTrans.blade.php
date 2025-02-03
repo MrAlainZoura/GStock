@@ -108,7 +108,7 @@
                 {{$item->destination}}            
             </td>
             <td>
-                @include('composant.actionLink', ['itemName'=>$item->code,'seeRoute'=>'transShow','seeParam'=>56745264509*$item->id."adft".$item->id*6789012345, 'deleteRoute'=>"transDelete",'deleteParam'=>56745264509*$item->id."adft".$item->id*6789012345, 'editeRoute'=>"transEdit",'editParam'=>$item->code." ".$item->id*6789012345])
+                @include('composant.actionLink', ['itemName'=>$item->code,'seeRoute'=>'transShow','seeParam'=>$item->code."adft".$item->id*6789012345, 'deleteRoute'=>"transDelete",'deleteParam'=>$item->code."adft".$item->id*6789012345, 'editeRoute'=>"transEdit",'editParam'=>$item->code."adft".$item->id*6789012345])
             </td>
         </tr>
         @endforeach
