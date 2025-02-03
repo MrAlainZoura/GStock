@@ -12,6 +12,7 @@ class Transfert extends Model
         "receptionUser",
         "destination",
         "code",
+        "description",
         "depot_id"
         ] ;
         

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Depot;
 use App\Models\Produit;
 use App\Models\ProduitDepot;
+use App\Models\Transfert;
 use Illuminate\Http\Request;
 use App\Models\Approvisionnement;
 use Carbon\Carbon;
@@ -119,13 +120,26 @@ class ApprovisionnementController extends Controller
             'receptionUser'=> "$userName $userPrenom",
             'updated_at'=>$date->format('Y-m-d H:i:s')];
         $updateConfirm = Approvisionnement::where('id',$id)->where('produit_id',$prod_id)->where('confirm',false)->first();
+        
         if($updateConfirm->user_id==Auth::user()->id)
         {
             return back()->with('echec',"Desolé, vous ne pouvez pas confirmé votre prore approvisionnement");
         }
-        $updateConfirm->update($data);
-        if($updateConfirm){
-        return back()->with('success',"Approvisionnement confirmé avec succcès par $userName $userPrenom");
+       ;
+        if($updateConfirm->origine !=null){
+            $updateConfirmAll = Approvisionnement::where('origine',$updateConfirm->origine)->where('confirm',false);
+            $dataUpdateAll = [
+                'receptionUser'=> "$userName $userPrenom",
+                'confirm'=>true,
+                'updated_at'=>$date->format('Y-m-d H:i:s')];
+            if($updateConfirmAll->update($dataUpdateAll)){
+                $updateConfirmTransfert = Transfert::where("code",$updateConfirm->origine)
+                                          ->update($dataUpdateAll);
+            }
+            return back()->with('success',"Approvisionnement confirmé avec succcès par $userName $userPrenom");
+        }
+        if($updateConfirm->update($data)){
+            return back()->with('success',"Approvisionnement confirmé avec succcès par $userName $userPrenom"); 
         }
         return back()->with('echec',"Desolé une erreur inattendue s'est produite, réessayez plus tard");
     }

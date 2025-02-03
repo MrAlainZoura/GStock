@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 class ProduitTransfert extends Model
 {
     protected $fillable = [
-        "description",
         "transfert_id",
         "produit_id",
         "quantite"

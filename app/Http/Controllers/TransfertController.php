@@ -64,7 +64,8 @@ class TransfertController extends Controller
             "user_id"=>Auth::user()->id,
             "destination"=>$request->destination,
             "code"=>$code,
-            "depot_id"=>$request->depot_id
+            "depot_id"=>$request->depot_id,
+            "description"=>$request->description
         ];
         $depotDestinatin = Depot::where("libele", $request->destination)->first();
         $verifTransData =[];
@@ -78,7 +79,6 @@ class TransfertController extends Controller
         $transfertCreate= Transfert::create($dataTrans);
             foreach($verifTransData as $key => $value){
                 $dataPT= [
-                    "description"=>$request->description,
                     "transfert_id"=>$transfertCreate->id,
                     "produit_id"=>$key,
                     "quantite"=>$value
