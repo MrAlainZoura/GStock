@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Categorie;
 use App\Models\Marque;
+use App\Models\Categorie;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 
 class CategorieController extends Controller
 {
@@ -16,7 +17,8 @@ class CategorieController extends Controller
     public function index()
     {
         $cat = Categorie::latest()->get();
-        return response()->json(['success'=>true, 'data'=>$cat]);
+        $user = Auth::user();
+        return view("categorie.index", compact("cat","user"));
     }
 
     /**

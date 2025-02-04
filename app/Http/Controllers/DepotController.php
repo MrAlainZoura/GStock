@@ -60,8 +60,9 @@ class DepotController extends Controller
         $depot = Depot::where("id",$id)->first();
         session(['depot' => $depot->libele]);
         $user = Auth::user();
+        $cat= Categorie::all();
         $prodDepot = ProduitDepot::where("depot_id",$id)->with('produit')->get();
-        return view('depot.show',compact('prodDepot','depot','user'));
+        return view('depot.show',compact('prodDepot','depot','user','cat'));
     }
     public function showProduit(string $depot)
     {
