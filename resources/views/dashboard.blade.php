@@ -28,7 +28,7 @@
 
 <section class="mt-10 p-20 gap-5 w-full grid grid-cols-1 sm:grid-cols-2 ">
     @foreach($depot as $cl=>$v)
-      @include('composant.depot',['libele'=>"$v->libele", 'route'=>"depot/$v->id"])
+      @include('composant.depot',['libele'=>"$v->libele", 'route'=>"depot/".$v->id*12726654])
     @endforeach
     <!-- Main modal -->
     @include('composant.modal',['libele'=>'dépôt', 'action'=>"depot.store",'user_id'=> $user->id ]) 

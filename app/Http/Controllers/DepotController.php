@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Categorie;
 use App\Models\User;
 use App\Models\Depot;
+use App\Models\Categorie;
 use App\Models\ProduitDepot;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class DepotController extends Controller
@@ -55,12 +56,19 @@ class DepotController extends Controller
      */
     public function show(string $id)
     {
+        $id = $id/12726654;
         $depot = Depot::where("id",$id)->first();
         session(['depot' => $depot->libele]);
-        $user = auth()->user();
-        $cat= Categorie::all();
+        $user = Auth::user();
         $prodDepot = ProduitDepot::where("depot_id",$id)->with('produit')->get();
-        return view('depot.show',compact('prodDepot','depot','user','cat'));
+        return view('depot.show',compact('prodDepot','depot','user'));
+    }
+    public function showProduit(string $depot)
+    {
+        $depotData = Depot::where("libele",$depot)->first();
+        $user = Auth::user();
+        $prodDepot = ProduitDepot::where("depot_id",$depotData->id)->with('produit')->latest()->get();
+        return view('depot.produit',compact('prodDepot','depotData','user'));
     }
 
     /**

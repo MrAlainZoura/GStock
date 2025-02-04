@@ -37,6 +37,7 @@ Route::get('transfert/{transfert}/show', [TransfertController::class,'show'])->n
 Route::get('transfert/{transfert}/edit', [TransfertController::class,'edit'])->name('transEdit')->middleware( AuthentifyMiddleware::class);
 Route::delete('transfert/{transfert}/delete', [TransfertController::class,'destroy'])->name('transDelete')->middleware( AuthentifyMiddleware::class);
 
+Route::get('{depot}/produits', [DepotController::class, 'showProduit'])->name("showProduit")->middleware(AuthentifyMiddleware::class);
 Route::resource('depot', DepotController::class)->middleware(AuthentifyMiddleware::class);
 Route::resource('cat-pro', CategorieController::class)->middleware(AuthentifyMiddleware::class);
 Route::resource('prod', ProduitController::class)->middleware(AuthentifyMiddleware::class);
