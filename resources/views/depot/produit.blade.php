@@ -27,7 +27,7 @@
     @include('composant.dataTable',['data'=>$prodDepot])
    </section>
    <section >        
-        @include('composant.modal_prod',['libele'=>'Produit', 'action'=>"prod.store",'depot_id'=> $depot->id, 'tab'=>$cat ]) 
+        @include('composant.modal_prod',['libele'=>'Produit', 'action'=>"prod.store",'depot_id'=> $depotData->id, 'tab'=>$cat ]) 
     </section>
 
    @include('composant.sidebar',['depot'=> session('depot')])

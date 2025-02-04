@@ -1,14 +1,15 @@
 <?php
 
-use App\Http\Controllers\ApprovisionnementController;
-use App\Http\Controllers\CategorieController;
-use App\Http\Controllers\DepotController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
-use App\Http\Controllers\ProduitController;
-use App\Http\Controllers\TransfertController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\DepotController;
+use App\Http\Controllers\VenteController;
+use App\Http\Controllers\ProduitController;
+use App\Http\Controllers\CategorieController;
+use App\Http\Controllers\TransfertController;
 use App\Http\Middleware\AuthentifyMiddleware;
+use App\Http\Controllers\ApprovisionnementController;
 
 // Route::get('/', function () {
 //     return view('home');
@@ -36,6 +37,13 @@ Route::post('transfert/{transfert}/confirmation', [TransfertController::class,'c
 Route::get('transfert/{transfert}/show', [TransfertController::class,'show'])->name('transShow')->middleware( AuthentifyMiddleware::class);
 Route::get('transfert/{transfert}/edit', [TransfertController::class,'edit'])->name('transEdit')->middleware( AuthentifyMiddleware::class);
 Route::delete('transfert/{transfert}/delete', [TransfertController::class,'destroy'])->name('transDelete')->middleware( AuthentifyMiddleware::class);
+
+Route::get('vente/{depot}', [VenteController::class,'showDepotVente'])->name('venteDepot')->middleware( AuthentifyMiddleware::class);
+Route::get('vente/{depot}/create', [VenteController::class,'create'])->name('venteCreate')->middleware( AuthentifyMiddleware::class);
+Route::post('vente/{depot}/store', [VenteController::class,'store'])->name('venteStore')->middleware( AuthentifyMiddleware::class);
+Route::get('vente/{vente}/show', [VenteController::class,'show'])->name('venteShow')->middleware( AuthentifyMiddleware::class);
+Route::get('vente/{vente}/edit', [VenteController::class,'edit'])->name('venteEdit')->middleware( AuthentifyMiddleware::class);
+Route::delete('vente/{vente}/delete', [VenteController::class,'destroy'])->name('venteDelete')->middleware( AuthentifyMiddleware::class);
 
 Route::get('{depot}/produits', [DepotController::class, 'showProduit'])->name("showProduit")->middleware(AuthentifyMiddleware::class);
 Route::resource('depot', DepotController::class)->middleware(AuthentifyMiddleware::class);

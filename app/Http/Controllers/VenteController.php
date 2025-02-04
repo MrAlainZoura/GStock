@@ -2,7 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Depot;
 use App\Models\Vente;
+use App\Models\Client;
+use App\Models\Categorie;
+use App\Models\ProduitDepot;
 use Illuminate\Http\Request;
 
 class VenteController extends Controller
@@ -12,28 +16,36 @@ class VenteController extends Controller
      */
     public function index()
     {
-        //
+        return Vente::all();
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create($depot)
     {
-        //
+        $depot= Depot::where("libele",$depot)->first();
+        $cat = Categorie::all();
+        $client =Client::all();
+        $produit = ProduitDepot::where("depot_id",$depot->id)->with("produit")->get();
+        return view("vente.create", compact("depot","cat","client","produit"));
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request, $depot)
     {
-        //
+        return back()->with("success","bientot disponible");
     }
 
     /**
      * Display the specified resource.
      */
+    public function showDepotVente($depot){
+        return back()->with("success","bientot disponible");
+
+    }
     public function show(Vente $vente)
     {
         //
