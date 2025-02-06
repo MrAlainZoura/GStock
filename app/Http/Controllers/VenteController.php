@@ -8,6 +8,8 @@ use App\Models\Client;
 use App\Models\Categorie;
 use App\Models\ProduitDepot;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
+use Carbon\CarbonInterface;
 
 class VenteController extends Controller
 {
@@ -27,7 +29,7 @@ class VenteController extends Controller
         $depot= Depot::where("libele",$depot)->first();
         $cat = Categorie::all();
         $client =Client::all();
-        $produit = ProduitDepot::where("depot_id",$depot->id)->with("produit")->get();
+        $produit = ProduitDepot::where("depot_id",$depot->id)->with("produit.marque")->get();
         return view("vente.create", compact("depot","cat","client","produit"));
     }
 
@@ -36,6 +38,7 @@ class VenteController extends Controller
      */
     public function store(Request $request, $depot)
     {
+        dd($request->all());
         return back()->with("success","bientot disponible");
     }
 
