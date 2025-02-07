@@ -25,7 +25,6 @@
               <div class="grid gap-4 sm:grid-cols-2 sm:gap-6">
                 <div>
                     <div class="sm:col-span-2 mb-2">
-                        <!-- <hr class="h-px  bg-black border-0 dark:bg-gray-700"> -->
                         <div class="text-lg mb-2 font-medium text-gray-900 dark:text-white">
                             Informations sur le <span class="italic">Client</span>
                             <div class="flex items-center">
@@ -46,7 +45,7 @@
                         <div>
                             <label for="category" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Genre</label>
                             <select id="category" name="genre" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
-                                <option selected value="">Choisir genre</option>
+                                <option selected value="">Choisir genre client</option>
                                 <option value="F">F</option>
                                 <option value="M">M</option>
                             </select>
@@ -63,7 +62,6 @@
                     </div>
                     <div>
                         <div class="sm:col-span-2 mb-2">
-                            <!-- <hr class="h-px  bg-black border-0 dark:bg-gray-700"> -->
                             <div class="text-lg mb-2 font-medium text-gray-900 dark:text-white">
                                 Facture <span class="italic">Prodiut en vente</span>
                                 <div class="flex items-center">
@@ -73,7 +71,6 @@
                             <hr class="h-px  bg-black border-0 dark:bg-gray-700">
                         </div>
                         <div class="grid gap-4 grid-cols-1 sm:gap-6">
-            
                             <div class="w-full sm:col-span-2" onclick="event.stopImmediatePropagation();">
                                 <input type="text" 
                                     id="autocompleteInput"
@@ -87,8 +84,17 @@
                             </div>
                         </div>
                         <div id="dynamicForm"  class="mb-5 mt-5 w-full sm:col-span-2 gap-4 grid md:grid-cols-2 sm:gap-4 sm:grid-cols-1">
-                            
+                           
                         </div>
+                        <div class="sm:col-span-2">
+                              <div class="flex items-center p-4 mb-4 text-sm text-red-800 border border-red-300 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400 dark:border-red-800" role="alert">
+                              <svg class="shrink-0 inline w-4 h-4 me-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
+                              </svg>
+                              <span class="sr-only">Info</span>
+                                <span id="netPayer" class="font-medium">Montant net à payer </span>
+                            </div>
+                          </div> 
                     </div>
                     
 
@@ -128,7 +134,7 @@ document.addEventListener("DOMContentLoaded", () => {
   renderOptions(users);
   today();
   ancien();
-  formSubmit();
+  submitMyForm();
 });
 
 function renderOptions(options) {
@@ -169,7 +175,7 @@ function selectOption(selectedOption, inputValue, indeX) {
 
   const newInputTotal = document.createElement('input');
     newInputTotal.type = 'text';
-    newInputTotal.className = "block w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500";
+    newInputTotal.className = "putainDesabled block w-full text-gray-900 border border-red-900 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500";
     newInputTotal.classList.add('dynamic-input');
     newInputTotal.placeholder = `Total`;
     newInputTotal.setAttribute("aria-label", "disabled input");
@@ -180,7 +186,7 @@ function selectOption(selectedOption, inputValue, indeX) {
   const newInputPrx = document.createElement('input');
     newInputPrx.type = 'number';
     newInputPrx.id = `inputPx${inputValue}`;
-    newInputPrx.className = "putainDesabled block w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500";
+    newInputPrx.className = "block w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500";
     newInputPrx.classList.add('dynamic-input');
     newInputPrx.placeholder = `10`;
     newInputPrx.min = `1`;
@@ -259,6 +265,24 @@ const setTotal = (inputQte, inputPx, showT) => {
   const inputQt = document.getElementById(inputQte);
   const inputPrx = document.getElementById(inputPx);
   const showTt = document.getElementById(showT);
+  const netPayer =document.getElementById('netPayer');
+
+  const calculNet = (net)=>{
+    let somme = 0;
+    const inputs = document.querySelectorAll('.putainDesabled');
+    inputs.forEach((input)=>{
+      const total = input.value.split(" ");
+      let tabTobal = total[0];
+      if(tabTobal.length > 4){
+        tabTobal = tabTobal.replace(/\./g, '');
+      }
+      if(parseInt(tabTobal)){
+        somme = parseInt(somme) + parseInt(tabTobal);
+      }
+      const sommeFormater = somme.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
+      net.textContent = `Montant net à payer ${sommeFormater} Fc`;
+    });
+  }
   const idStr = (str)=>{
     const getId = str.match(/\D*(\d+)/);
     if (getId) {
@@ -266,22 +290,23 @@ const setTotal = (inputQte, inputPx, showT) => {
     }
   }
 
-  const renderTt = (quantity,prix,text, idInter)=>{
+  const renderTt = (quantity,prix,text, idInter,net)=>{
     let total = quantity * prix;
     total = total.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     text.value = `${total} Fc`;
     const id = idStr(idInter);
     text.name= `produits[${id}][${inputQt.value}]`;
+    calculNet(net);
   }
 
   inputPrx.addEventListener('input', (event)=>{
    if( inputQt.value !=null){
-    renderTt(inputQt.value,inputPrx.value,showTt, inputQt.id)
+    renderTt(inputQt.value,inputPrx.value,showTt, inputQt.id, netPayer)
    }
   });
   inputQt.addEventListener('input', (event)=>{
    if( inputPrx.value !=null){
-    renderTt(inputQt.value,inputPrx.value,showTt, inputQt.id)
+    renderTt(inputQt.value,inputPrx.value,showTt, inputQt.id, netPayer)
    }
   });
   
@@ -301,4 +326,23 @@ const ancien = ()=>{
     });
 }
 
+const submitMyForm = ()=>{
+  const myFormVente =document.getElementById('myFormVente');
+  myFormVente.addEventListener('submit', (event)=>{
+    event.preventDefault();
+   const inputs = myFormVente.querySelectorAll('.putainDesabled');
+   inputs.forEach((input)=>{
+    input.removeAttribute('disabled')
+    input.removeAttribute('aria-label')
+
+    const total = input.value.split(" ");
+      let totalEntier = total[0];
+      if(totalEntier.length > 4){
+        totalEntier = totalEntier.replace(/\./g, '');
+      }
+      input.value = totalEntier;
+   })
+  myFormVente.submit();
+  })
+}
 </script>
