@@ -87,6 +87,8 @@ class VenteController extends Controller
                     $dataSave['qt']=$k;
                     $dataSave['pt']=$v;
                     array_push($tabDataVenteProduit,$dataSave);
+                    $newQt =$verifQTe->quantite - $k;
+                    $verifQTe->update(['quantite'=>$newQt, 'updated_at'=>Carbon::now()->format('Y-m-d H:i:s')]);
                 }
             }
         }
