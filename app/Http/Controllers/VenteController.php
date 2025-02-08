@@ -114,9 +114,9 @@ class VenteController extends Controller
                         'prixT'=>$valeur['pt']
                     ];
                     $createVenteProduit = VenteProduit::create($dataVenteProduit);
-                    if($createVenteProduit){
-                        return back()->with("success","Vente effectué avec succes, numéro $createVente->code par ".Auth::user()->name);
-                    }
+                }
+                if($createVenteProduit){
+                    return back()->with("success","Vente effectué avec succes, numéro $createVente->code par ".Auth::user()->name);
                 }
             }
         }        
@@ -127,21 +127,27 @@ class VenteController extends Controller
     /**
      * Display the specified resource.
      */
-    public function showDepotVente($depot){
-        return back()->with("success","bientot disponible");
+    public function showDepotVente($depotVar){
+        // dd($depotVar);
+        $depot= Depot::where('libele',$depotVar)->first();
+        // dd($depot->vente);
+        return view('vente.index', compact('depot')) ;
 
     }
-    public function show(Vente $vente)
+    public function show( $vente)
     {
-        //
+        $id= $vente/56745264509;
+        $detailVente = Vente::where('id',$id)->first();
+        // dd($detailVente->venteProduit[0]->produit->image);
+        return view('vente.show', compact('detailVente')) ;
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Vente $vente)
+    public function edit( $vente)
     {
-        //
+        return back()->with("success","Bientôt disponible");
     }
 
     /**
@@ -155,8 +161,8 @@ class VenteController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Vente $vente)
+    public function destroy($vente)
     {
-        //
+        return back()->with("success","Bientôt disponible");
     }
 }
