@@ -57,7 +57,7 @@ class UserController extends Controller
             return back()->with('echec',$validateDate->errors());
         }
         $fichier = $request->file('image');
-        $type = $fichier->getClientOriginalExtension();
+        $type = ($request->file('image')!=null)?$fichier->getClientOriginalExtension():null;
         $data = [
             'name'=>$request->name,
             'email'=>$request->email,
@@ -74,7 +74,6 @@ class UserController extends Controller
             'prenom'=>$request->teprenoml,
             'image'=>($request->file('image')!=null)? "$request->name$request->postnom.$type":null,
         ];
-
         $user = User::create($data);
         if($user){
             $dossier = 'users';
