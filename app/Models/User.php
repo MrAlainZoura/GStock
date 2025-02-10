@@ -41,7 +41,7 @@ class User extends Authenticatable
         return $this->hasMany(Approvisionnement::class);
     }
     public function vente(){
-        return $this->hasMany(Approvisionnement::class);
+        return $this->hasMany(Vente::class);
     }
 
     /**

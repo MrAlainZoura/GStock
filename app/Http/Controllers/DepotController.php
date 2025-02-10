@@ -2,10 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Approvisionnement;
+use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Depot;
+use App\Models\Vente;
 use App\Models\Categorie;
 use App\Models\ProduitDepot;
+use App\Models\Transfert;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -61,8 +65,46 @@ class DepotController extends Controller
         session(['depot' => $depot->libele]);
         $user = Auth::user();
         $cat= Categorie::all();
+        $mois = Carbon::now()->format('m');
+
+        $vendeurs = Vente::selectRaw('user_id, COUNT(*) as count')
+                    ->groupBy('user_id')
+                    ->orderByDesc('count')
+                    ->whereMonth('created_at', (int)$mois)
+                    ->where('depot_id', $depot->id)
+                    ->take(2)
+                    ->get();
+        $approMois = Approvisionnement::whereMonth('created_at', (int)$mois)
+                    ->where('depot_id', $depot->id)
+                    ->count();
+        $transMois = Transfert::whereMonth('created_at', (int)$mois)
+                    ->where('depot_id', $depot->id)
+                    ->count();
+        $totalVenteMois = Vente::where('depot_id', $depot->id)->whereMonth('created_at',$mois)->get();
+        
+        $tabProdVendu = [];
+        foreach($totalVenteMois as $key=>$value){
+            foreach($value->venteProduit as $k=>$v){
+                if(array_key_exists($v->produit->marque->categorie->libele." ".$v->produit->marque->libele." ".$v->produit->libele , $tabProdVendu)){
+                    $newQt = $tabProdVendu[$v->produit->marque->categorie->libele." ".$v->produit->marque->libele." ".$v->produit->libele] +$v->quantite;
+                    $tabProdVendu[$v->produit->marque->categorie->libele." ".$v->produit->marque->libele." ".$v->produit->libele] = $newQt;
+                }else{
+                    $tabProdVendu[$v->produit->marque->categorie->libele." ".$v->produit->marque->libele." ".$v->produit->libele]=$v->quantite;
+                }
+
+            }
+        }
+         arsort($tabProdVendu);
+        (count($totalVenteMois)>9)?:$totalVenteMois="0".count($totalVenteMois);
+        ($approMois>9)?:$approMois="0$approMois";
+        $depot->totalVente = $totalVenteMois;
+        ($transMois>9)?:$transMois="0$transMois";
+// dd($tabProdVendu);
+        $depot->totalVente = $totalVenteMois;
+        $depot->approMois = $approMois;
+        $depot->transMois = $transMois;
         $prodDepot = ProduitDepot::where("depot_id",$id)->with('produit')->get();
-        return view('depot.show',compact('prodDepot','depot','user','cat'));
+        return view('depot.show',compact('prodDepot','depot','user','vendeurs','tabProdVendu'));
     }
     public function showProduit(string $depot)
     {
