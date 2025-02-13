@@ -74,12 +74,12 @@ class DepotController extends Controller
                     ->where('depot_id', $depot->id)
                     ->take(2)
                     ->get();
-        $approMois = Approvisionnement::whereMonth('created_at', (int)$mois)
+        $approMois1 = Approvisionnement::whereMonth('created_at', (int)$mois)
                     ->where('depot_id', $depot->id)
-                    ->count();
-        $transMois = Transfert::whereMonth('created_at', (int)$mois)
+                    ->get();
+        $transMois1 = Transfert::whereMonth('created_at', (int)$mois)
                     ->where('depot_id', $depot->id)
-                    ->count();
+                    ->get();
         $totalVenteMois = Vente::where('depot_id', $depot->id)->whereMonth('created_at',$mois)->get();
         
         $tabProdVendu = [];
@@ -94,13 +94,25 @@ class DepotController extends Controller
 
             }
         }
-         arsort($tabProdVendu);
+        $totalApro = 0;
+        foreach($approMois1 as $cl=>$vl){
+            $totalApro+=$vl->quantite;
+        }
+
+        $totalTrans = 0;
+        foreach($transMois1 as $cle=>$valeur){
+            foreach($valeur->produitTransfert as $c=>$vl){
+                $totalTrans+=$vl->quantite;
+            }
+        }
+        arsort($tabProdVendu);
         (count($totalVenteMois)>9)?:$totalVenteMois="0".count($totalVenteMois);
-        ($approMois>9)?:$approMois="0$approMois";
+        (count($approMois1)>9)?$approMois=count($approMois1):$approMois="0".count($approMois1);
+        (count($transMois1)>9)?$transMois=count($transMois1):$transMois="0". count($transMois1);
+        
         $depot->totalVente = $totalVenteMois;
-        ($transMois>9)?:$transMois="0$transMois";
-// dd($tabProdVendu);
-        $depot->totalVente = $totalVenteMois;
+        $depot->totalApro = $totalApro;
+        $depot->totalTrans = $totalTrans;
         $depot->approMois = $approMois;
         $depot->transMois = $transMois;
         $prodDepot = ProduitDepot::where("depot_id",$id)->with('produit')->get();

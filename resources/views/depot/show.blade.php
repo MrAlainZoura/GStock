@@ -1,5 +1,7 @@
 @extends('base')
 @section('title', "Accueil")
+<!-- <link rel="stylesheet" href="{{asset('bootstrap/bootstrap.min.css')}}"> -->
+<script src="{{asset('bootstrap/apexcharts.min.js')}}"></script>
 
 @section('header')
   @include('composant.hearder', ['user_email'=>"$user->email", 'user_name'=>"$user->name"])
@@ -50,13 +52,20 @@
                 </div>
                 
             </div>
-            <div class="flex items-center justify-center h-48 mb-4 rounded-sm bg-gray-50 dark:bg-gray-800">
-                <p class="text-2xl ">
-                    <svg class="w-3.5 h-3.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 18">
-                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 1v16M1 9h16"/>
-                    </svg>
-                    graphique
-                </p>
+            <div class="flex items-center justify-center  m-4 rounded-sm bg-gray-50 dark:bg-gray-800">
+            <div class="w-2/3 sm:w-full p-4">
+                <div class="card">
+                    <div class="card-body ">
+                    <h5 class="card-title">Statistique produits</h5>
+
+                    <!-- Pie Chart -->
+                    <div id="pieChart"></div>
+                    
+                    <!-- End Pie Chart -->
+
+                    </div>
+                </div>
+                </div>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div class="p-4 items-center justify-center rounded-sm bg-blue-300 ">
@@ -79,11 +88,13 @@
                     <p class="text-2xl ">
                         @php
                             $i = 0;
+                            $totalVendue =0;
                             foreach ($tabProdVendu as $key => $valuer) {
-                                if ($i ==0) {
+                                if ($i == 0) {
                                     echo  $key . ", avec : " . $valuer ." pieces venduess";
                                 }
                                 $i++;
+                                $totalVendue+=$valuer;
                             }
                         @endphp     
                     </p>
@@ -141,3 +152,22 @@
     @include('composant.footer')
 @endsection
 
+<script>
+    const vente = @json($totalVendue);
+    const transfert =@json(    $depot->totalTrans);
+    const appro = @json($depot->totalApro);
+    console.log('donnee', vente);
+    document.addEventListener("DOMContentLoaded", () => {
+    new ApexCharts(document.querySelector("#pieChart"), {
+        series: [parseInt(vente), parseInt(appro) ,parseInt(transfert)],
+        chart: {
+        height: 350,
+        type: 'pie',
+        toolbar: {
+            show: true
+        }
+        },
+        labels: ['Total pièces vendues', 'Total pièces approvisionnéés', 'Total pièces transferées']
+    }).render();
+    });
+</script>
