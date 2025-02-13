@@ -7,7 +7,9 @@ use App\Models\Depot;
 use App\Models\Vente;
 use App\Models\Transfert;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Approvisionnement;
+use Illuminate\Support\Facades\App;
 
 class RapportController extends Controller
 {
@@ -16,17 +18,24 @@ class RapportController extends Controller
         $today = Carbon::now()->format('Y-m-d');
         $depot = Depot::where('libele',$depot)->first();
 
-        $approJour = Approvisionnement::where('depot_id', $depot->id)
-                    ->where('created_at','like','like'.$today.'like')
+        $approJour = Approvisionnement::orderBy('user_id')->where('depot_id', $depot->id)
+                    ->where('created_at','like','%'.$today.'%')
                     ->get();
-        $transJour = Transfert::where('depot_id', $depot->id)
-                    ->where('created_at','like','like'.$today.'like')
+        $transJour = Transfert::orderBy('user_id')->where('depot_id', $depot->id)
+                    ->where('created_at','like','%'.$today.'%')
                     ->get();
-        $venteJour = Vente::where('depot_id', $depot->id)
-                        ->where('created_at','like','like'.$today.'like')
+        $venteJour = Vente::orderBy('user_id')->where('depot_id', $depot->id)
+                        ->where('created_at','like','%'.$today.'%')
                         ->get();
         
+        $pdf = App::make('dompdf.wrapper');
+        $pdf->loadHTML('<h1>Test vide</h1>');
+
         return [$approJour, $transJour, $venteJour];
+        // return $pdf->download('Teste.pdf',$pdf->stream());
+
+        // $pdf = Pdf::loadView('pdf.invoice', $data);
+        // return $pdf->download('invoice.pdf');
     }
     public function mensuel($depot){
         return back()->with('success',"Bientôt disponible");
