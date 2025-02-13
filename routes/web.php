@@ -10,6 +10,7 @@ use App\Http\Controllers\CategorieController;
 use App\Http\Controllers\TransfertController;
 use App\Http\Middleware\AuthentifyMiddleware;
 use App\Http\Controllers\ApprovisionnementController;
+use App\Http\Controllers\RapportController;
 
 // Route::get('/', function () {
 //     return view('home');
@@ -44,6 +45,10 @@ Route::post('vente/{depot}/store', [VenteController::class,'store'])->name('vent
 Route::get('vente/{vente}/show', [VenteController::class,'show'])->name('venteShow')->middleware( AuthentifyMiddleware::class);
 Route::get('vente/{vente}/edit', [VenteController::class,'edit'])->name('venteEdit')->middleware( AuthentifyMiddleware::class);
 Route::delete('vente/{vente}/delete', [VenteController::class,'destroy'])->name('venteDelete')->middleware( AuthentifyMiddleware::class);
+
+Route::get('rapport/{depot}/journalier', [RapportController::class,'journalier'])->name('rapport.jour')->middleware( AuthentifyMiddleware::class);
+Route::get('rapport/{depot}/mensuel', [RapportController::class,'mensuel'])->name('rapport.mois')->middleware( AuthentifyMiddleware::class);
+Route::get('rapport/{depot}/annuel', [RapportController::class,'annuel'])->name('rapport.annee')->middleware( AuthentifyMiddleware::class);
 
 Route::get('{depot}/produits', [DepotController::class, 'showProduit'])->name("showProduit")->middleware(AuthentifyMiddleware::class);
 Route::resource('depot', DepotController::class)->middleware(AuthentifyMiddleware::class);
