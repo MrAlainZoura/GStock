@@ -29,13 +29,14 @@ class RapportController extends Controller
                         ->get();
         
         $pdf = App::make('dompdf.wrapper');
-        $pdf->loadHTML('<h1>Test vide</h1>');
+        
+        return view('rapport.journalier', compact ( "approJour", "transJour", "venteJour"));
+        // $pdf = Pdf::loadView('rapport.journalier', $venteJour)
+        // return $pdf->download('essaie rapport.pdf');
+        // return $pdf->download('Rapport Test.pdf',$pdf->stream());
+        // $pdf->loadHTML('<h1>Test Rapport jounalier vide</h1> <br/>'.$venteJour.'<br/>'.$transJour.'<br/>'.$approJour);
 
-        return [$approJour, $transJour, $venteJour];
-        // return $pdf->download('Teste.pdf',$pdf->stream());
 
-        // $pdf = Pdf::loadView('pdf.invoice', $data);
-        // return $pdf->download('invoice.pdf');
     }
     public function mensuel($depot){
         return back()->with('success',"Bientôt disponible");
