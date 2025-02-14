@@ -60,7 +60,7 @@
             <tr>
                 
                 <th scope="row" class="px-6 py-4 text-xl uppercase text-gray-900 whitespace-nowrap dark:text-white">
-                    Recette du jour
+                    {{ $period }}
                 </th>
                 <td></td>
                 <td></td>
