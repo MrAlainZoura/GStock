@@ -17,27 +17,23 @@ class RapportController extends Controller
     public function journalier($depot){
 
         $today = Carbon::now()->format('Y-m-d');
+        
         $depot = Depot::where('libele',$depot)->first();
 
         $approJour = Approvisionnement::orderBy('user_id')->where('depot_id', $depot->id)
-                    ->where('created_at','%'.$today.'%')
+                    ->where('created_at','like','%'.$today.'%')
                     ->get();
         $transJour = Transfert::orderBy('user_id')->where('depot_id', $depot->id)
-                    ->where('created_at','%'.$today.'%')
+                    ->where('created_at','like','%'.$today.'%')
                     ->get();
         $venteJour = Vente::orderBy('user_id')->where('depot_id', $depot->id)
-                        ->where('created_at','%'.$today.'%')
+                        ->where('created_at','like','%'.$today.'%')
                         ->get();
         
-        $pdf = App::make('dompdf.wrapper');
-        
         return view('rapport.journalier', compact ( "approJour", "transJour", "venteJour"));
-        // $pdf = Pdf::loadView('rapport.journalier', $venteJour)
-        // return $pdf->download('essaie rapport.pdf');
-        // return $pdf->download('Rapport Test.pdf',$pdf->stream());
-        // $pdf->loadHTML('<h1>Test Rapport jounalier vide</h1> <br/>'.$venteJour.'<br/>'.$transJour.'<br/>'.$approJour);
     }
     public function mensuel($depot){
+        Carbon::setLocale('fr');
         $mois = Carbon::now()->format('m');
         $depot = Depot::where('libele',$depot)->first();
 
@@ -50,7 +46,6 @@ class RapportController extends Controller
         $venteMois = Vente::orderBy('user_id')->where('depot_id', $depot->id)
                         ->whereMonth('created_at',$mois)
                         ->get();
-        Carbon::setLocale('fr');
         
         $mois = Carbon::now()->isoFormat('MMMM YYYY');;
                         
@@ -70,5 +65,33 @@ class RapportController extends Controller
                         ->whereYear('created_at',$year)
                         ->get();
         return view('rapport.annuel', compact ( "approAn", "transAn", "venteAn","year"));
+    }
+
+
+    public function journalieru($depot){
+        Carbon::setLocale('fr');
+
+        $today = Carbon::now()->format('Y-m-d');
+        $depot = Depot::where('libele',$depot)->first();
+
+        $approJour = Approvisionnement::orderBy('user_id')->where('depot_id', $depot->id)
+                    // ->where('created_at','%'.$today.'%')
+                    ->get();
+        $transJour = Transfert::orderBy('user_id')->where('depot_id', $depot->id)
+                    // ->where('created_at','%'.$today.'%')
+                    ->get();
+        $venteJour = Vente::orderBy('user_id')->where('depot_id', $depot->id)
+                        // ->where('created_at','%'.$today.'%')
+                        ->get();
+                        
+        $jour = Carbon::now()->isoFormat('dddd D MMMM YYYY');
+        $data =[
+            'vente'=>$venteJour,
+            'appro'=>$approJour,
+            'trans'=>$transJour,
+            'date'=>$jour
+        ];
+        $pdf = Pdf::loadView('pdf.rapportJ', $data);
+        return $pdf->download('invoice.pdf');
     }
 }
