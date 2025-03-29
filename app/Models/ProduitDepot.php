@@ -8,7 +8,7 @@ class ProduitDepot extends Model
 {
     protected $fillable = ['depot_id',
     'produit_id',
-    'quantite'] ;
+    'quantite'];
 
     public function produit(){
         return $this->belongsTo(Produit::class);

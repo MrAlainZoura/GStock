@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Depot extends Model
 {
-    protected $fillable = ['libele'];
+    protected $fillable = ['libele','user_id'];
 
     public function user(){
         return $this->hasMany(User::class);
