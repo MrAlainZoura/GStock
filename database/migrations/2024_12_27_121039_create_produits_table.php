@@ -17,10 +17,6 @@ return new class extends Migration
                 ->constrained()
                 ->noActionOnDelete()
                 ->cascadeOnUpdate();
-            $table->foreignId('depot_id')
-                ->constrained()
-                ->noActionOnDelete()
-                ->cascadeOnUpdate();
             $table->string('libele');
             $table->string('description');
             $table->string('prix');
