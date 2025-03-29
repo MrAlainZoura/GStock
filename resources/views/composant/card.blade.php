@@ -7,8 +7,9 @@
     </a>
     <div class="px-5 pb-5">
         <a href="#">
-            <h5 class="text-xl font-semibold tracking-tight text-gray-900 dark:text-white">{{$description}}</h5>
+            <h5 class="text-xl font-semibold tracking-tight text-gray-900 dark:text-white">{{$libele}}</h5>
         </a>
+        <h5 class="text-xl font-semibold tracking-tight text-gray-900 dark:text-white">{{$description}}</h5>
         <div class="flex items-center mt-2.5 mb-5">
             <div class="flex items-center space-x-1 rtl:space-x-reverse">
                 <svg class="w-4 h-4 text-yellow-300" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
