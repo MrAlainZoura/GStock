@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Depot;
+use App\Models\DepotUser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -40,17 +41,17 @@ class UserController extends Controller
         [
             'name'=>'required',
             'email'=>'required|email|max:255|unique:users',
-            'genre'=>'string',
-            'naissance'=>'string',
-            'fonction'=>'string',
-            'niveauEtude'=>'string',
-            'option'=>'string',
-            'adresse'=>'string',
-            'tel'=>'string',
+            'genre'=>($request->genre)?'string':'',
+            'naissance'=>($request->naissance)?'string':'',
+            'fonction'=>($request->fonction)?'string':'',
+            'niveauEtude'=>($request->niveauEtude)?'string':'',
+            'option'=>($request->option)?'string':'',
+            'adresse'=>($request->adresse)?'string':'',
+            'tel'=>($request->tel)?'string':'',
             'depot_id'=>'required|exists:depots,id',
-            'postnom'=>'string',
-            'prenom'=>'string',
-            'image'=>'file|mimes:jpg, jpeg, png, gift, jfif'
+            'postnom'=>($request->postnom)?'string':'',
+            'prenom'=>($request->prenom)?'string':'',
+            'image'=>'file|mimes:jpg,jpeg,png,gift,jfif'
         ]);
 
         if($validateDate->fails()){
@@ -69,13 +70,14 @@ class UserController extends Controller
             'option'=>$request->option,
             'adresse'=>$request->adresse,
             'tel'=>$request->tel,
-            'depot_id'=>$request->depot_id,
+            // 'depot_id'=>$request->depot_id,
             'postnom'=>$request->postnom,
             'prenom'=>$request->teprenoml,
             'image'=>($request->file('image')!=null)? "$request->name$request->postnom.$type":null,
         ];
         $user = User::create($data);
         if($user){
+            $depotUser = DepotUser::create(['depot_id'=>$request->depot_id,'user_id'=>$user->id]);
             $dossier = 'users';
         if (!Storage::disk('public')->exists($dossier)) {
             Storage::disk('public')->makeDirectory($dossier);

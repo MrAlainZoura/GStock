@@ -2,15 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Approvisionnement;
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Depot;
 use App\Models\Vente;
+use App\Models\Produit;
 use App\Models\Categorie;
-use App\Models\ProduitDepot;
 use App\Models\Transfert;
+use App\Models\ProduitDepot;
 use Illuminate\Http\Request;
+use App\Models\Approvisionnement;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
@@ -49,6 +50,7 @@ class DepotController extends Controller
         }
         $data = [
             'libele'=>$request->libele,
+            'user_id'=>Auth::user()->id
         ];
 
         $depot = Depot::create($data);
@@ -122,7 +124,8 @@ class DepotController extends Controller
     {
         $depotData = Depot::where("libele",$depot)->first();
         $user = Auth::user();
-        $cat = Categorie::orderBy('libele')->with('marque')->get();        $prodDepot = ProduitDepot::where("depot_id",$depotData->id)->with('produit.marque')->latest()->get();
+        $cat = Categorie::orderBy('libele')->with('marque')->get();        
+        $prodDepot = ProduitDepot::where("depot_id",$depotData->id)->with('produit.marque')->latest()->get();
         return view('depot.produit',compact('prodDepot','depotData','user','cat'));
     }
 

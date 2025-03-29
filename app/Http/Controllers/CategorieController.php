@@ -38,7 +38,7 @@ class CategorieController extends Controller
         [
             'libele'=>'required|string|max:255',
             'user_id'=>'required|string|max:255',
-            'image'=>'required|file|mimes:jpg, jpeg, png, gift, jfif',
+            'image'=>'file|mimes:jpg, jpeg, png, gift, jfif',
             'marque'=>'array',
         ]);
 
@@ -52,7 +52,7 @@ class CategorieController extends Controller
             Storage::disk('public')->makeDirectory($dossier);
         }
         $fichier = $request->file('image');
-        $type = $fichier->getClientOriginalExtension();
+        $type = ($request->file('image')!=null)? $fichier->getClientOriginalExtension() : null;
         $data = [
             'libele'=>$request->libele,
             'image'=>($request->file('image')!=null)? "$request->libele.$type":null

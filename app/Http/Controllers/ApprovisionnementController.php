@@ -125,7 +125,7 @@ class ApprovisionnementController extends Controller
         {
             return back()->with('echec',"Desolé, vous ne pouvez pas confirmé votre prore approvisionnement");
         }
-       ;
+       
         if($updateConfirm->origine !=null){
             $updateConfirmAll = Approvisionnement::where('origine',$updateConfirm->origine)->where('confirm',false);
             $dataUpdateAll = [

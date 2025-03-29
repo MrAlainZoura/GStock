@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Approvisionnement;
+use App\Models\Categorie;
 use App\Models\Produit;
+use App\Models\ProduitDepot;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
@@ -24,7 +26,8 @@ class ProduitController extends Controller
      */
     public function create()
     {
-        //
+        $tab = Categorie::orderby('libele')->get();
+        return view('produit.create', compact('tab','depot_id'));
     }
 
     /**
@@ -32,6 +35,7 @@ class ProduitController extends Controller
      */
     public function store(Request $request)
     {
+        // dd($request->all());
         $dossier = 'produit';
         // Vérifier si le dossier existe, sinon le créer
         if (!Storage::disk('public')->exists($dossier)) {
@@ -44,7 +48,7 @@ class ProduitController extends Controller
             'description'=>'required|string|max:255',
             'prix'=>'required|string|max:255',
             'etat'=>'required|string|max:255',
-            'image'=>'file|mimes:jpg, jpeg, png, gift, jfif'
+            'image'=>($request->image!=null)?'file|mimes:jpg,jpeg,png,gift,jfif':''
         ]);
 
         if($validateDate->fails()){
@@ -53,7 +57,7 @@ class ProduitController extends Controller
         }
 
         $fichier = $request->file('image');
-        $type = $fichier->getClientOriginalExtension();
+        $type =($request->file('image')!=null)? $fichier->getClientOriginalExtension():'';
 
         $data = [
             'marque_id'=>$request->marque_id,
@@ -79,8 +83,11 @@ class ProduitController extends Controller
                     'confirm'=>false,
                     'receptionUser'=>null
                 ];
+                $dataProD =['depot_id'=>$request->depot_id,
+                            'produit_id'=>$produit->id,
+                            'quantite'=>$request->quantite];
                 $approvisionnement = Approvisionnement::create($dataApro);
-                
+                $produitDepot = ProduitDepot::create($dataProD);
             }else{
                 return back()->with('success',"Enregistrement reussi sans approvisionnement !");
             }
