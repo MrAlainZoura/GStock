@@ -60,10 +60,14 @@ class DepotController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show($getDepot)
     {
-        $id = $id/12726654;
-        $depot = Depot::where("id",$id)->first();
+        if(!is_numeric($getDepot)){
+            $depot = Depot::where("libele",$getDepot)->first();
+        }else{
+            $getDepot = $getDepot/12726654;
+            $depot = Depot::where("id",$getDepot)->first();
+        }
         session(['depot' => $depot->libele]);
         $user = Auth::user();
         $cat= Categorie::all();
@@ -117,7 +121,7 @@ class DepotController extends Controller
         $depot->totalTrans = $totalTrans;
         $depot->approMois = $approMois;
         $depot->transMois = $transMois;
-        $prodDepot = ProduitDepot::where("depot_id",$id)->with('produit')->get();
+        $prodDepot = ProduitDepot::where("depot_id",$depot->id)->with('produit')->get();
         return view('depot.show',compact('prodDepot','depot','user','vendeurs','tabProdVendu'));
     }
     public function showProduit(string $depot)

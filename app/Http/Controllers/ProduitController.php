@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Approvisionnement;
-use App\Models\Categorie;
+use App\Models\Depot;
 use App\Models\Produit;
+use App\Models\Categorie;
 use App\Models\ProduitDepot;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
+use App\Models\Approvisionnement;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 
 class ProduitController extends Controller
 {
@@ -26,7 +27,8 @@ class ProduitController extends Controller
      */
     public function create()
     {
-        $tab = Categorie::orderby('libele')->get();
+        $tab = Categorie::orderby('libele')->with('marque')->get();
+        $depot_id=Depot::where('libele',session('depot'))->first()->id;
         return view('produit.create', compact('tab','depot_id'));
     }
 

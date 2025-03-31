@@ -26,11 +26,15 @@
                     <h3 class="mt-3 text-lg/6 font-semibold text-gray-900 group-hover:text-gray-600">
                         <div>
                             <span class=""></span>
-                            Vendeur :
+                            Vendeur : 
                         </div>
                     </h3>
                     <div class="relative mt-8 flex items-center gap-x-4">
+                    @if ($findVenteDetail->user->image == null)
+                        <img class="w-10 h-10 rounded" src="{{asset('svg/man.svg')}}" alt="Produit">
+                    @else
                         <img src="{{asset('storage/users/'.$findVenteDetail->user->image)}}" alt="photo" class="size-14 rounded-sm bg-gray-50">
+                    @endif
                         <div class="text-sm/6">
                             <p class="font-semibold text-gray-900">
                             <a href="#">
@@ -57,39 +61,56 @@
             </div>
                 
             </div>
-            <div class="mx-auto mt-10 grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 border-t border-gray-200 pt-10 sm:mt-16 sm:pt-16 lg:mx-0 lg:max-w-none lg:grid-cols-3">
+            <div class="mx-auto mt-10 grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 border-t border-gray-200 pt-10 sm:mt-16 sm:pt-16 lg:mx-0 lg:max-w-none ">
             
-                @foreach ( $findVenteDetail->venteProduit as $item)
-                    
-                <article class="bg-gray-100 p-2 flex max-w-xl flex-col items-start justify-between">
-                    <div class="flex items-center gap-x-4 text-xs">
-                    <time class="text-gray-500">{{$item->created_at}}</time>
-                    <label class="relative z-10 rounded-full bg-red-100 px-3 py-1.5 font-medium text-gray-600 hover:bg-gray-100">{{$findVenteDetail->type}}</label>
-                    </div>
-                    <div class="group relative">
-                    <h3 class="mt-3 text-lg/6 font-semibold text-gray-900 group-hover:text-gray-600">
-                        <div>
-                        <span class="absolute inset-0"></span>
-                        {{$item->produit->marque->categorie->libele}} {{$item->produit->marque->libele}} {{$item->produit->libele}} {{$item->produit->etat}}
-                        </div>
-                    </h3>
-                    <!-- <p class="mt-5 line-clamp-3 text-sm/6 text-gray-600">Illo sint voluptas. Error voluptates culpa eligendi. Hic vel totam vitae illo. Non aliquid explicabo necessitatibus unde. Sed exercitationem placeat consectetur nulla deserunt vel. Iusto corrupti dicta.</p> -->
-                    </div>
-                    <div class="relative mt-8 flex items-center gap-x-4">
-                    <img src="{{asset('storage/produit/'.$item->produit->image)}}" alt="" class="size-14 rounded-sm bg-gray-50">
-                    <div class="text-sm/6">
-                        <p class="font-semibold text-gray-900">
-                        <a href="#">
-                            <span class="absolute inset-0"></span>
-                            {{$item->quantite}} pc
-                        </a>
-                        </p>
-                        <p class="text-gray-600">@formaMille($item->prixT) Fc</p>
-                    </div>
-                    </div>
-                </article>
+                              
 
-                @endforeach
+                <div class="relative max-w-md">
+                    <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                        <thead class="text-xs text-gray-700 uppercase bg-gray-100 dark:bg-gray-700 dark:text-gray-400">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 rounded-s-lg">
+                                    Produit
+                                </th>
+                                <th scope="col" class="px-6 py-3">
+                                    Qté
+                                </th>
+                                <th scope="col" class="px-6 py-3 rounded-e-lg">
+                                    Prix
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        @foreach ( $findVenteDetail->venteProduit as $item)  
+                            <tr class="bg-white dark:bg-gray-800">
+                                <th scope="row" class="px-3 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                    {{$item->produit->marque->libele}} 
+                                    {{$item->produit->libele}}<br>
+                                    {{$item->produit->etat}}
+                                </th>
+                                <td class="px-3 py-2">
+                                {{$item->quantite}} pc
+                                </td>
+                                <td class="px-3 py-2">
+                                @formaMille($item->prixT) Fc
+                                </td>
+                            </tr>
+                        @endforeach
+                        </tbody>
+                        <tfoot>
+                            <tr class="font-semibold text-gray-900 dark:text-white">
+                                <th scope="row" class="px-4 py-3 text-base">Total</th>
+                                <td class="px-3 py-3">
+                                  {{$quantite}}
+                                   pc
+                                </td>
+                                <td class="px-3 py-3"> @formaMille($netPaye) Fc</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+
+               
 
             </div>
         </div>
