@@ -94,4 +94,21 @@ class RapportController extends Controller
         $pdf = Pdf::loadView('pdf.rapportJ', $data);
         return $pdf->download('invoice.pdf');
     }
+    public function facture($vente){
+       
+        $id= $vente/56745264509;
+        $findVenteDetail = Vente::where('id',$id)->first();
+        // dd($detailVente->venteProduit[0]->produit->image);
+        // return view('vente.fact', compact('findVenteDetail')) ;
+        
+        $data =[
+            'findVenteDetail'=>$findVenteDetail, 
+        ];
+        $code = str_replace('/', '-', $findVenteDetail->code);
+        $facture ="facture ".$findVenteDetail->user->name." ".$findVenteDetail->created_at." ".$code .".pdf";
+        $pdf = Pdf::loadView('vente.fact', $data);
+        return $pdf->download($facture);
+    }
+
+    
 }

@@ -49,6 +49,7 @@ Route::delete('vente/{vente}/delete', [VenteController::class,'destroy'])->name(
 Route::get('rapport/{depot}/journalier', [RapportController::class,'journalier'])->name('rapport.jour')->middleware( AuthentifyMiddleware::class);
 Route::get('rapport/{depot}/mensuel', [RapportController::class,'mensuel'])->name('rapport.mois')->middleware( AuthentifyMiddleware::class);
 Route::get('rapport/{depot}/annuel', [RapportController::class,'annuel'])->name('rapport.annee')->middleware( AuthentifyMiddleware::class);
+Route::get('rapport/{depot}/facture', [RapportController::class,'facture'])->name('facturePDF')->middleware( AuthentifyMiddleware::class);
 
 Route::get('{depot}/produits', [DepotController::class, 'showProduit'])->name("showProduit")->middleware(AuthentifyMiddleware::class);
 Route::resource('depot', DepotController::class)->middleware(AuthentifyMiddleware::class);
