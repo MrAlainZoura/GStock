@@ -7,7 +7,7 @@
     <style>
         /* Styles de base */
 .container {
-    max-width: 600px; /* Equivalent de max-w-md */
+    max-width: 300px; 
     margin: 2.5rem auto; /* Equivalent de mt-10 */
 }
 
@@ -23,16 +23,18 @@
 }
 
 .table th, .table td {
-    border: 1px solid #d1d5db; /* Bordure légère autour des cellules */
-}
-.table-header {
-    text-transform: uppercase; /* Equivalent de uppercase */
-    background-color: #f3f4f6; /* Equivalent de bg-gray-100 */
-    color: #374151; /* Equivalent de text-gray-700 */
+    border: 1px solid rgb(21, 22, 23); /* Bordure légère autour des cellules */
+    text-align: left;
+    align-items: left;
+    justify-content: left;
+    justify-items: left;
+    color: black;
+    font-weight: bold;
 }
 
 .header-cell {
-    padding: 0.75rem 1.5rem; /* Equivalent de px-6 py-3 */
+    padding: 1px; /* Equivalent de px-6 py-3 */
+    text-align: left;
 }
 
 .rounded-left {
@@ -45,38 +47,22 @@
     border-bottom-right-radius: 0.5rem;
 }
 
-.table-row {
-    background-color: #ffffff; /* Equivalent de bg-white */
-}
-
-.row-cell {
-    padding: 0.5rem 1rem; /* Equivalent de px-3 py-2 */
-    color: #111827; /* Equivalent de text-gray-900 */
-}
-
 .footer-row {
     font-weight: 600; /* Equivalent de font-semibold */
-    color: #111827; /* Equivalent de text-gray-900 */
+    text-align: left;
 }
 
 .footer-cell {
-    padding: 0.75rem 1rem; /* Equivalent de px-3 py-3 */
+    padding: 1px; /* Equivalent de px-3 py-3 */
 }
 
 /* Styles pour le mode sombre */
 @media (prefers-color-scheme: dark) {
-    .table-header {
-        background-color: #374151; /* Equivalent de dark:bg-gray-700 */
-        color: #d1d5db; /* Equivalent de dark:text-gray-400 */
-    }
-    .table-row {
-        background-color: #1f2937; /* Equivalent de dark:bg-gray-800 */
-    }
-    .row-cell {
-        color: #ffffff; /* Equivalent de dark:text-white */
-    }
+
     .footer-row {
-        color: #ffffff; /* Equivalent de dark:text-white */
+        color:rgb(6, 5, 5); /* Equivalent de dark:text-white */
+        font-size: bold;
+        text-align: left;
     }
 }
 
@@ -114,31 +100,31 @@
     </div>
         <div class="table-wrapper">
         <table class="table">
-            <thead class="table-header">
+            <thead class="">
                 <tr>
-                    <th scope="col" class="header-cell rounded-left">
+                    <th  class="header-cell rounded-left">
                         Produit
                     </th>
-                    <th scope="col" class="header-cell">
+                    <th  class="header-cell">
                         Qté
                     </th>
-                    <th scope="col" class="header-cell rounded-right">
+                    <th  class="header-cell rounded-right">
                         Prix
                     </th>
                 </tr>
             </thead>
             <tbody>
             @foreach ($findVenteDetail->venteProduit as $item)
-                <tr class="table-row">
-                    <th scope="row" class="row-cell">
+                <tr class="">
+                    <th >
                         {{$item->produit->marque->libele}} 
                         {{$item->produit->libele}}<br>
                         {{$item->produit->etat}}
                     </th>
-                    <td class="row-cell">
+                    <td >
                         {{$item->quantite}} pc
                     </td>
-                    <td class="row-cell">
+                    <td >
                         @formaMille($item->prixT) Fc
                     </td>
                 </tr>
@@ -146,7 +132,7 @@
             </tbody>
             <tfoot>
                 <tr class="footer-row">
-                    <th scope="row" class="footer-cell">Total</th>
+                    <th class="footer-cell">Total</th>
                     <td class="footer-cell">
                         {{$quantite}} pc
                     </td>

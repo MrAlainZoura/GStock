@@ -106,7 +106,10 @@ class RapportController extends Controller
         ];
         $code = str_replace('/', '-', $findVenteDetail->code);
         $facture ="facture ".$findVenteDetail->user->name." ".$findVenteDetail->created_at." ".$code .".pdf";
+      
+        $customPaper = array(0, 0, 278, 600); // (gauche, haut, droite, bas)
         $pdf = Pdf::loadView('vente.fact', $data);
+        $pdf->setPaper($customPaper);
         return $pdf->download($facture);
     }
 
