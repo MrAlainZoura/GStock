@@ -21,7 +21,9 @@ class Depot extends Model
     public function vente(){
         return $this->hasMany(Vente::class);
     }
-  
+    public function depotUser(){
+        return $this->hasMany(DepotUser::class);
+    }
 
 
 }

@@ -43,6 +43,9 @@ class User extends Authenticatable
     public function vente(){
         return $this->hasMany(Vente::class);
     }
+    public function depotUser(){
+        return $this->hasMany(DepotUser::class);
+    }
 
     /**
      * The attributes that should be hidden for serialization.

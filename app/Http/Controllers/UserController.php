@@ -18,7 +18,8 @@ class UserController extends Controller
      */
     public function index()
     {
-        $user = User::orderBy("depot_id")->with('depot')->get();
+        $user = User::with('depotUser.depot')->get();
+        // dd((count($user[0]->depotUser)<1)?'ok':$user[0]->depotUser);//->depotUser[0]->depot->libele);
         return view('users.index', compact('user'));
     }
 
@@ -36,7 +37,7 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        // dd($request->all());
+        dd($request->all());
         $validateDate = Validator::make($request->all(),
         [
             'name'=>'required',
@@ -72,7 +73,7 @@ class UserController extends Controller
             'tel'=>$request->tel,
             // 'depot_id'=>$request->depot_id,
             'postnom'=>$request->postnom,
-            'prenom'=>$request->teprenoml,
+            'prenom'=>$request->prenom,
             'image'=>($request->file('image')!=null)? "$request->name$request->postnom.$type":null,
         ];
         $user = User::create($data);
@@ -120,7 +121,7 @@ class UserController extends Controller
             $id = $parts[1]/6789012345;
         }
         $depot = Depot::orderBy('libele')->get();
-        $user= User::where("id","=", $id)->where('name',$name)->first();
+        $user= User::where("id","=", $id)->where('name',$name)->with('depotUser')->first();
         return view('users.profil',compact('user','depot'));
     }
 
@@ -133,16 +134,16 @@ class UserController extends Controller
         [
             'name'=>'required',
             'email'=>'required|email|max:255',
-            'genre'=>'string',
-            'naissance'=>'string',
-            'fonction'=>'string',
-            'niveauEtude'=>'string',
-            'option'=>'string',
-            'adresse'=>'string',
-            'tel'=>'string',
-            'depot_id'=>'required|exists:depots,id',
-            'postnom'=>'string',
-            'image'=>'file|mimes:jpg, jpeg, png, gift, jfif'
+            'image'=>'file|mimes:jpg, jpeg, png, gift, jfif',
+            'genre'=>($request->genre)?'string':'',
+            'naissance'=>($request->naissance)?'string':'',
+            'fonction'=>($request->fonction)?'string':'',
+            'niveauEtude'=>($request->niveauEtude)?'string':'',
+            'option'=>($request->option)?'string':'',
+            'adresse'=>($request->adresse)?'string':'',
+            'tel'=>($request->tel)?'string':'',
+            'postnom'=>($request->postnom)?'string':'',
+            'prenom'=>($request->prenom)?'string':'',
         ]);
 
         if($validateDate->fails()){
@@ -174,14 +175,16 @@ class UserController extends Controller
             'option'=>$request->option,
             'adresse'=>$request->adresse,
             'tel'=>$request->tel,
-            'depot_id'=>$request->depot_id,
             'postnom'=>$request->postnom,
-            'prenom'=>$request->teprenoml,
+            'prenom'=>$request->prenom,
             'image'=>$image,
         ];
 
         $data2 = array_filter($data, function($val){return !is_null($val);});
         $userUpdate = User::where('id', $id)->update($data2);
+        if($request->depot_id!=null){
+            $update_affectation = DepotUser::where('user_id',$id)->update(['depot_id'=>$request->depot_id]);
+        }
         if($userUpdate) {
             return back()->with('success',"Profil mis à jour avec succès !");
         }

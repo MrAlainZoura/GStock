@@ -52,7 +52,13 @@
                 @method('put')
                 <div class="grid gap-4 sm:grid-cols-2 sm:gap-6">
                     <div class="w-full flex flex-col sm:flex-row sm:col-span-2 sm:block"> 
-                        <img id="imagePreview" class="w-20 h-20 rounded-full m-2 border border-gray-300 " src="{{asset('storage/users/'.$user->image)}}" alt="Voir"> 
+                        <img id="imagePreview" class="w-20 h-20 rounded-full m-2 border border-gray-300 " 
+                            @if ($user->image!=null)
+                                src="{{asset('storage/users/'.$user->image)}}"
+                            @else
+                                src="{{asset('svg/man.svg')}}"
+                            @endif
+                        alt="Voir"> 
                         <div class="w-full">
                             <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white" for="file_input">Prendre une image</label>
                             <input class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" 
@@ -102,11 +108,20 @@
                     </div>
                     <div>
                         <label for="shop" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Affectation</label>
-                        <select required name="depot_id" id="shop" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
-                                <option selected value="{{$user->depot->id}}">{{$user->depot->libele}}</option>
-                                @foreach ($depot as $itm )
-                                    <option value="{{$itm->id}}">{{$itm->libele}}</option>
-                                @endforeach  
+                        <select name="depot_id" id="shop" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
+                            @if(count($user->depotUser)>0)
+                                <option selected value="{{$user->depotUser[0]->depot->id}}">
+                                    {{$user->depotUser[0]->depot->libele}} 
+                                </option>
+                            @else
+                            <option selected value="">
+                                    Choisir une affectation 
+                                </option>
+                            @endif
+                                
+                            @foreach ($depot as $itm )
+                                <option value="{{$itm->id}}">{{$itm->libele}}</option>
+                            @endforeach  
                         </select>
                     </div>
                     <div class="w-full">

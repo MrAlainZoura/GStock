@@ -74,7 +74,9 @@
                 
             </td>
             <td>
-            {{$item->depot->libele}}  
+                @if(count($item->depotUser)>0)
+                    {{$item->depotUser[0]->depot->libele}} 
+                @endif
             </td>
             <td> 
                 @include('composant.actionLink', ['itemName'=>$item->name,'seeRoute'=>'user.show','seeParam'=>"$item->name ".$item->id*6789012345, 'deleteRoute'=>"user.destroy",'deleteParam'=>"$item->name ".$item->id*6789012345, 'editeRoute'=>"user.edit",'editParam'=>"$item->name ".$item->id*6789012345])
