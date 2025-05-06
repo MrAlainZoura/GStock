@@ -85,6 +85,7 @@
 
         <div class="container">
         <div class="invoice-header">
+            <img src="{{public_path('img/icon.jpeg')}}" alt="" style="width: 20px; height:20px;">
         <h2>Détails de la Facture</h2>
         <h3>Ste. Ujisha ...</h3>
         <p> Facture effectué par {{$findVenteDetail->user->name}} 
