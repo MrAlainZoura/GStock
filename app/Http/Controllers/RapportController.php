@@ -95,7 +95,7 @@ class RapportController extends Controller
                 "enter"=>$singleProdApro,
                 "trans"=>$singleProdTrans,
                 "vente"=> $singleProdVente,
-                "rest"=>($val->produit->produitDepot !=null)?$val->produit->produitDepot[0]->quantite:""
+                "rest"=>ProduitDepot::where('produit_id',$val->produit_id)->where('depot_id', $depot->id)->first()->quantite
             ];
             
             array_push($prodArrayResume,$singleProdResume);
