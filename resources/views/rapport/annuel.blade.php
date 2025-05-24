@@ -1,5 +1,5 @@
 @extends('base')
-@section('title', "Transfert ". session('depot'))
+@section('title', "Rapport annuel ". session('depot'))
 
 @section('header')
   @include('composant.hearder', ['user_email'=>Auth::user()->email, 'user_name'=>Auth::user()->name])
@@ -41,6 +41,7 @@
         <div class="py-4 px-2 mx-auto max-w-screen-xl text-left lg:py-4">
             <h1 class="mb-4 text-xl  tracking-tight leading-none text-gray-900 md:text-xl lg:text-xl dark:text-white">3. RESUME STOCK </h1>
         </div>
+        @include('composant.rapportTableResume',['data'=> $prodArrayResume])
     </section>
 
     @include('composant.sidebar',['depot'=> session('depot')])

@@ -10,7 +10,10 @@ use App\Models\Transfert;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Approvisionnement;
+use App\Models\ProduitDepot;
+use App\Models\VenteProduit;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\DB;
 
 class RapportController extends Controller
 {
@@ -64,7 +67,45 @@ class RapportController extends Controller
         $venteAn = Vente::orderBy('user_id')->where('depot_id', $depot->id)
                         ->whereYear('created_at',$year)
                         ->get();
-        return view('rapport.annuel', compact ( "approAn", "transAn", "venteAn","year"));
+        //resume stock chaque produit
+        $prodArrayResume = [];
+        $allProdDepot = ProduitDepot::where('depot_id', $depot->id)->with('produit','produit.marque', 'produit.marque.categorie','produit.produitDepot')->get();
+        foreach($allProdDepot as $ke=>$val){
+            $singleProdApro = Approvisionnement::where('depot_id', $depot->id)
+                            ->where('produit_id',$val->produit_id)
+                            ->whereYear('created_at',$year)
+                            ->sum('quantite');
+
+            $singleProdVente =DB::table('ventes')
+                            ->join('vente_produits', 'ventes.id', '=', 'vente_produits.vente_id')
+                            ->whereYear('ventes.created_at',$year)
+                            ->where('produit_id',$val->produit_id)
+                            ->where('depot_id', $depot->id)
+                            ->sum('vente_produits.quantite');
+            $singleProdTrans =DB::table('transferts')
+                            ->join('produit_transferts', 'transferts.id', '=', 'produit_transferts.transfert_id')
+                            ->whereYear('transferts.created_at',$year)
+                            ->where('produit_id',$val->produit_id)
+                            ->where('depot_id', $depot->id)
+                            ->sum('produit_transferts.quantite');
+
+            $singleProdResume = [
+                'libele'=>$val->produit->libele,
+                "cat"=>$val->produit->marque->categorie->libele." ". $val->produit->marque->libele,
+                "enter"=>$singleProdApro,
+                "trans"=>$singleProdTrans,
+                "vente"=> $singleProdVente,
+                "rest"=>($val->produit->produitDepot !=null)?$val->produit->produitDepot[0]->quantite:""
+            ];
+            
+            array_push($prodArrayResume,$singleProdResume);
+        }
+        //tirer le tableau selon ordre decroissant de categorie
+        usort($prodArrayResume, function ($a, $b) {
+            return strcmp($b['cat'], $a['cat']);
+        });
+        // dd($prodArrayResume);
+        return view('rapport.annuel', compact ( "approAn", "transAn", "venteAn","year","prodArrayResume"));
     }
 
 
