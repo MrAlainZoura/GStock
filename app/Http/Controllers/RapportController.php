@@ -32,12 +32,51 @@ class RapportController extends Controller
         $venteJour = Vente::orderBy('user_id')->where('depot_id', $depot->id)
                         ->where('created_at','like','%'.$today.'%')
                         ->get();
+                //resume stock chaque produit
+        $prodArrayResume = [];
+        $allProdDepot = ProduitDepot::where('depot_id', $depot->id)->with('produit','produit.marque', 'produit.marque.categorie')->get();
+        foreach($allProdDepot as $ke=>$val){
+            $singleProdApro = Approvisionnement::where('depot_id', $depot->id)
+                            ->where('produit_id',$val->produit_id)
+                            ->where('created_at','like','%'.$today.'%')
+                            ->sum('quantite');
+
+            $singleProdVente =DB::table('ventes')
+                            ->join('vente_produits', 'ventes.id', '=', 'vente_produits.vente_id')
+                            ->where('ventes.created_at','like','%'.$today.'%')
+                            ->where('produit_id',$val->produit_id)
+                            ->where('depot_id', $depot->id)
+                            ->sum('vente_produits.quantite');
+            $singleProdTrans =DB::table('transferts')
+                            ->join('produit_transferts', 'transferts.id', '=', 'produit_transferts.transfert_id')
+                            ->where('transferts.created_at','like','%'.$today.'%')
+                            ->where('produit_id',$val->produit_id)
+                            ->where('depot_id', $depot->id)
+                            ->sum('produit_transferts.quantite');
+
+            $singleProdResume = [
+                'libele'=>$val->produit->libele,
+                "cat"=>$val->produit->marque->categorie->libele." ". $val->produit->marque->libele,
+                "enter"=>$singleProdApro,
+                "trans"=>$singleProdTrans,
+                "vente"=> $singleProdVente,
+                "rest"=>$val->quantite
+            ];
+            
+            array_push($prodArrayResume,$singleProdResume);
+        }
+        //tirer le tableau selon ordre decroissant de categorie
+        usort($prodArrayResume, function ($a, $b) {
+            return strcmp($b['cat'], $a['cat']);
+        });
+        // dd($prodArrayResume);
         
-        return view('rapport.journalier', compact ( "approJour", "transJour", "venteJour"));
+        return view('rapport.journalier', compact ( "approJour", "transJour", "venteJour","prodArrayResume"));
     }
     public function mensuel($depot){
         Carbon::setLocale('fr');
         $mois = Carbon::now()->format('m');
+        $year = Carbon::now()->format('Y');
         $depot = Depot::where('libele',$depot)->first();
 
         $approMois = Approvisionnement::orderBy('user_id')->where('depot_id', $depot->id)
@@ -49,10 +88,52 @@ class RapportController extends Controller
         $venteMois = Vente::orderBy('user_id')->where('depot_id', $depot->id)
                         ->whereMonth('created_at',$mois)
                         ->get();
+
+                //resume stock chaque produit
+        $prodArrayResume = [];
+        $allProdDepot = ProduitDepot::where('depot_id', $depot->id)->with('produit','produit.marque', 'produit.marque.categorie')->get();
+        foreach($allProdDepot as $ke=>$val){
+            $singleProdApro = Approvisionnement::where('depot_id', $depot->id)
+                            ->where('produit_id',$val->produit_id)
+                            ->whereMonth('created_at',$mois)
+                            ->whereYear('created_at',$year)
+                            ->sum('quantite');
+
+            $singleProdVente =DB::table('ventes')
+                            ->join('vente_produits', 'ventes.id', '=', 'vente_produits.vente_id')
+                            ->whereYear('ventes.created_at',$year)
+                            ->whereMonth('ventes.created_at',$mois)
+                            ->where('produit_id',$val->produit_id)
+                            ->where('depot_id', $depot->id)
+                            ->sum('vente_produits.quantite');
+            $singleProdTrans =DB::table('transferts')
+                            ->join('produit_transferts', 'transferts.id', '=', 'produit_transferts.transfert_id')
+                            ->whereYear('transferts.created_at',$year)
+                            ->whereMonth('transferts.created_at',$mois)
+                            ->where('produit_id',$val->produit_id)
+                            ->where('depot_id', $depot->id)
+                            ->sum('produit_transferts.quantite');
+
+            $singleProdResume = [
+                'libele'=>$val->produit->libele,
+                "cat"=>$val->produit->marque->categorie->libele." ". $val->produit->marque->libele,
+                "enter"=>$singleProdApro,
+                "trans"=>$singleProdTrans,
+                "vente"=> $singleProdVente,
+                "rest"=>$val->quantite
+            ];
+            
+            array_push($prodArrayResume,$singleProdResume);
+        }
+        //tirer le tableau selon ordre decroissant de categorie
+        usort($prodArrayResume, function ($a, $b) {
+            return strcmp($b['cat'], $a['cat']);
+        });
+        // dd($prodArrayResume);
         
         $mois = Carbon::now()->isoFormat('MMMM YYYY');;
                         
-        return view('rapport.mensuel', compact ( "approMois", "transMois", "venteMois","mois"));
+        return view('rapport.mensuel', compact ( "approMois", "transMois", "venteMois","mois","prodArrayResume"));
     }
     public function annuel($depot){
         $year = Carbon::now()->format('Y');
@@ -69,7 +150,7 @@ class RapportController extends Controller
                         ->get();
         //resume stock chaque produit
         $prodArrayResume = [];
-        $allProdDepot = ProduitDepot::where('depot_id', $depot->id)->with('produit','produit.marque', 'produit.marque.categorie','produit.produitDepot')->get();
+        $allProdDepot = ProduitDepot::where('depot_id', $depot->id)->with('produit','produit.marque', 'produit.marque.categorie')->get();
         foreach($allProdDepot as $ke=>$val){
             $singleProdApro = Approvisionnement::where('depot_id', $depot->id)
                             ->where('produit_id',$val->produit_id)
@@ -95,7 +176,7 @@ class RapportController extends Controller
                 "enter"=>$singleProdApro,
                 "trans"=>$singleProdTrans,
                 "vente"=> $singleProdVente,
-                "rest"=>ProduitDepot::where('produit_id',$val->produit_id)->where('depot_id', $depot->id)->first()->quantite
+                "rest"=>$val->quantite
             ];
             
             array_push($prodArrayResume,$singleProdResume);
