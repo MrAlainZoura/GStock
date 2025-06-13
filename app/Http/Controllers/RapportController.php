@@ -190,6 +190,9 @@ class RapportController extends Controller
     }
 
 
+    public function seemore($action){
+        dd($action);
+    }
     public function journalieru($depot){
         Carbon::setLocale('fr');
 
