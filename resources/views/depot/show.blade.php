@@ -156,7 +156,7 @@
     const vente = @json($totalVendue);
     const transfert =@json(    $depot->totalTrans);
     const appro = @json($depot->totalApro);
-    console.log('donnee', vente);
+    // console.log('donnee', vente);
     document.addEventListener("DOMContentLoaded", () => {
     new ApexCharts(document.querySelector("#pieChart"), {
         series: [parseInt(vente), parseInt(appro) ,parseInt(transfert)],

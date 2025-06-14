@@ -174,4 +174,25 @@ class DepotController extends Controller
         }
         return response()->json(['success'=>true, 'data'=>'Suppression reussie!']);
     }
+
+    public function depotSetting(string $depot){
+         $depotData = Depot::where("libele",$depot)->first();
+         $collaborateur = count($depotData->depotUser);
+         $tabCatMark = [];
+         $countMark = 0;
+
+         foreach($depotData->produitDepot as $k=>$v){
+
+            if (array_key_exists($v->produit->marque->categorie->libele, $tabCatMark)) {
+                if (!in_array($v->produit->marque->libele, $tabCatMark[$v->produit->marque->categorie->libele])) {
+                    $tabCatMark[$v->produit->marque->categorie->libele][] = $v->produit->marque->libele;
+                    $countMark+=1;
+                } 
+            } else {
+                $tabCatMark[$v->produit->marque->categorie->libele] = [$v->produit->marque->libele];
+                $countMark+=1;
+            }
+         }
+        return view('depot.setting',compact('depotData', 'collaborateur','tabCatMark','countMark'));
+    }
 }

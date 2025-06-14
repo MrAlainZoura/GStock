@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Depot;
 use App\Models\Vente;
 use App\Models\Client;
+use App\Models\Paiement;
 use App\Models\Categorie;
 use Carbon\CarbonInterface;
 use App\Models\ProduitDepot;
@@ -32,7 +33,7 @@ class VenteController extends Controller
         $depot= Depot::where("libele",$depot)->first();
         $cat = Categorie::all();
         $client =Client::all();
-        $produit = ProduitDepot::where("depot_id",$depot->id)->with("produit.marque")->get();
+        $produit = ProduitDepot::where("depot_id",$depot->id)->with("produit.marque","produit.marque.categorie")->get();
         return view("vente.create", compact("depot","cat","client","produit"));
     }
 
@@ -46,7 +47,7 @@ class VenteController extends Controller
         [
             'nom_client'=>'string|required',
             'lieu_de_vente'=>'string|required',
-            'contact_client'=>'required|max:255',
+            'contact_client'=>'max:255',
             'produits'=>'array|required'
         ]);
         if($validateDate->fails()){
@@ -92,7 +93,6 @@ class VenteController extends Controller
                 }
             }
         }
-        // dd($tabDataVenteProduit);
         if($tabDataVenteProduit!=null){
             $dataVente = [
                 'user_id'=>Auth::user()->id,
@@ -104,8 +104,8 @@ class VenteController extends Controller
 
             $createVente = Vente::create($dataVente);
             if($createVente){
+                $netPayer = 0;
                 foreach($tabDataVenteProduit as $valeur){
-                    // dd( $valeur['id'], $valeur['qt'], $valeur['pt']);
                     $dataVenteProduit =[
                         'produit_id'=>$valeur['id'],
                         'vente_id'=>$createVente->id,
@@ -113,10 +113,23 @@ class VenteController extends Controller
                         'prixU'=>(int)$valeur['pt']/(int)$valeur['qt'],
                         'prixT'=>$valeur['pt']
                     ];
+                    $netPayer+=(int)$valeur['pt'];
                     $createVenteProduit = VenteProduit::create($dataVenteProduit);
                 }
+                $dataPaiement  = [
+                    'vente_id'=>$createVente->id,
+                    "tranche"=>1,
+                    "avance"=>$request->trancheP,
+                    "solde"=>$netPayer - (int)$request->trancheP,
+                    "net"=>$netPayer,
+                    "completed"=>false
+                ];
+                $checkTranche = filter_var($request->tranche, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+                ($checkTranche==true)?$createPaiement = Paiement::create($dataPaiement):"";
+                
                 if($createVenteProduit){
-                    return back()->with("success","Vente effectué avec succes, numéro $createVente->code par ".Auth::user()->name);
+                     $routeParam = 56745264509*$createVente->id;
+                    return to_route('venteShow',$routeParam);
                 }
             }
         }        

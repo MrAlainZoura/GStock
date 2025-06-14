@@ -1,5 +1,5 @@
 @extends('base')
-@section('title', "Transfert ". session('depot'))
+@section('title', "Ventes ". session('depot'))
 
 @section('header')
   @include('composant.hearder', ['user_email'=>Auth::user()->email, 'user_name'=>Auth::user()->name])
@@ -102,6 +102,20 @@
                               <span class="sr-only">Info</span>
                                 <span id="netPayer" class="font-medium">Montant net à payer </span>
                             </div>
+                            <div>
+                            <label for="paie" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Mode de Paiement</label>
+                            <select id="paie" required name="tranche" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
+                                <option selected value="">Choisir le mode de paiement </option>
+                                <option value=false>Paiement cash</option>
+                                <option value=true>Paiement par tranche</option>
+                            </select>
+                          
+                            <div class="w-full hidden" id="inputTranche">
+                                <label for="tranche" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Première tranche</label>
+                                <input type="number" min="1" name="trancheP" id="tranche" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="1000" >
+                            </div>
+                            
+                        </div>
                           </div> 
                     </div>
                     
@@ -125,24 +139,55 @@
 <script>
     
 let users = @json($produit);
-// console.log(users)
+console.log(users)
 function onkeyUp(e) {
   let keyword = e.target.value;
   let dropdownEl = document.querySelector("#dropdown");
   dropdownEl.classList.remove("hidden");
 
-  let filteredusers = users.filter((c) =>
-    c.produit.description.toLowerCase().includes(keyword.toLowerCase())
-  );
+  let filteredusers = users.filter((c) => {
+    if (c.produit.libele.toLowerCase().includes(keyword.toLowerCase())) {
+        return true; 
+    }
+    if (c.produit.description.toLowerCase().includes(keyword.toLowerCase())) {
+        return true; 
+    }
+    if (c.produit.marque.libele.toLowerCase().includes(keyword.toLowerCase())) {
+        return true; 
+    }
+    if (c.produit.marque.categorie.libele.toLowerCase().includes(keyword.toLowerCase())) {
+        return true; 
+    }
+    return false;
+});
 
   renderOptions(filteredusers);
 }
 
+//script tranche 
+const tranche =()=> {document.getElementById('paie').addEventListener('change', function() {
+        var select = document.getElementById('paie');
+        var tranche = document.getElementById('inputTranche');
+        var inputTrans = document.getElementById('tranche');
+        const valeur = select.value;
+        if(valeur =='true'){
+          select.value = true;
+          tranche.classList.remove("hidden");
+          inputTrans.setAttribute("required", true)
+        }else{
+          select.value = false;
+          tranche.classList.add('hidden');
+          inputTrans.removeAttribute("required")
+        }
+        // console.log(select.value, true)
+        ;})
+}
 document.addEventListener("DOMContentLoaded", () => {
   renderOptions(users);
   today();
   ancien();
   submitMyForm();
+  tranche();
 });
 
 function renderOptions(options) {
@@ -353,4 +398,7 @@ const submitMyForm = ()=>{
   myFormVente.submit();
   })
 }
+
+
+    
 </script>

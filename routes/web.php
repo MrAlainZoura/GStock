@@ -10,6 +10,7 @@ use App\Http\Controllers\CategorieController;
 use App\Http\Controllers\TransfertController;
 use App\Http\Middleware\AuthentifyMiddleware;
 use App\Http\Controllers\ApprovisionnementController;
+use App\Http\Controllers\PaiementController;
 use App\Http\Controllers\RapportController;
 
 // Route::get('/', function () {
@@ -49,9 +50,15 @@ Route::delete('vente/{vente}/delete', [VenteController::class,'destroy'])->name(
 Route::get('rapport/{depot}/journalier', [RapportController::class,'journalier'])->name('rapport.jour')->middleware( AuthentifyMiddleware::class);
 Route::get('rapport/{depot}/mensuel', [RapportController::class,'mensuel'])->name('rapport.mois')->middleware( AuthentifyMiddleware::class);
 Route::get('rapport/{depot}/annuel', [RapportController::class,'annuel'])->name('rapport.annee')->middleware( AuthentifyMiddleware::class);
+Route::get('rapport/{depot}/voir plus/{action}', [RapportController::class,'seemore'])->name('rapport.more')->middleware( AuthentifyMiddleware::class);
 Route::get('rapport/{depot}/facture', [RapportController::class,'facture'])->name('facturePDF')->middleware( AuthentifyMiddleware::class);
 
+Route::get('{depot}/parametre', [DepotController::class, 'depotSetting'])->name("depotSetting")->middleware(AuthentifyMiddleware::class);
 Route::get('{depot}/produits', [DepotController::class, 'showProduit'])->name("showProduit")->middleware(AuthentifyMiddleware::class);
+
+Route::get('vente/creances/{depot}', [PaiementController::class,'creance'])->name('creanceDepot')->middleware( AuthentifyMiddleware::class);
+Route::post('vente/creances/{vente}', [PaiementController::class,'store'])->name('creanceStore')->middleware( AuthentifyMiddleware::class);
+Route::resource('paiement',PaiementController::class)->middleware(AuthentifyMiddleware::class);
 Route::resource('depot', DepotController::class)->middleware(AuthentifyMiddleware::class);
 Route::resource('cat-pro', CategorieController::class)->middleware(AuthentifyMiddleware::class);
 Route::resource('prod', ProduitController::class)->middleware(AuthentifyMiddleware::class);

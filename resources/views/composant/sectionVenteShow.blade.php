@@ -117,8 +117,47 @@
                                 </td>
                                 <td class="px-3 py-3"> @formaMille($netPaye) Fc</td>
                             </tr>
+                            
                         </tfoot>
                     </table>
+                    
+                    
+                @if($findVenteDetail->paiement !=null)
+                    <div class="w-full pt-5 text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                        <div>
+                            <div class="grid grid-cols-4 p-1 text-sm font-medium text-gray-900 bg-gray-100 border-t border-b border-gray-200 gap-2 dark:bg-gray-800 dark:border-gray-700 dark:text-white">
+                                <div class="flex items-center">Date</div>
+                                <div>Versement</div>
+                                <div>Reste</div>
+                                <div>Soldé</div>
+                            </div>
+                            
+                            @foreach($findVenteDetail->paiement as $cl=>$val)
+                            <div class="grid grid-cols-4  py-5 text-sm text-gray-700 border-b border-gray-200 gap-x-3 dark:border-gray-700">
+                                <div class="text-gray-500 dark:text-gray-400">{{$val->created_at}}</div>
+                                <div>
+                                   {{$val->avance}}
+                                </div>
+                                <div>
+                                    {{$val->solde}}
+                                </div>
+                                <div>
+                                    @if($val->completed==false)
+                                    <svg class="w-3 h-3 text-red-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                                    </svg>
+                                    @else
+                                    <svg class="w-3 h-3 text-green-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 12">
+                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5.917 5.724 10.5 15 1.5"/>
+                                    </svg>
+                                    @endif
+                                </div>
+                            </div>
+                              @endforeach                          
+                        </div>
+                    </div>
+
+                @endif
                 </div>
 
                
