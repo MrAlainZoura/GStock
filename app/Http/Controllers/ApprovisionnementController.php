@@ -120,7 +120,9 @@ class ApprovisionnementController extends Controller
             'receptionUser'=> "$userName $userPrenom",
             'updated_at'=>$date->format('Y-m-d H:i:s')];
         $updateConfirm = Approvisionnement::where('id',$id)->where('produit_id',$prod_id)->where('confirm',false)->first();
-        
+        if($updateConfirm==null){
+            return back()->with('echec',"Desolé, vous ne pouvez pas confirmé approvisionnement deux fois");
+        }
         if($updateConfirm->user_id==Auth::user()->id)
         {
             return back()->with('echec',"Desolé, vous ne pouvez pas confirmé votre prore approvisionnement");

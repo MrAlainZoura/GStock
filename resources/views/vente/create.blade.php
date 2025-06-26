@@ -17,6 +17,25 @@
         @include('composant.alert_echec', ['message'=>session('echec')])
     </div>
     @endif
+    
+    <div id="alert-additional-content-2" class="p-4 mb-4 text-red-800 border border-red-300 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400 dark:border-red-800" role="alert">
+      <div class="flex items-center">
+        <svg class="shrink-0 w-4 h-4 me-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+          <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
+        </svg>
+        <span class="sr-only">Info</span>
+        <h3 class="text-lg font-medium">Erreur, vente impossible</h3>
+      </div>
+      <div class="mt-2 mb-4 text-sm">
+          Veuillez au moins choisir un produit pour effectuer cette vente, sinon elle n'aura pas de sens!
+      </div>
+      <div class="flex item-center justify-center">
+        <button type="button" onclick="alertErreurProduitSend('hide')" class="text-red-800 bg-transparent border border-red-800 hover:bg-red-900 hover:text-white focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-xs px-3 py-1.5 text-center dark:hover:bg-red-600 dark:border-red-600 dark:text-red-500 dark:hover:text-white dark:focus:ring-red-800">
+          Reprennez
+        </button>
+      </div>
+    </div>
+
     <div class="p-10">
 
         <form id="myFormVente" action="{{route('venteStore',session('depot'))}}" method="post" enctype="multipart/form-data">
@@ -139,11 +158,14 @@
 <script>
     
 let users = @json($produit);
-console.log(users)
+let prodListTab=[];
+// console.log(users)
 function onkeyUp(e) {
   let keyword = e.target.value;
   let dropdownEl = document.querySelector("#dropdown");
-  dropdownEl.classList.remove("hidden");
+  if (document.activeElement===e.target) {
+    dropdownEl.classList.remove("hidden"); 
+  }
 
   let filteredusers = users.filter((c) => {
     if (c.produit.libele.toLowerCase().includes(keyword.toLowerCase())) {
@@ -188,6 +210,7 @@ document.addEventListener("DOMContentLoaded", () => {
   ancien();
   submitMyForm();
   tranche();
+  alertErreurProduitSend('hide');
 });
 
 function renderOptions(options) {
@@ -197,17 +220,35 @@ function renderOptions(options) {
 
   options.forEach((user,indice) => {
     newHtml += `<div
-      onclick="selectOption('${user.produit.marque.libele} ${user.produit.libele}', '${user.produit.id}', '${indice}')"
+      onclick="updateDivProduit('${indice}')"
       class="px-5 py-3 border-b border-gray-200 text-stone-600 cursor-pointer hover:bg-slate-100 transition-colors"
     >
       ${user.produit.marque.libele} ${user.produit.libele}
     </div>`;
 
-  });
+    });
   dropdownEl.innerHTML = newHtml;
 }
 
-function selectOption(selectedOption, inputValue, indeX) {
+function updateDivProduit(index){
+  prodListTab = [...prodListTab, users[index]];
+  users = removeObjectByIndex(users, index);
+  const dernierProduit = prodListTab.length-1;
+  const div = prodListTab[dernierProduit]
+  selectOption(`${div.produit.marque.libele} ${div.produit.libele}`, `${div.produit.id}`, `${dernierProduit}`)
+}
+
+function removeDivProduit(index, idDiv) {
+  users = [...users, prodListTab[index]];                    // Ajoute l'élément retiré à users
+  prodListTab = removeObjectByIndex(prodListTab, index);     // Supprime l'élément du tableau
+  const deleteDivLabel = document.getElementById(`divLabel${idDiv}`);          // Cherche le div dans le DOM
+  const deleteDivPrix = document.getElementById(`divPrix${idDiv}`);          // Cherche le div dans le DOM
+  if (deleteDivLabel) {
+    deleteDivPrix.remove()
+    deleteDivLabel.remove();                                      // Supprime du DOM s'il existe
+  }
+}
+function selectOption(selectedOption, inputValue, index) {
   hideDropdown();
   let input = document.querySelector("#autocompleteInput");
   input.value = '';
@@ -252,20 +293,39 @@ newInputTotal.name = `produits[${inputValue}][${newInputQte.value}]`;
 
   const divQtPrix = document.createElement('div');
         divQtPrix.className="flex gap-2";
+        divQtPrix.id=`divPrix${inputValue}`;
+
+  const divLabel = document.createElement('div');
+        divLabel.className="flex";
+        divLabel.id=`divLabel${inputValue}`;
+  const svgDelete = `
+                    <svg width="15px" height="15px" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="http://www.w3.org/2000/svg" fill="#000000">
+                      <g id="SVGRepo_bgCarrier" stroke-width="0"/>
+                      <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"/>
+                      <g id="SVGRepo_iconCarrier">
+                      <path d="M960 160h-291.2a160 160 0 0 0-313.6 0H64a32 32 0 0 0 0 64h896a32 32 0 0 0 0-64zM512 96a96 96 0 0 1 90.24 64h-180.48A96 96 0 0 1 512 96zM844.16 290.56a32 32 0 0 0-34.88 6.72A32 32 0 0 0 800 320a32 32 0 1 0 64 0 33.6 33.6 0 0 0-9.28-22.72 32 32 0 0 0-10.56-6.72zM832 416a32 32 0 0 0-32 32v96a32 32 0 0 0 64 0v-96a32 32 0 0 0-32-32zM832 640a32 32 0 0 0-32 32v224a32 32 0 0 1-32 32H256a32 32 0 0 1-32-32V320a32 32 0 0 0-64 0v576a96 96 0 0 0 96 96h512a96 96 0 0 0 96-96v-224a32 32 0 0 0-32-32z" fill="#231815"/>
+                      <path d="M384 768V352a32 32 0 0 0-64 0v416a32 32 0 0 0 64 0zM544 768V352a32 32 0 0 0-64 0v416a32 32 0 0 0 64 0zM704 768V352a32 32 0 0 0-64 0v416a32 32 0 0 0 64 0z" fill="#231815"/>
+                      </g>
+                    </svg>
+                    `;
+  const deleteBtn = document.createElement('button');
+        deleteBtn.className = "mr-1 text-red-700 hover:text-white border border-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm text-center  dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:hover:bg-red-600 dark:focus:ring-red-900";
+        deleteBtn.innerHTML = svgDelete;
+        deleteBtn.type = 'button';
+        // deleteBtn.id = `${inputValue}`;
+        deleteBtn.setAttribute('onclick',`removeDivProduit('${index}', '${inputValue}')`)
 
   const labelIpnut = document.createElement('label');
-    labelIpnut.className="block mb-2 text-sm font-medium text-gray-900 dark:text-white";
+    labelIpnut.className="bloc mb-2 text-sm font-medium text-gray-900 dark:text-white";
     labelIpnut.textContent = selectedOption;
  
+  divLabel.appendChild(deleteBtn);
+  divLabel.appendChild(labelIpnut);
   divQtPrix.appendChild(newInputQte);
   divQtPrix.appendChild(newInputPrx);
   divQtPrix.appendChild(newInputTotal);
-  form.appendChild(labelIpnut);
+  form.appendChild(divLabel);
   form.appendChild(divQtPrix);
-
-
-  users = removeObjectByIndex(users, indeX);
-  // console.log(indeX,'supprimer Object');
 }
 
 document.addEventListener("click", () => {
@@ -332,6 +392,10 @@ const setTotal = (inputQte, inputPx, showT) => {
       if(parseInt(tabTobal)){
         somme = parseInt(somme) + parseInt(tabTobal);
       }
+       if (document.getElementById('tranche')) {
+        const maxTranchePaie = document.getElementById('tranche');
+        maxTranchePaie.max = somme; //Ajouter du maximum au champ de premiere tranche
+    }
       const sommeFormater = somme.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
       net.textContent = `Montant net à payer ${sommeFormater} Fc`;
     });
@@ -379,6 +443,15 @@ const ancien = ()=>{
     });
 }
 
+const alertErreurProduitSend = (action)=>{
+  const divErreur = document.getElementById('alert-additional-content-2')
+  if(action=='hide'){
+      divErreur.classList.add('hidden');
+    }
+    if(action=="show"){
+      divErreur.classList.remove("hidden");
+    }
+}
 const submitMyForm = ()=>{
   const myFormVente =document.getElementById('myFormVente');
   myFormVente.addEventListener('submit', (event)=>{
@@ -395,7 +468,9 @@ const submitMyForm = ()=>{
       }
       input.value = totalEntier;
    })
-  myFormVente.submit();
+console.log(prodListTab.length);
+(prodListTab.length==0)?alertErreurProduitSend('show'):myFormVente.submit();
+  // myFormVente.submit();
   })
 }
 

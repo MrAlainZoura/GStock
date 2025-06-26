@@ -68,11 +68,15 @@ class VenteController extends Controller
             "genre"=>$request->genre
         ];
         $filterDataClient = array_filter($dataClient, function($val){return !is_null($val);});
-        $tel = "0".substr($filterDataClient['tel'], 4);
-        $findClient = Client::where('tel',$filterDataClient['tel'])->orWhere('tel',)->get();
         $client_id ="";
-        if(count($findClient) > 0){
-            $client_id =$findClient[0]->id;
+        $tel=$request->contact_client;
+        $findClient =null;
+        if($tel !=null){
+            (strlen($tel)<=10)?$lonTel="+243".substr($tel, 1):$lonTel=$tel;
+            $findClient = Client::where('tel',$tel)->orWhere('tel',$lonTel)->first();
+            if($findClient != null){
+                $client_id =$findClient->id;
+            }
         }else{
             $createClient = Client::create($filterDataClient);
             $client_id = $createClient->id;
@@ -116,17 +120,19 @@ class VenteController extends Controller
                     $netPayer+=(int)$valeur['pt'];
                     $createVenteProduit = VenteProduit::create($dataVenteProduit);
                 }
+                $checkTranche = filter_var($request->tranche, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+
                 $dataPaiement  = [
                     'vente_id'=>$createVente->id,
                     "tranche"=>1,
-                    "avance"=>$request->trancheP,
-                    "solde"=>$netPayer - (int)$request->trancheP,
+                    "avance"=>($checkTranche==true)?(int)$request->trancheP:$netPayer,
+                    "solde"=>($checkTranche==true)?$netPayer - (int)$request->trancheP:0,
                     "net"=>$netPayer,
-                    "completed"=>false
+                    "completed"=>($checkTranche==true)?false:true
                 ];
-                $checkTranche = filter_var($request->tranche, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
-                ($checkTranche==true)?$createPaiement = Paiement::create($dataPaiement):"";
-                
+
+                $createPaiement = Paiement::create($dataPaiement);
+
                 if($createVenteProduit){
                      $routeParam = 56745264509*$createVente->id;
                     return to_route('venteShow',$routeParam);
@@ -176,6 +182,20 @@ class VenteController extends Controller
      */
     public function destroy($vente)
     {
-        return back()->with("success","Bientôt disponible");
+        $idVente = $vente/56745264509;
+        $deleteVente = Vente::where('id', $idVente)->first();
+        $produitRelatif = VenteProduit::where('vente_id', $idVente);
+        $paimentRelatif = Paiement::where('vente_id', $idVente);
+
+        if(auth::user()->id==null){
+            //verification de role d'admin
+            $deleteVente->delete();
+            $produitRelatif->delete();
+            $paimentRelatif->delete();
+            return back()->with("success","Vente effacée avec succès");
+        }else{
+            // dd($produitRelatif->get(), $paimentRelatif->get());
+            return back()->with("echec","Vous ne disposez pas de droit necessaire pour effectuer cette action");
+        }
     }
 }

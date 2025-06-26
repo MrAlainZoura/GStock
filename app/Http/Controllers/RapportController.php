@@ -3,17 +3,17 @@
 namespace App\Http\Controllers;
 
 use Carbon\Carbon;
-use Carbon\CarbonInterval;
+use Dompdf\Dompdf;
 use App\Models\Depot;
 use App\Models\Vente;
 use App\Models\Transfert;
+use Carbon\CarbonInterval;
+use App\Models\ProduitDepot;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Approvisionnement;
-use App\Models\ProduitDepot;
-use App\Models\VenteProduit;
-use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\View;
 
 class RapportController extends Controller
 {
@@ -223,8 +223,6 @@ class RapportController extends Controller
        
         $id= $vente/56745264509;
         $findVenteDetail = Vente::where('id',$id)->first();
-        // dd($detailVente->venteProduit[0]->produit->image);
-        // return view('vente.fact', compact('findVenteDetail')) ;
         
         $data =[
             'findVenteDetail'=>$findVenteDetail, 
@@ -232,10 +230,41 @@ class RapportController extends Controller
         $code = str_replace('/', '-', $findVenteDetail->code);
         $facture ="facture ".$findVenteDetail->user->name." ".$findVenteDetail->created_at." ".$code .".pdf";
       
-        $customPaper = array(0, 0, 278, 600); // (gauche, haut, droite, bas)
-        $pdf = Pdf::loadView('vente.fact', $data);
-        $pdf->setPaper($customPaper);
-        return $pdf->download($facture);
+        // $customPaper = array(0, 0, 227, 600); // (gauche, haut, droite, bas)
+        // $pdf = Pdf::loadView('vente.fact', $data);
+        // $pdf->setPaper($customPaper);
+        // return $pdf->download($facture);
+
+         $html = View::make('vente.fact', $data)->render();
+
+        // Étape 1 – Mesurer la hauteur
+        $GLOBALS['bodyHeight'] = 0;
+        $dompdf1 = new Dompdf();
+        $dompdf1->setPaper([0, 0, 226.77, 1000]); // 80mm largeur, hauteur temporaire
+        $dompdf1->loadHtml($html);
+        $dompdf1->setCallbacks([
+            'collect_height' => [
+                'event' => 'end_frame',
+                'f' => function ($frame) {
+                    $node = $frame->get_node();
+                    if (strtolower($node->nodeName) === 'body') {
+                        $padding_box = $frame->get_padding_box();
+                        $GLOBALS['bodyHeight'] = $padding_box['h'];
+                    }
+                }
+            ]
+        ]);
+    
+        $dompdf1->render();
+
+        $hauteurReelle = $GLOBALS['bodyHeight']; // marges de sécurité
+
+        // Étape 2 – Rendu final avec hauteur exacte
+        $dompdf2 = new Dompdf();
+        $dompdf2->setPaper([0, 0, 226.77, $hauteurReelle]);
+        $dompdf2->loadHtml($html);
+        $dompdf2->render();
+        return $dompdf2->stream($facture);
     }
 
     
