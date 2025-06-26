@@ -33,7 +33,7 @@
   </button>
 </div>
     @endif
-    <form action="{{route('login')}}" method="post" class="max-w-sm mx-auto">
+    <form action="{{route('login')}}" method="post" class="max-w-sm mx-auto hidden">
         @csrf
         @method('post')
     <div class="mb-5">

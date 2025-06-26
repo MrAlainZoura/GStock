@@ -19,6 +19,7 @@ use App\Http\Controllers\RapportController;
 Route::get('/',[HomeController::class, 'home'])->name('home');
 Route::get('dashbord',[HomeController::class, 'dashboard'])->name('dashboard')->middleware(AuthentifyMiddleware::class);
 
+Route::get('sing in',[UserController::class, 'loginCreate'])->name('loginCreate');
 Route::post('login',[UserController::class, 'login'])->name('login');
 Route::post('logout',[UserController::class, 'logout'])->name('logout')->middleware(AuthentifyMiddleware::class);
 Route::put('update-password-user/{user}',[UserController::class, 'updataPass'])->name('updataPass')->middleware(AuthentifyMiddleware::class);

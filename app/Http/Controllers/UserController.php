@@ -90,6 +90,10 @@ class UserController extends Controller
         return back()->with('echec',"Une erreur inattendue s'est produite reessayer plus tard");
     }
 
+    public function loginCreate(){
+        return view('users.login');
+    }
+
     /**
      * Display the specified resource.
      */
