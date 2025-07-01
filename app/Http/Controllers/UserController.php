@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Role;
 use App\Models\User;
 use App\Models\Depot;
+use App\Models\UserRole;
 use App\Models\DepotUser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -71,7 +73,6 @@ class UserController extends Controller
             'option'=>$request->option,
             'adresse'=>$request->adresse,
             'tel'=>$request->tel,
-            // 'depot_id'=>$request->depot_id,
             'postnom'=>$request->postnom,
             'prenom'=>$request->prenom,
             'image'=>($request->file('image')!=null)? "$request->name$request->postnom.$type":null,
@@ -239,14 +240,15 @@ class UserController extends Controller
 
     public function login(Request $request){
         $daliation = Validator::make($request->all(),[
-            'email'=>'required|email',
+            'email'=>'required',
             'password'=>'required|min:4'
         ]);
         if($daliation->fails()){
             return back()->with('echec',$daliation->errors());
         }
         $data = ['email'=>$request->email, 'password'=>$request->password];
-        if(Auth::attempt($data)){
+        $dataLoginByName = ['name'=>$request->email, 'password'=>$request->password];
+        if(Auth::attempt($data) || Auth::attempt($dataLoginByName)){
             $request->session()->regenerate();
             // return to_route('dashboard'); 
             return redirect()->intended('dashbord');
@@ -256,5 +258,40 @@ class UserController extends Controller
     public function logout(){
         Auth::logout();
         return redirect(url("/"));
+    }
+
+    public function createCompte(Request $request){
+        $validateDate = Validator::make($request->all(),
+        [
+            'name'=>'required',
+            'email'=>'required|email|max:255|unique:users',
+            'password'=>'required|min:4'
+        ]);
+
+        if($validateDate->fails()){
+            $message = $validateDate->errors();
+            $erreursEmail = $validateDate->errors()->get('email');
+            if($erreursEmail!=null){
+                return back()->with('echecRegister','Ce email est déjà pris ou incorrect');
+            }
+            return back()->with('echecRegister','Erreur inattendue, Veuillez réessayer.');   
+        }
+        $data = [
+            'name'=>$request->name,
+            'email'=>$request->email,
+            'password'=>Hash::make($request->password)
+        ];
+
+        // dd($data);
+        $createAdmin = User::create($data);
+        if($createAdmin){ 
+            $getAdminRoleId = Role::where('libele', 'Administrateur')->first();
+           $roleId = ($getAdminRoleId !== null)
+                    ? $getAdminRoleId->id
+                    : Role::firstOrCreate(['libele'=>'Super admin','libele' => 'Administrateur','libele'=>'user'])->id;
+            $dataRoleUser = ['user_id'=>$createAdmin->id, 'role_id'=>$roleId];
+            $createRoleUSer = UserRole::create($dataRoleUser);
+        }
+       return back()->with('succes', 'Veuillez vous connectez à présent');
     }
 }

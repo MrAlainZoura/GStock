@@ -26,7 +26,7 @@
                 @method('post')
 
                 <div class="input-box animation" style="--i:1; --j:22">
-                    <input type="email" id="email" name="email" autocomplete="off" required>
+                    <input type="text" id="email" name="email" autocomplete="off" required>
                     <label for="">Email</label>
                     <i class='bx bxs-user'></i>
                 </div>
@@ -46,7 +46,7 @@
         <div class="info-text login">
             <h2 class="animation" style="--i:0; --j:20">Bienvenue!</h2>
             @if(session('echec'))
-                <p class="error-message">Identifiants incorrects. Veuillez réessayer.</p>
+                <p class="error-message" id="alerteLog">Identifiants incorrects. Veuillez réessayer.</p>
             @endif
             <p class="animation" style="--i:1; --j:21">Renseigner vos identifiants : email et mot de passe pour vous connecter</p>
         </div>
@@ -61,27 +61,33 @@
 
             <h2 class="title animation" style="--i:17; --j:0">Créer un compte</h2>
 
-            <form action="#">
-
+            <form action="{{route('nousRejoindre')}}" method="post" autocomplete="off">
+                @csrf
+                @method('post')
                 <div class="input-box animation" style="--i:18; --j:1">
-                    <input type="text" required>
-                    <label for="">Username</label>
+                    <input type="text" name="name" required autocomplete="off">
+                    <label for="">Nom utilisateur</label>
                     <i class='bx bxs-user'></i>
                 </div>
 
                 <div class="input-box animation" style="--i:19; --j:2">
-                    <input type="email" required>
+                    <input type="email" name="email" required autocomplete="off">
                     <label for="">Email</label>
                     <i class='bx bxs-envelope'></i>
                 </div>
 
                 <div class="input-box animation" style="--i:20; --j:3">
-                    <input type="password" required>
-                    <label for="">Password</label>
+                    <input type="password" id="password" name="password" autocomplete="off" required>
+                    <label for="">Mot de passe</label>
+                    <i class='bx bxs-lock-alt'></i>
+                </div>
+                <div class="input-box animation" style="--i:20; --j:3">
+                    <input type="password" id="confirm" autocomplete="off">
+                    <label for="">Mot de passe</label>
                     <i class='bx bxs-lock-alt'></i>
                 </div>
 
-                <button type="submit" class="btn animation" style="--i:21;--j:4">Créer compte</button>
+                <button type="submit" id="createCompte" class="btn animation" style="--i:21;--j:4">Créer compte</button>
 
                 <div class="linkTxt animation" style="--i:22; --j:5">
                     <p>Déjà un compte? <a href="#" class="login-link">Connexion</a></p>
@@ -92,8 +98,11 @@
 
         <div class="info-text register">
             <h2 class="animation" style="--i:17; --j:0;">Merci de nous rejoindre!</h2>
+            @if(session('echecRegister'))
+                <p class="error-message" id="alerte">{{session('echecRegister')}}</p>
+            @endif
             <p class="animation" style="--i:18; --j:1;">
-                Renseigner votre nom, email et mot de passe secret puis enregistrer
+                Renseigner votre nom, email et mot de passe secret puis Créer
             </p>
         </div>
 
