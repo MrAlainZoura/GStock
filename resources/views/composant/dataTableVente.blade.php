@@ -69,7 +69,11 @@
             </td>
             <td class="font-medium text-gray-900  dark:text-white">
                 <div class="flex gap-2 sm:bloc">
-                    {{$item->user->name}}                 
+                    @if($item->user!=null)
+                        {{$item->user->name}}
+                    @else
+                        Utilisateur à problème
+                    @endif                
                 </div>
             </td>
             <td >

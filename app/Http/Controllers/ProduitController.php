@@ -217,7 +217,7 @@ class ProduitController extends Controller
      */
     public function edit(Produit $produit)
     {
-        //
+        return back()->with('success',"Bientôt disponible"); 
     }
 
     /**

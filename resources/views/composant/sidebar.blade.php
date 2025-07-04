@@ -103,22 +103,21 @@
                         Liste
                      </a>
                   </li>
-                  <li>
-                     <a href="{{route('cat-pro.index')}}" class="flex items-center gap-2 w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
-                     <img src="{{asset('svg/cat.svg')}}" class="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" aria-hidden="true" alt="">
-                        Catégorie
-                     </a>
-                  </li>
-                 
-                  <li>
-                     <a href="{{route('prod.create')}}" class="flex items-center gap-2 w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
-                     <img src="{{asset('svg/add.svg')}}" class="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" aria-hidden="true" alt="">
-                        Ajouter
-                     </a>
-                  </li>
-              
+                  @if(Auth::user()->user_role->role->libele=='Administrateur' || Auth::user()->user_role->role->libele=='Super admin')
+                     <li>
+                        <a href="{{route('cat-pro.index')}}" class="flex items-center gap-2 w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
+                        <img src="{{asset('svg/cat.svg')}}" class="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" aria-hidden="true" alt="">
+                           Catégorie
+                        </a>
+                     </li>
                   
-                  
+                     <li>
+                        <a href="{{route('prod.create')}}" class="flex items-center gap-2 w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
+                        <img src="{{asset('svg/add.svg')}}" class="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" aria-hidden="true" alt="">
+                           Ajouter
+                        </a>
+                     </li>
+                  @endif      
             </ul>
          </li>
          
@@ -158,7 +157,6 @@
                <span class="inline-flex items-center justify-center w-3 h-3 p-3 ms-3 text-sm font-medium text-blue-800 bg-blue-100 rounded-full dark:bg-blue-900 dark:text-blue-300">3</span>
             </a>
          </li> -->
-
          <li>
             <button type="button" class="flex items-center w-full p-2 text-base text-gray-900 transition duration-75 rounded-lg group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
              aria-controls="dropdown-example3" data-collapse-toggle="dropdown-example3">
@@ -177,21 +175,23 @@
                         Liste
                      </a>
                   </li>
-                 
+                  @if(Auth::user()->user_role->role->libele=='Administrateur' || Auth::user()->user_role->role->libele=='Super admin')
                   <li>
                      <a href="{{route('user.create')}}" class="flex items-center gap-2 w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
                      <img src="{{asset('svg/add.svg')}}" class="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" aria-hidden="true" alt="">
                         Ajouter
                      </a>
                   </li>
+                  @endif
             </ul>
          </li>
+         @if(Auth::user()->user_role->role->libele=='Administrateur' || Auth::user()->user_role->role->libele=='Super admin')
+
          <li>
             <button type="button" class="flex items-center w-full p-2 text-base text-gray-900 transition duration-75 rounded-lg group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
              aria-controls="dropdown-example5" data-collapse-toggle="dropdown-example5">
              <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 
-<!-- Uploaded to: SVG Repo, www.svgrepo.com, Transformed by: SVG Repo Mixer Tools -->
                   <svg fill="#000000" height="24px" width="24px" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 463 463" xml:space="preserve" stroke="#000000" stroke-width="0.0046300000000000004">
                      <g id="SVGRepo_bgCarrier" stroke-width="0"/>
                      <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"/>
@@ -245,13 +245,14 @@
                <span class="flex-1 ms-3 whitespace-nowrap">Paramètres</span>
             </a>
          </li>
+         @endif
          <li>
-            <a href="#" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+            <form action="{{route('logout')}}" method="post" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
             <img src="{{asset('svg/exit.svg')}}" class="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" aria-hidden="true" alt="">
-
-
-               <span class="flex-1 ms-3 whitespace-nowrap">Exit</span>
-            </a>
+                @csrf 
+                @method('post')
+                <button type="submit" class="ml-1 flex-1 whitespace-nowrap">Exit</button>
+            </form>
          </li>
       </ul>
    </div>

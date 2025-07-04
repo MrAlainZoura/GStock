@@ -27,10 +27,22 @@
 </section>
 
 <section class="mt-10 p-20 gap-5 w-full grid grid-cols-1 sm:grid-cols-2 ">
-    @foreach($depot as $cl=>$v)
-      @include('composant.depot',['libele'=>"$v->libele", 'route'=>"depot/".$v->id*12726654])
-    @endforeach
+
     <!-- Main modal -->
+    @if($user->user_role->role->libele=='Administrateur')
+        @foreach($user->depot as $cl=>$v)
+            @include('composant.depot',['libele'=>"$v->libele", 'route'=>"depot/".$v->id*12726654])
+        @endforeach  
+        
+    @elseif($user->user_role->role->libele=='Super admin')
+        @foreach($depot as $cl=>$v)
+            @include('composant.depot',['libele'=>"$v->libele", 'route'=>"depot/".$v->id*12726654])
+        @endforeach
+    @else
+        @foreach($user->depotUser as $cl=>$v)
+            @include('composant.depot',['libele'=>$v->depot->libele , 'route'=>"depot/".$v->depot->id*12726654])
+        @endforeach
+    @endif
     @include('composant.modal',['libele'=>'dépôt', 'action'=>"depot.store",'user_id'=> $user->id ]) 
    </section>
 @endsection

@@ -20,20 +20,20 @@
         <span class="rotate-bg2"></span>
 
         <div class="form-box login">
-            <h2 class="title animation" style="--i:0; --j:21">Login</h2>
+            <h2 class="title animation" style="--i:0; --j:21">Login <a title="Retour" href="{{route('home')}}" class="close">&times;</a></h2>
              <form action="{{route('login')}}" method="post" class="max-w-sm mx-auto">
                 @csrf
                 @method('post')
 
                 <div class="input-box animation" style="--i:1; --j:22">
                     <input type="text" id="email" name="email" autocomplete="off" required>
-                    <label for="">Email</label>
+                    <label >Email</label>
                     <i class='bx bxs-user'></i>
                 </div>
 
                 <div class="input-box animation" style="--i:2; --j:23">
                     <input type="password" name="password" autocomplete="off" required>
-                    <label for="">Mot de passe</label>
+                    <label >Mot de passe</label>
                     <i class='bx bxs-lock-alt'></i>
                 </div>
                 <button type="submit" class="btn animation" style="--i:3; --j:24">Login</button>
@@ -59,31 +59,31 @@
 
         <div class="form-box register">
 
-            <h2 class="title animation" style="--i:17; --j:0">Créer un compte</h2>
+            <h2 class="title animation" style="--i:17; --j:0">Créer un compte <a title="Retour" href="{{route('home')}}" class="close">&times;</a></h2>
 
             <form action="{{route('nousRejoindre')}}" method="post" autocomplete="off">
                 @csrf
                 @method('post')
                 <div class="input-box animation" style="--i:18; --j:1">
                     <input type="text" name="name" required autocomplete="off">
-                    <label for="">Nom utilisateur</label>
+                    <label >Nom utilisateur</label>
                     <i class='bx bxs-user'></i>
                 </div>
 
                 <div class="input-box animation" style="--i:19; --j:2">
                     <input type="email" name="email" required autocomplete="off">
-                    <label for="">Email</label>
+                    <label >Email</label>
                     <i class='bx bxs-envelope'></i>
                 </div>
 
                 <div class="input-box animation" style="--i:20; --j:3">
                     <input type="password" id="password" name="password" autocomplete="off" required>
-                    <label for="">Mot de passe</label>
+                    <label >Mot de passe</label>
                     <i class='bx bxs-lock-alt'></i>
                 </div>
                 <div class="input-box animation" style="--i:20; --j:3">
                     <input type="password" id="confirm" autocomplete="off">
-                    <label for="">Mot de passe</label>
+                    <label >Mot de passe</label>
                     <i class='bx bxs-lock-alt'></i>
                 </div>
 
