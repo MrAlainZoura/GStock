@@ -36,8 +36,11 @@
                 @endforeach
                 </td>
                 <td class="px-6 py-4">
-                {{ $item->user->name }} 
-
+                    @if($item->user != null)
+                        {{ $item->user->name }} 
+                    @else
+                        Utilisateur à problème
+                    @endif
                 </td>
                 <td class="px-6 py-4">
                 {{ $item->destination }} 

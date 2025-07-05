@@ -74,10 +74,13 @@
                     </p>
                     <p class="text-2xl"> 
                     @if (count($vendeurs)>0)
+                    @if($vendeurs[0]->user != null)
+
                     {{$vendeurs[0]->user->name}} 
                     {{$vendeurs[0]->user->postnom}} 
                     {{$vendeurs[0]->user->prenom}}
                      avec {{$vendeurs[0]->count}} ventes
+                     @endif
                     @endif
                     </p>
                 </div>
@@ -105,10 +108,12 @@
                     </p>
                     <p class="text-2xl">
                     @if (count($vendeurs)>1)
+                    @if($vendeurs[1]->user != null)
                     {{$vendeurs[1]->user->name}} 
                     {{$vendeurs[1]->user->postnom}} 
                     {{$vendeurs[1]->user->prenom}}
                      avec {{$vendeurs[1]->count}} ventes
+                     @endif
                     @endif
                     </p>
                 </div>

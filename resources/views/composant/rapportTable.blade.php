@@ -51,7 +51,11 @@
                 {{$v->vente->type}}
                 </td>
                 <td class="px-6 py-4">
-                {{$v->vente->user->name}}
+                @if($v->vente->user != null)
+                    {{$v->vente->user->name}}
+                @else
+                    Utilisateur à problème
+                @endif
                 </td>
             </tr>
            
