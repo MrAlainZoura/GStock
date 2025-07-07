@@ -24,6 +24,9 @@ class Depot extends Model
     public function depotUser(){
         return $this->hasMany(DepotUser::class);
     }
+    public function devise(){
+        return $this->hasMany(Devise::class);
+    }
 
 
 }
