@@ -314,10 +314,9 @@ class UserController extends Controller
                     'user'
                 ];
                 foreach($dataAllRole as $role){
-                   $createAdminRole = Role::firstOrCreate(['libele'=>$role])->id;
+                   $createAdminRole = Role::firstOrCreate(['libele'=>$role]);
                    ($role == 'Administrateur')?$roleId =$createAdminRole->id:"";
                 }
-
             }
             $dataRoleUser = ['user_id'=>$createAdmin->id, 'role_id'=>$roleId];
             $createRoleUSer = UserRole::create($dataRoleUser);
