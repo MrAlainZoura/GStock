@@ -10,7 +10,11 @@
   <div class="flex items-center md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
       <button type="button" class="flex text-sm bg-gray-800 rounded-full md:me-0 focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600" id="user-menu-button" aria-expanded="false" data-dropdown-toggle="user-dropdown" data-dropdown-placement="bottom">
         <span class="sr-only">Open user menu</span>
-        <img class="w-8 h-8 rounded-full" src="{{asset('svg/man.svg')}}" alt="user photo">
+         @if (Auth::user()->image!=null)
+              <img class="w-10 h-10 rounded-full" src="{{asset('storage/users/'.Auth::user()->image)}}" alt="Small avatar">
+          @else
+              <img class="w-10 h-10 rounded-full" src="{{asset('svg/man.svg')}}" alt="Small avatar">
+          @endif
       </button>
       <!-- Dropdown menu -->
       <div class="z-50 hidden my-4 text-base list-none bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-700 dark:divide-gray-600" id="user-dropdown">
@@ -45,13 +49,22 @@
         <a href="{{route('dashboard')}}" class="block py-2 px-3 text-white bg-blue-700 rounded md:bg-transparent md:text-blue-700 md:p-0 md:dark:text-blue-500" aria-current="page">Home</a>
       </li>
       @if(Route::current()->getName() =='dashboard')
-      <li>    
-        <button data-modal-target="authentication-modal" data-modal-toggle="authentication-modal"  type="button" 
-        class='block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700'>
-          Depot+ 
-        </button>
+      <li>  
+            @if($user->user_role->role->libele=='Administrateur')
+              <button data-modal-target="authentication-modal" data-modal-toggle="authentication-modal"  type="button" 
+              class='block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700'>
+                Depot+
+              </button>
+            @elseif( $user->user_role->role->libele=='Super admin')
+              <button data-modal-target="authentication-modal" data-modal-toggle="authentication-modal"  type="button" 
+              class='block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700'>
+                Depot+
+              </button>
+            @endif
       </li>
       @endif
+      @if(Auth::user()->user_role->role->libele=='Administrateur' || Auth::user()->user_role->role->libele=='Super admin')
+      
       @if(Route::current()->getName() =='cat-pro.index')
         <li>    
           <button data-modal-target="authentication-modal1" data-modal-toggle="authentication-modal1"  type="button" 
@@ -68,8 +81,8 @@
             Produit+ 
           </button>
         </li>
-        
         @endif
+      @endif
         
         @if(Route::current()->getName() =='aproDepot')
         <li>    

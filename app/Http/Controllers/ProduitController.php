@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use Excel;
 use App\Models\Depot;
+use App\Models\Marque;
 use App\Models\Produit;
 use App\Models\Categorie;
 use App\Models\ProduitDepot;
 use Illuminate\Http\Request;
+use App\Imports\ProduitImport;
 use App\Models\Approvisionnement;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -100,6 +103,106 @@ class ProduitController extends Controller
         return back()->with('echec',"Enregistrement n'a pas abouti !");
     }
 
+    public function importProduitExcel(Request $request){
+        // dd($request->all());
+        $array = Excel::toArray(new ProduitImport, $request->file('prodExcel'));
+        $modelExcel =  ["libele" => "",
+                        "marque" => "",
+                        "categorie" => "",
+                        "quantite" => "",
+                        "prix" => "",
+                        "etat" =>"",
+                        "description" => ""];
+        $dataProduit= [
+                    'marque_id'=>'',
+                    'libele'=>'',
+                    'description'=>'',
+                    'prix'=>'nullable',
+                    'etat'=>'',
+                ];
+       
+        $dataCategorie = ['libele'=>''];
+        $dataMarque = ['libele'=>'','categorie_id'=>''];
+        $dataFormExcel = $array[0];
+        $dataFormExcel = array_change_key_case($dataFormExcel, CASE_LOWER);
+        if($dataFormExcel!=null){
+            if (array_keys($modelExcel) === array_keys($dataFormExcel[0])) {
+                foreach($dataFormExcel as $k=>$v){
+
+                    $dataProduit['libele']=$v['libele'];
+                    $dataProduit['description']=$v['description'];
+                    $dataProduit['etat']=($v['categorie']=='ordinateur')?'Reconditionnée':'Neuf';
+                    $dataProduit['prix']=$v['prix'];
+                    $nomCategorie = $v['categorie'];
+                    $nomMarque = $v['marque'];
+
+                    $categorie = Categorie::where('libele', $nomCategorie)
+                            ->with(['marque' => function ($query) use ($nomMarque) {
+                                $query->where('libele', $nomMarque);
+                            }])->first();
+
+                    if (!$categorie) {
+                        //on cree la categorie si non nulle
+                        if($nomCategorie != null){
+                            $dataCategorie['libele']=$nomCategorie;
+                            $createNewCat = Categorie::firstOrcreate($dataCategorie);
+                        }else{                           
+                            $createNewCat = Categorie::firstOrcreate(['libele'=>'Divers']);
+                        }
+                        ($nomMarque != null)?$dataMarque['libele']=$nomMarque:$dataMarque['libele']='Divers';
+                        
+                        $dataMarque['categorie_id'] = $createNewCat->id;
+                        $createNewMarque = Marque::firstOrcreate($dataMarque);
+                        $dataProduit['marque_id'] = $createNewMarque->id;
+                        
+                    } elseif ($categorie->marque->isEmpty()) {
+                        //on ajoute la marque si non null
+                        ($nomMarque != null)?$dataMarque['libele']=$nomMarque:$dataMarque['libele']='Divers';
+                        $dataMarque['categorie_id'] = $categorie->id;
+                        $createNewMarque = Marque::firstOrcreate($dataMarque);
+                        $dataProduit['marque_id']=$createNewMarque->id;
+                    } else {
+                        $marque = $categorie->marque->first(); 
+                        $dataProduit['marque_id']=$marque->id;
+                    }
+                    $texte = $v['libele'];
+                    $position = strpos($texte, 'HSN');
+                    if ($position !== false) {
+                        $avantHSN = substr($texte, 0, $position);
+                        $dataProduit['libele']=$avantHSN; 
+                    }
+                    // dd($dataProduit, 'enregistrement', $v['quantite']);
+                    if($v['libele']!=null){
+                        $findProdExist = Produit::where('libele', $dataProduit['libele'])->first();
+                        ($findProdExist!=null)?$produitId=$findProdExist->id:$createNewProd = Produit::firstOrcreate($dataProduit);
+                        
+                            if($v['quantite']!= null){
+                                $dataApro = [
+                                'user_id'=>auth()->user()->id,
+                                'depot_id'=>$request->depot_id,
+                                'produit_id'=>($findProdExist!=null)?$produitId:$createNewProd->id,
+                                'quantite'=>$v['quantite'],
+                                'confirm'=>false,
+                                'receptionUser'=>null
+                            ];
+                        $approvisionnement = Approvisionnement::create($dataApro);
+                            }
+                        $dataProD = ['depot_id'=>$request->depot_id,
+                                    'produit_id'=>($findProdExist!=null)?$produitId:$createNewProd->id,
+                                    'quantite'=>$v['quantite']
+                                ];
+                        $produitDepot = ProduitDepot::create($dataProD);  
+                    }
+                    // dd('Enregistrement effectué');
+                }
+                return back()->with('success','Enregistrement reussi avec succès !');
+            } else {
+                return back()->with('echec',"La structure de votre tableau ne correspond pas à la stucture demandée !");
+            }
+        }
+        return back()->with('echec','Importation échouée, votre fichier excel est vide');   
+    }
+
     /**
      * Display the specified resource.
      */
@@ -114,7 +217,7 @@ class ProduitController extends Controller
      */
     public function edit(Produit $produit)
     {
-        //
+        return back()->with('success',"Bientôt disponible"); 
     }
 
     /**

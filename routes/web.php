@@ -19,6 +19,8 @@ use App\Http\Controllers\RapportController;
 Route::get('/',[HomeController::class, 'home'])->name('home');
 Route::get('dashbord',[HomeController::class, 'dashboard'])->name('dashboard')->middleware(AuthentifyMiddleware::class);
 
+Route::get('sing in',[UserController::class, 'loginCreate'])->name('loginCreate');
+Route::post('nous rejoindre',[UserController::class, 'createCompte'])->name('nousRejoindre');
 Route::post('login',[UserController::class, 'login'])->name('login');
 Route::post('logout',[UserController::class, 'logout'])->name('logout')->middleware(AuthentifyMiddleware::class);
 Route::put('update-password-user/{user}',[UserController::class, 'updataPass'])->name('updataPass')->middleware(AuthentifyMiddleware::class);
@@ -56,6 +58,7 @@ Route::get('rapport/{depot}/facture', [RapportController::class,'facture'])->nam
 Route::get('{depot}/parametre', [DepotController::class, 'depotSetting'])->name("depotSetting")->middleware(AuthentifyMiddleware::class);
 Route::get('{depot}/produits', [DepotController::class, 'showProduit'])->name("showProduit")->middleware(AuthentifyMiddleware::class);
 
+Route::post('import produit',[ ProduitController::class, 'importProduitExcel'])->name('import_prod_excel')->middleware(AuthentifyMiddleware::class);
 Route::get('vente/creances/{depot}', [PaiementController::class,'creance'])->name('creanceDepot')->middleware( AuthentifyMiddleware::class);
 Route::post('vente/creances/{vente}', [PaiementController::class,'store'])->name('creanceStore')->middleware( AuthentifyMiddleware::class);
 Route::resource('paiement',PaiementController::class)->middleware(AuthentifyMiddleware::class);

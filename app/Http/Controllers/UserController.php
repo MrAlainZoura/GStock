@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Role;
 use App\Models\User;
 use App\Models\Depot;
+use App\Models\UserRole;
 use App\Models\DepotUser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -18,8 +20,15 @@ class UserController extends Controller
      */
     public function index()
     {
-        $user = User::with('depotUser.depot')->get();
-        // dd((count($user[0]->depotUser)<1)?'ok':$user[0]->depotUser);//->depotUser[0]->depot->libele);
+        if(Auth::user()->user_role->role->libele =='Administrateur' || Auth::user()->user_role->role->libele=='Super admin'){
+          $user = User::whereHas('depotUser.depot', function ($query) {
+                    $query->where('libele', session('depot'));
+                })->with(['depotUser.depot'])->get();
+
+        }else{
+            $user[] = Auth::user();
+            // dd('user simple' , Auth::user()->user_role->role->libele);
+        }
         return view('users.index', compact('user'));
     }
 
@@ -37,7 +46,7 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        dd($request->all());
+        // dd($request->all());
         $validateDate = Validator::make($request->all(),
         [
             'name'=>'required',
@@ -52,7 +61,7 @@ class UserController extends Controller
             'depot_id'=>'required|exists:depots,id',
             'postnom'=>($request->postnom)?'string':'',
             'prenom'=>($request->prenom)?'string':'',
-            'image'=>'file|mimes:jpg,jpeg,png,gift,jfif'
+            'image'=>'file|mimes:.jpg,jpeg,png,gift,jfif'
         ]);
 
         if($validateDate->fails()){
@@ -71,13 +80,17 @@ class UserController extends Controller
             'option'=>$request->option,
             'adresse'=>$request->adresse,
             'tel'=>$request->tel,
-            // 'depot_id'=>$request->depot_id,
             'postnom'=>$request->postnom,
             'prenom'=>$request->prenom,
             'image'=>($request->file('image')!=null)? "$request->name$request->postnom.$type":null,
         ];
         $user = User::create($data);
         if($user){
+            $getUSerRoleId = Role::where('libele', 'user')->first();
+
+            $dataRoleUser = ['user_id'=>$user->id, 'role_id'=>$getUSerRoleId->id];
+            $createRoleUSer = UserRole::create($dataRoleUser);
+
             $depotUser = DepotUser::create(['depot_id'=>$request->depot_id,'user_id'=>$user->id]);
             $dossier = 'users';
         if (!Storage::disk('public')->exists($dossier)) {
@@ -88,6 +101,10 @@ class UserController extends Controller
         return back()->with('success',"Enregistrement de $user->name $user->postnom a reussi !");
         }
         return back()->with('echec',"Une erreur inattendue s'est produite reessayer plus tard");
+    }
+
+    public function loginCreate(){
+        return view('users.login');
     }
 
     /**
@@ -134,7 +151,7 @@ class UserController extends Controller
         [
             'name'=>'required',
             'email'=>'required|email|max:255',
-            'image'=>'file|mimes:jpg, jpeg, png, gift, jfif',
+            'image'=>'file|mimes:jpg,jpeg,png,gift,jfif',
             'genre'=>($request->genre)?'string':'',
             'naissance'=>($request->naissance)?'string':'',
             'fonction'=>($request->fonction)?'string':'',
@@ -160,9 +177,11 @@ class UserController extends Controller
         if($findUser->name!= $request->name || $request->postnom != $findUser->postnom) {
             $image=($request->file('image')!=null)? "$request->name$request->postnom.$type":$findUser->image;
             Storage::move("public/$dossier/$findUser->image", "public/$dossier/$image");
+        }elseif($findUser->name!= null || $findUser->postnom != null){
+            $image=($request->file('image')!=null)? "$request->name$request->postnom.$type":$findUser->image;
         }
         if($request->file("image")!=null) {
-            Storage::delete("public/$dossier/$findUser->image");
+            // Storage::delete("public/$dossier/$findUser->image");
             $fichier = $request->file('image')->storeAs($dossier,$image,'public');
         }
         $data = [
@@ -216,6 +235,7 @@ class UserController extends Controller
     public function destroy(string $userDelete)
     {
         $string = $userDelete;
+        $dossier="users";
         $id = "";
         $name="";
         $parts = explode(" ", $string);
@@ -223,26 +243,31 @@ class UserController extends Controller
             $name = $parts[0];
             $id = $parts[1]/6789012345;
         }
-        $user= User::where("id","=", $id)->where('name',$name)->first();
-        return back()->with('success',"Bientot disponible !");
-
-        // $delete = User::where('id',$id)->delete();
-        // if(!$delete){
-        //     return response()->json(['success'=>true, 'data'=>'echec de suppression']);
-        // }
-        // return response()->json(['success'=>true, 'data'=>'Suppression reussie!']);
+        $user= User::where("id", $id)->where('name',$name)->first();
+        if($user != null){
+            $image=$user->image;
+            if($user->delete()){
+                if (Storage::exists("public/$dossier/$image")) {
+                    Storage::delete("public/$dossier/$image");
+                }
+                return back()->with('success',"Utilisateur supprimé avec succès !");
+            }
+            return back()->with('echec',"Erreur inattendue, utilisateur est lié à un processus encours!");
+        }
+        return back()->with('echec',"Erreur inattendue !");
     }
 
     public function login(Request $request){
         $daliation = Validator::make($request->all(),[
-            'email'=>'required|email',
+            'email'=>'required',
             'password'=>'required|min:4'
         ]);
         if($daliation->fails()){
             return back()->with('echec',$daliation->errors());
         }
         $data = ['email'=>$request->email, 'password'=>$request->password];
-        if(Auth::attempt($data)){
+        $dataLoginByName = ['name'=>$request->email, 'password'=>$request->password];
+        if(Auth::attempt($data) || Auth::attempt($dataLoginByName)){
             $request->session()->regenerate();
             // return to_route('dashboard'); 
             return redirect()->intended('dashbord');
@@ -252,5 +277,51 @@ class UserController extends Controller
     public function logout(){
         Auth::logout();
         return redirect(url("/"));
+    }
+
+    public function createCompte(Request $request){
+        $validateDate = Validator::make($request->all(),
+        [
+            'name'=>'required',
+            'email'=>'required|email|max:255|unique:users',
+            'password'=>'required|min:4'
+        ]);
+
+        if($validateDate->fails()){
+            $message = $validateDate->errors();
+            $erreursEmail = $validateDate->errors()->get('email');
+            if($erreursEmail!=null){
+                return back()->with('echecRegister','Ce email est déjà pris ou incorrect');
+            }
+            return back()->with('echecRegister','Erreur inattendue, Veuillez réessayer.');   
+        }
+        $data = [
+            'name'=>$request->name,
+            'email'=>$request->email,
+            'password'=>Hash::make($request->password)
+        ];
+
+        // dd($data);
+        $createAdmin = User::create($data);
+        if($createAdmin){ 
+            $getAdminRoleId = Role::where('libele', 'Administrateur')->first();
+            if($getAdminRoleId !== null){
+                $roleId=$getAdminRoleId->id;
+            }else{
+                $dataAllRole = [
+                    'Super admin',
+                    'Administrateur',
+                    'user'
+                ];
+                foreach($dataAllRole as $role){
+                   $createAdminRole = Role::firstOrCreate(['libele'=>$role])->id;
+                   ($role == 'Administrateur')?$roleId =$createAdminRole->id:"";
+                }
+
+            }
+            $dataRoleUser = ['user_id'=>$createAdmin->id, 'role_id'=>$roleId];
+            $createRoleUSer = UserRole::create($dataRoleUser);
+        }
+       return back()->with('succes', 'Veuillez vous connectez à présent');
     }
 }

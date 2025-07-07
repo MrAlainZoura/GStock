@@ -9,7 +9,11 @@
 <section class="mt-10 p-20 gap-5 w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
 
 @foreach($produit as $key=>$value)
-@include('composant.card', ['image'=>"storage/produit/$value->image",'libele'=>$value->libele, 'description'=> $value->description,'prix'=>"$value->prix $", 'depot'=>"ujisha"])
+ @if ($value->image == null)
+     @include('composant.card', ['image'=>"produit/prodDefaut.jpeg",'libele'=>$value->libele, 'description'=> $value->description,'prix'=>"$value->prix $", 'depot'=>"ujisha"])
+ @else
+ @include('composant.card', ['image'=>"storage/produit/$value->image",'libele'=>$value->libele, 'description'=> $value->description,'prix'=>"$value->prix $", 'depot'=>"ujisha"])
+ @endif
 @endforeach
 <!-- Pagination -->
 
@@ -33,7 +37,7 @@
   </button>
 </div>
     @endif
-    <form action="{{route('login')}}" method="post" class="max-w-sm mx-auto">
+    <form action="{{route('login')}}" method="post" class="max-w-sm mx-auto hidden">
         @csrf
         @method('post')
     <div class="mb-5">

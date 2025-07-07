@@ -1,10 +1,26 @@
+@php 
+echo 'allo zoura';
+if($findVenteDetail->user != null){
+    $user = $findVenteDetail->user->name ;
+    $prenom = $findVenteDetail->user->prenom;
+    $postnom = $findVenteDetail->user->prenom;
+    $email ="" ;
+    $image = $findVenteDetail->user->image;
+}else{
+    $user = "Utilisateur à problème";
+    $prenom ="";
+    $postnom ="";
+    $email="";
+    $image = null;
+}   
+@endphp
 <section class="bg-white py-10 sm:py-16">
         <div class="mx-auto max-w-7xl px-6 lg:px-8">
             <div class="mx-auto max-w-2xl lg:mx-0">
                 <h2 class="text-4xl font-semibold tracking-tight text-pretty text-gray-900 sm:text-5xl">Vente {{$findVenteDetail->code}} Détails </h2>
                 <p class="mt-2 text-lg/8 text-gray-600"> Description de la vente : <br>
                     Vente numero {{$findVenteDetail->code}} effectué par 
-                    {{$findVenteDetail->user->name}} {{$findVenteDetail->user->postnom}} {{$findVenteDetail->user->prenom}}
+                    {{$user}} {{$postnom}} {{$prenom}}
                      pour le compte de {{session('depot')}} en date du 
                      {{$findVenteDetail->created_at}} au client {{$findVenteDetail->client->name}} {{$findVenteDetail->client->prenom}} qui a acheté 
                      {{count($findVenteDetail->venteProduit) }}
@@ -41,7 +57,7 @@
                         </div>
                     </h3>
                     <div class="relative mt-8 flex items-center gap-x-4">
-                    @if ($findVenteDetail->user->image == null)
+                    @if ($image == null)
                         <img class="w-10 h-10 rounded" src="{{asset('svg/man.svg')}}" alt="Produit">
                     @else
                         <img src="{{asset('storage/users/'.$findVenteDetail->user->image)}}" alt="photo" class="size-14 rounded-sm bg-gray-50">
@@ -50,10 +66,10 @@
                             <p class="font-semibold text-gray-900">
                             <a href="#">
                                 <span class=""></span>
-                                {{$findVenteDetail->user->name}} {{$findVenteDetail->user->postnom}} {{$findVenteDetail->user->prenom}}
+                                {{$user}} {{$postnom}} {{$prenom}}
                             </a>
                             </p>
-                            <p class="text-gray-600">{{$findVenteDetail->user->email}}</p>
+                            <p class="text-gray-600">{{$email}}</p>
                         </div>
                     </div>
                 </div>
@@ -159,9 +175,6 @@
 
                 @endif
                 </div>
-
-               
-
             </div>
         </div>
     </section>

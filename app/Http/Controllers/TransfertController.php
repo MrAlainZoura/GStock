@@ -143,9 +143,9 @@ class TransfertController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit( $transfert)
+    public function edit($transfert)
     {
-        return $transfert;
+        return back()->with('success',"Bientôt disponible"); 
     }
 
     /**

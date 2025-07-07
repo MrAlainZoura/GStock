@@ -94,11 +94,11 @@ class ApprovisionnementController extends Controller
      */
     public function edit(string $appro)
     {
-        //
+        return back()->with('success',"Bientôt disponible"); 
     }
 
     public function show(string $appro){
-
+        return back()->with('success',"Bientôt disponible"); 
     }
     public function confirm(string $appro){
 
@@ -151,7 +151,7 @@ class ApprovisionnementController extends Controller
      */
     public function update(Request $request, Approvisionnement $approvisionnement)
     {
-        //
+        return back()->with('success',"Bientôt disponible"); 
     }
 
     /**
@@ -159,6 +159,6 @@ class ApprovisionnementController extends Controller
      */
     public function destroy(Approvisionnement $approvisionnement)
     {
-        //
+        return back()->with('success',"Bientôt disponible"); 
     }
 }

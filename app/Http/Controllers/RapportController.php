@@ -223,12 +223,22 @@ class RapportController extends Controller
        
         $id= $vente/56745264509;
         $findVenteDetail = Vente::where('id',$id)->first();
-        
-        $data =[
-            'findVenteDetail'=>$findVenteDetail, 
-        ];
+        if($findVenteDetail->user == null){
+            $objet = new \stdClass();
+            $objet->name = "Vendeur Suspendu";
+            $objet->prenom = "";
+            $objet->postnom = "";
+
+            $findVenteDetail->user = $objet;
+        }
+         $data =[
+                'findVenteDetail'=>$findVenteDetail, 
+            ];
+
         $code = str_replace('/', '-', $findVenteDetail->code);
-        $facture ="facture ".$findVenteDetail->user->name." ".$findVenteDetail->created_at." ".$code .".pdf";
+        $facture = ($findVenteDetail->user != null)
+            ? "facture ".$findVenteDetail->user->name." ".$findVenteDetail->created_at." ".$code .".pdf"
+            : "facture "." ".$findVenteDetail->created_at." ".$code .".pdf";
       
         // $customPaper = array(0, 0, 227, 600); // (gauche, haut, droite, bas)
         // $pdf = Pdf::loadView('vente.fact', $data);

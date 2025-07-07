@@ -41,7 +41,11 @@
                     @endif
                 </td>
                 <td class="px-6 py-4">
-                {{ $item->user->name }} 
+                    @if($item->user != null)
+                        {{ $item->user->name }} 
+                    @else
+                        Utilsateur à problème
+                    @endif
                 </td>
                 <td class="px-6 py-4">
                 @if ($item->receptionUser==null)
@@ -52,7 +56,6 @@
                 </svg>
                 <span class="sr-only">Non confirmé</span>
                 </span>
-                
                 Non confirmé
                 @else
                 <span class="inline-flex items-center justify-center w-6 h-6 me-2 text-sm font-semibold text-blue-800 bg-blue-100 rounded-full dark:bg-gray-700 dark:text-blue-400">

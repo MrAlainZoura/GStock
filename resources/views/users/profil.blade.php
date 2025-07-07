@@ -21,11 +21,11 @@
 
     <section class="bg-white dark:bg-gray-900">
         <div class="py-8 px-4 mx-auto max-w-2xl lg:py-16">
-            @if (Auth::user()->id == $user->id)  
+            @if (Auth::user()->id == $user->id || Auth::user()->user_role->role->libele=='Administrateur' || Auth::user()->user_role->role->libele=='Super admin')
             <div class="flex justify-between">
                 <h2 class= "mb-4 text-xl font-bold text-gray-900 dark:text-white">Editer mon profil {{$user->name." ".$user->postnom." ".$user->prenom}}</h2>
                 <button data-modal-target="authentication-modal" data-modal-toggle="authentication-modal" class="inline-flex items-center font-medium text-blue-600 dark:text-blue-500 hover:underline">
-                Changer mon mot de passe 
+                Changer mot de passe 
                     <!-- <svg width="24px" height="24px" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <g id="SVGRepo_bgCarrier" stroke-width="0"/>
                         <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"/>
