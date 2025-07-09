@@ -5,9 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     @vite(['resources/css/app.css','resources/js/app.js'])
     <title>@yield('title')</title>
+
+    <link rel="stylesheet" href="{{asset('build/assets/app-B2cmbZS5.css')}}">
+    <link rel="stylesheet" href="{{asset('build/assets/login-dEIJI-aL.css')}}">
     <link rel="stylesheet" href="{{asset('build/assets/app-hg-u5LYb.js')}}">
-    <link rel="stylesheet" href="{{asset('build/assets/app-CFWMNUKO.css')}}">
+    <link rel="stylesheet" href="{{asset('build/assets/login-BsT8zmkB.js')}}">
     <link rel="stylesheet" href="{{asset('build/manifest.json')}}">
+
     <link rel="icon" type="image/x-icon" href="{{asset('img/icon.jpeg')}}">    
     <script src="https://cdn.jsdelivr.net/npm/simple-datatables@9.0.3"></script>
 
