@@ -2,7 +2,7 @@
 
 <div class="max-w-sm bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
     <a href="#">
-        <img class="rounded-t-lg w-full h-60" src="{{asset('storage/cat/'.$image)}}" alt="" />
+        <img class="rounded-t-lg w-full h-60" src="{{asset('uploads/cat/'.$image)}}" alt="" />
     </a>
     <div class="p-5">
         <a href="#">

@@ -54,7 +54,7 @@
                     <div class="w-full flex flex-col sm:flex-row sm:col-span-2 sm:block"> 
                         <img id="imagePreview" class="w-20 h-20 rounded-full m-2 border border-gray-300 " 
                             @if ($user->image!=null)
-                                src="{{asset('storage/users/'.$user->image)}}"
+                                src="{{asset('uploads/users/'.$user->image)}}"
                             @else
                                 src="{{asset('svg/man.svg')}}"
                             @endif

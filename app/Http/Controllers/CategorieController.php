@@ -48,8 +48,8 @@ class CategorieController extends Controller
         }
         $dossier = 'cat';
         // Vérifier si le dossier existe, sinon le créer
-        if (!Storage::disk('public')->exists($dossier)) {
-            Storage::disk('public')->makeDirectory($dossier);
+        if (!Storage::disk('direct_public')->exists($dossier)) {
+            Storage::disk('direct_public')->makeDirectory($dossier);
         }
         $fichier = $request->file('image');
         $type = ($request->file('image')!=null)? $fichier->getClientOriginalExtension() : null;
@@ -61,7 +61,7 @@ class CategorieController extends Controller
         $cat = Categorie::create($data);
         if($cat){
             if($request->file('image') != null){
-                $fichier = $request->file('image')->storeAs($dossier,"$cat->libele.$type",'public');
+                $fichier = $request->file('image')->storeAs($dossier,"$cat->libele.$type",'direct_public');
             }
            foreach($request->marque as $k=>$v){
                 if($v!=null)

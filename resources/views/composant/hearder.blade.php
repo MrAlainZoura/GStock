@@ -11,7 +11,7 @@
       <button type="button" class="flex text-sm bg-gray-800 rounded-full md:me-0 focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600" id="user-menu-button" aria-expanded="false" data-dropdown-toggle="user-dropdown" data-dropdown-placement="bottom">
         <span class="sr-only">Open user menu</span>
          @if (Auth::user()->image!=null)
-              <img class="w-10 h-10 rounded-full" src="{{asset('storage/users/'.Auth::user()->image)}}" alt="Small avatar">
+              <img class="w-10 h-10 rounded-full" src="{{asset('uploads/users/'.Auth::user()->image)}}" alt="Small avatar">
           @else
               <img class="w-10 h-10 rounded-full" src="{{asset('svg/man.svg')}}" alt="Small avatar">
           @endif

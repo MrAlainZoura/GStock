@@ -43,8 +43,11 @@ class ProduitController extends Controller
         // dd($request->all());
         $dossier = 'produit';
         // Vérifier si le dossier existe, sinon le créer
-        if (!Storage::disk('public')->exists($dossier)) {
-            Storage::disk('public')->makeDirectory($dossier);
+        // if (!Storage::disk('public')->exists($dossier)) {
+        //     Storage::disk('public')->makeDirectory($dossier);
+        // }
+        if (!Storage::disk('direct_public')->exists($dossier)) {
+            Storage::disk('direct_public')->makeDirectory($dossier);
         }
         $validateDate = Validator::make($request->all(),
         [
@@ -74,8 +77,15 @@ class ProduitController extends Controller
         ];
 // dd($data);
         $produit = Produit::create($data);
-        if($request->file('image') != null){
-            $fichier = $request->file('image')->storeAs($dossier,"$produit->libele.$type",'public');
+        // if($request->file('image') != null){
+        //     $fichier = $request->file('image')->storeAs($dossier,"$produit->libele.$type",'public');
+        // }
+         if ($request->hasFile('image')) {
+                $fichier = $request->file('image')->storeAs(
+                    $dossier,
+                    "$produit->libele.$type",
+                    'direct_public'
+                );
         }
         if($produit){
 

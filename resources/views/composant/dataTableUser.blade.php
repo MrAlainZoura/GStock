@@ -52,7 +52,7 @@
             <td class="font-medium text-gray-900  dark:text-white">
                 <div class="flex gap-2 sm:bloc">
                     @if ($item->image!=null)
-                        <img class="w-10 h-10 rounded-full" src="{{asset('storage/users/'.$item->image)}}" alt="Small avatar">
+                        <img class="w-10 h-10 rounded-full" src="{{asset('uploads/users/'.$item->image)}}" alt="Small avatar">
                     @else
                         <img class="w-10 h-10 rounded-full" src="{{asset('svg/man.svg')}}" alt="Small avatar">
                     @endif

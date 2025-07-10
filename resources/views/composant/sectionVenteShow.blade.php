@@ -1,5 +1,4 @@
 @php 
-echo 'allo zoura';
 if($findVenteDetail->user != null){
     $user = $findVenteDetail->user->name ;
     $prenom = $findVenteDetail->user->prenom;
@@ -60,7 +59,7 @@ if($findVenteDetail->user != null){
                     @if ($image == null)
                         <img class="w-10 h-10 rounded" src="{{asset('svg/man.svg')}}" alt="Produit">
                     @else
-                        <img src="{{asset('storage/users/'.$findVenteDetail->user->image)}}" alt="photo" class="size-14 rounded-sm bg-gray-50">
+                        <img src="{{asset('uploads/users/'.$findVenteDetail->user->image)}}" alt="photo" class="size-14 rounded-sm bg-gray-50">
                     @endif
                         <div class="text-sm/6">
                             <p class="font-semibold text-gray-900">

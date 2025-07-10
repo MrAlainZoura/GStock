@@ -46,7 +46,7 @@
                     @if ($item->produit->image == null)
                         <img class="w-10 h-10 rounded" src="{{asset('produit/prodDefaut.jpeg')}}" alt="Produit">
                     @else
-                        <img class="w-10 h-10 rounded" src="{{asset('storage/produit/'.$item->produit->image)}}" alt="Produit">
+                        <img class="w-10 h-10 rounded" src="{{asset('uploads/produit/'.$item->produit->image)}}" alt="Produit">
                     @endif
                     {{$item->produit->libele}} <br/>
                     {{$item->produit->etat}}
