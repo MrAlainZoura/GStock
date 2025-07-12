@@ -37,7 +37,17 @@ class UserController extends Controller
      */
     public function create()
     {
-        $depot = Depot::orderBy('libele')->get();
+        if(Auth::user()->user_role->role->libele=="Administrateur"){
+            $depot = Depot::orderBy('libele')->where('user_id', Auth::user()->id)->get();
+        }
+        if(Auth::user()->user_role->role->libele == 'Super admin'){
+            $depot = Depot::orderBy('libele')->get();
+        }
+       $roleAutorises = ['Administrateur', 'Super admin'];
+        if (!in_array(Auth::user()->user_role->role->libele, $roleAutorises)) {
+            // dd('Accès refusé', Auth::user()->user_role->role->libele);
+            return back()->with('echec', 'Vous ne disposez pas de droit nécessaire pour effectuer cette action !');
+        }
         return view('users.create',compact('depot'));
     }
 
