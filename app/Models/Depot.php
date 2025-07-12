@@ -6,7 +6,22 @@ use Illuminate\Database\Eloquent\Model;
 
 class Depot extends Model
 {
-    protected $fillable = ['libele','user_id'];
+    protected $fillable = [
+        'libele',
+        'user_id',
+        'logo',
+        'email',
+        'contact1',
+        'contact',
+        'cpostal',
+        'pays',
+        'province',
+        'ville',
+        'avenue',
+        'idNational',
+        'numImpot',
+        'autres',
+    ];
 
     public function user(){
         return $this->belongsTo(User::class);
