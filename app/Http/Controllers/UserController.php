@@ -65,7 +65,7 @@ class UserController extends Controller
         ]);
 
         if($validateDate->fails()){
-            return back()->with('echec',$validateDate->errors());
+            // return back()->with('echec',$validateDate->errors());
         }
         $fichier = $request->file('image');
         $type = ($request->file('image')!=null)?$fichier->getClientOriginalExtension():null;
@@ -93,11 +93,23 @@ class UserController extends Controller
 
             $depotUser = DepotUser::create(['depot_id'=>$request->depot_id,'user_id'=>$user->id]);
             $dossier = 'users';
-        if (!Storage::disk('public')->exists($dossier)) {
+            if (!Storage::disk('direct_public')->exists($dossier)) {
+                Storage::disk('direct_public')->makeDirectory($dossier);
+            }
+
+            if ($request->hasFile('image')) {
+                $fichier = $request->file('image')->storeAs(
+                    $dossier,
+                    "$user->name$user->postnom.$type",
+                    'direct_public'
+                );
+            }
+        /*if (!Storage::disk('public')->exists($dossier)) {
             Storage::disk('public')->makeDirectory($dossier);
-        }if($request->file('image') != null){
-            $fichier = $request->file('image')->storeAs($dossier,"$user->name$user->postnom.$type",'public');
         }
+        if($request->file('image') != null){
+            $fichier = $request->file('image')->storeAs($dossier,"$user->name$user->postnom.$type",'public');
+        }*/
         return back()->with('success',"Enregistrement de $user->name $user->postnom a reussi !");
         }
         return back()->with('echec',"Une erreur inattendue s'est produite reessayer plus tard");
@@ -176,13 +188,13 @@ class UserController extends Controller
 
         if($findUser->name!= $request->name || $request->postnom != $findUser->postnom) {
             $image=($request->file('image')!=null)? "$request->name$request->postnom.$type":$findUser->image;
-            Storage::move("public/$dossier/$findUser->image", "public/$dossier/$image");
+            Storage::move("public/uploads/$dossier/$findUser->image", "public/uploads/$dossier/$image");
         }elseif($findUser->name!= null || $findUser->postnom != null){
-            $image=($request->file('image')!=null)? "$request->name$request->postnom.$type":$findUser->image;
+            $image = ($request->file('image')!=null)? "$request->name$request->postnom.$type":$findUser->image;
         }
         if($request->file("image")!=null) {
             // Storage::delete("public/$dossier/$findUser->image");
-            $fichier = $request->file('image')->storeAs($dossier,$image,'public');
+            $fichier = $request->file('image')->storeAs($dossier,$image,'direct_public');
         }
         $data = [
             'name'=>$request->name,
@@ -247,8 +259,8 @@ class UserController extends Controller
         if($user != null){
             $image=$user->image;
             if($user->delete()){
-                if (Storage::exists("public/$dossier/$image")) {
-                    Storage::delete("public/$dossier/$image");
+                if (Storage::exists("public/uploads/$dossier/$image")) {
+                    Storage::delete("public/uploads/$dossier/$image");
                 }
                 return back()->with('success',"Utilisateur supprimé avec succès !");
             }

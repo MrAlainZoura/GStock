@@ -12,7 +12,7 @@
  @if ($value->image == null)
      @include('composant.card', ['image'=>"produit/prodDefaut.jpeg",'libele'=>$value->libele, 'description'=> $value->description,'prix'=>"$value->prix $", 'depot'=>"ujisha"])
  @else
- @include('composant.card', ['image'=>"storage/produit/$value->image",'libele'=>$value->libele, 'description'=> $value->description,'prix'=>"$value->prix $", 'depot'=>"ujisha"])
+ @include('composant.card', ['image'=>"uploads/produit/$value->image",'libele'=>$value->libele, 'description'=> $value->description,'prix'=>"$value->prix $", 'depot'=>"ujisha"])
  @endif
 @endforeach
 <!-- Pagination -->

@@ -34,7 +34,7 @@ return [
             'driver' => 'local',
             'root' => storage_path('app/private'),
             'serve' => true,
-            'throw' => false,
+            'throw' => false, 
         ],
 
         'public' => [
@@ -44,6 +44,12 @@ return [
             'visibility' => 'public',
             'throw' => false,
         ],
+        'direct_public' => [
+                'driver' => 'local',
+                'root' => public_path('uploads'),
+                'url' => env('APP_URL') . '/uploads',
+                'visibility' => 'public',
+            ],
 
         's3' => [
             'driver' => 's3',
