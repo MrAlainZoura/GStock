@@ -52,7 +52,7 @@
                 </div>
                 
             </div>
-            <div class="flex items-center justify-center  m-4 rounded-sm bg-gray-50 dark:bg-gray-800">
+            <div class="flex items-center justify-center  m-4 rounded-sm bg-gray-50 hidden sm:block dark:bg-gray-800">
             <div class="w-2/3 sm:w-full p-4">
                 <div class="card">
                     <div class="card-body ">
