@@ -358,3 +358,41 @@ form .linkTxt{
     transform: rotate(-11deg) skewY(-40deg);
     transition-delay: 1.2s;
 }
+
+@media screen and (max-width: 768px) {
+  .wrapper {
+    width: 95%;
+    height: auto;
+    flex-direction: column;
+    box-shadow: none;
+    border: none;
+  }
+
+  .wrapper .form-box,
+  .wrapper .info-text {
+    width: 100%;
+    height: auto;
+    position: static;
+    padding: 20px;
+    text-align: center;
+  }
+
+  .wrapper .form-box.login,
+  .wrapper .form-box.register {
+    padding: 20px;
+  }
+
+  .wrapper .info-text.login,
+  .wrapper .info-text.register {
+    top: 0;
+    padding: 20px;
+  }
+.form-box.register{
+    top: 0;
+    position: relative;
+}
+  .rotate-bg,
+  .rotate-bg2 {
+    display: none;
+  }
+}

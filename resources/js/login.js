@@ -1,13 +1,16 @@
 const wrapper = document.querySelector('.wrapper')
 const registerLink = document.querySelector('.register-link')
 const loginLink = document.querySelector('.login-link')
+const form_register = document.querySelector('.form-box.register');
 
 registerLink.onclick = () => {
     wrapper.classList.add('active')
+    if (form_register) form_register.style.position = "absolute";
 }
 
 loginLink.onclick = () => {
     wrapper.classList.remove('active')
+    form_register.style.removeProperty("position");
 }
 
 
