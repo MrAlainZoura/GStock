@@ -8,8 +8,8 @@
     <title>Login Register form</title>
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' 
     rel='stylesheet'>
+    
     <link rel="stylesheet" href="{{asset('build/assets/login-dEIJI-aL.css')}}">
-
     <link rel="stylesheet" href="{{asset('build/assets/login-BsT8zmkB.js')}}">
 
     <link rel="icon" type="image/x-icon" href="{{asset('img/icon.jpeg')}}">    

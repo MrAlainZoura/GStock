@@ -219,7 +219,7 @@ class RapportController extends Controller
         $pdf = Pdf::loadView('pdf.rapportJ', $data);
         return $pdf->download('invoice.pdf');
     }
-    public function facture($vente){
+    public function facture($vente, $action){
        
         $id= $vente/56745264509;
         $findVenteDetail = Vente::where('id',$id)->first();
@@ -274,7 +274,13 @@ class RapportController extends Controller
         $dompdf2->setPaper([0, 0, 226.77, $hauteurReelle]);
         $dompdf2->loadHtml($html);
         $dompdf2->render();
-        return $dompdf2->stream($facture);
+        if($action === 'print') {
+            return $dompdf2->stream($facture, ['Attachment' => false]);
+        }elseif($action === 'download') {
+            return $dompdf2->stream($facture, ['Attachment' => true]);
+        }else{
+            back()->with('echec','Erreur inattendue');
+        }
     }
 
     
