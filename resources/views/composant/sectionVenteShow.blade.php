@@ -36,13 +36,13 @@ if($findVenteDetail->user != null){
                     @endforeach
                      {{$quantite}} piece(s) au total et le prix net payé @formaMille($netPaye) Fc.
                 </p>
-                <div class="flex flex-col justify-between sm:flex sm:flex-row sm:flex-1">
+                <div class="flex flex-col justify-between sm:flex gap-2 sm:flex-row sm:flex-1">
                                         
-                    <a href="#" class="inline-flex items-center px-5 py-2.5 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                    <button onclick="imprimerPDF('{{route('facturePDF',['vente'=>$findVenteDetail->id*56745264509, 'action'=>'print'])}}')" class="inline-flex items-center px-5 py-2.5 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
                         Imprimer
                         <img src="{{asset('svg/print.svg')}}" class="w-8 rounded" alt="">
-                    </a>
-                    <a href="{{route('facturePDF',$findVenteDetail->id*56745264509)}}" class="inline-flex items-center px-5 py-2.5 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                    </button>
+                    <a href="{{route('facturePDF',['vente'=>$findVenteDetail->id*56745264509, 'action'=>'download'])}}" class="inline-flex items-center px-5 py-2.5 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
                         PDF
                         <img src="{{asset('svg/pdf.svg')}}" class="w-6 rounded" alt="">
                     </a>
@@ -177,3 +177,12 @@ if($findVenteDetail->user != null){
             </div>
         </div>
     </section>
+
+    <script>
+    function imprimerPDF(url) {
+        const fenetre = window.open(url, '_blank');
+        fenetre.onload = function () {
+            fenetre.print();
+        };
+    }
+</script>
