@@ -45,6 +45,8 @@ class DepotController extends Controller
         $validateDate = Validator::make($request->all(),
         [
             'libele'=>'required|string|max:255',
+            'monnaie'=>'required|string|max:255',
+            'taux'=>'required|max:255',
         ]);
 
         if($validateDate->fails()){
@@ -54,8 +56,16 @@ class DepotController extends Controller
             'libele'=>$request->libele,
             'user_id'=>Auth::user()->id
         ];
-
+        // dd($data, $dataDevise);
         $depot = Depot::create($data);
+        if($depot){
+            $dataDevise = [
+                'libele'=>$request->monnaie, 
+                'taux'=>$request->taux, 
+                'depot_id'=>$depot->id
+            ];
+            $createDevise = Devise::firstOrCreate($dataDevise);
+        }
         return back()->with('success','Depot ajouté avec success');
     }
 
