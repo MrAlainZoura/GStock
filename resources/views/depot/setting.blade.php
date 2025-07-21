@@ -39,21 +39,23 @@
       <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
         <dt class="text-sm/6 font-medium text-gray-900">Monnaie & Devise</dt>
         <dd class="mt-2 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-          <ul role="list" class="divide-y divide-gray-100 rounded-md border border-gray-200">           
-            @foreach ( $depotData->devise as $val)
-              <li class="flex items-center justify-between py-4 pr-5 pl-4 text-sm/6">
-                <div class="flex w-0 flex-1 items-center">
-                      <img src="{{asset('svg/paie.svg')}}" class="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" aria-hidden="true" alt="">
-                  <div class="ml-4 flex min-w-0 flex-1 gap-2">
-                    <span class="truncate font-medium">1 {{ $val->libele }}</span>
-                    <span class="shrink-0 text-gray-400">{{ $val->taux }} Franc (fc)</span>
+          <ul role="list" class="divide-y divide-gray-100 rounded-md border border-gray-200"> 
+            @if ($depotData->devise != null)
+              @foreach ( $depotData->devise as $val)
+                <li class="flex items-center justify-between py-4 pr-5 pl-4 text-sm/6">
+                  <div class="flex w-0 flex-1 items-center">
+                        <img src="{{asset('svg/paie.svg')}}" class="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" aria-hidden="true" alt="">
+                    <div class="ml-4 flex min-w-0 flex-1 gap-2">
+                      <span class="truncate font-medium">1 {{ $val->libele }}</span>
+                      <span class="shrink-0 text-gray-400">{{ $val->taux }} Franc (fc)</span>
+                    </div>
                   </div>
+                  <div class="ml-4 shrink-0">
+                  <a href="#" class="font-medium text-indigo-600 hover:text-indigo-500">Editer</a>
                 </div>
-                <div class="ml-4 shrink-0">
-                <a href="#" class="font-medium text-indigo-600 hover:text-indigo-500">Editer</a>
-              </div>
-              </li>
-            @endforeach
+                </li>
+              @endforeach
+            @endif          
           </ul>
         </dd>
       </div>
