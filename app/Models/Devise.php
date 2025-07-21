@@ -15,4 +15,7 @@ class Devise extends Model
     public function depot(){
         return $this->belongsTo(Depot::class);
     }
+    public function vente(){
+        return $this->hasMany(Vente::class);
+    }
 }

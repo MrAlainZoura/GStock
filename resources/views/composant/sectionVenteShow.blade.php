@@ -34,7 +34,7 @@ if($findVenteDetail->user != null){
                             $netPaye+=$val->prixT;
                         @endphp
                     @endforeach
-                     {{$quantite}} piece(s) au total et le prix net payé @formaMille($netPaye) Fc.
+                     {{$quantite}} piece(s) au total et le prix net payé @formaMille($netPaye) {{  $findVenteDetail->devise }} au taux d'échange de {{  $findVenteDetail->taux }} pour la monnaie locale.
                 </p>
                 <div class="flex flex-col justify-between sm:flex gap-2 sm:flex-row sm:flex-1">
                                         
@@ -118,7 +118,7 @@ if($findVenteDetail->user != null){
                                 {{$item->quantite}} pc
                                 </td>
                                 <td class="px-3 py-2">
-                                @formaMille($item->prixT) Fc
+                                @formaMille($item->prixT)  {{$findVenteDetail->devise}}
                                 </td>
                             </tr>
                         @endforeach
@@ -130,7 +130,9 @@ if($findVenteDetail->user != null){
                                   {{$quantite}}
                                    pc
                                 </td>
-                                <td class="px-3 py-3"> @formaMille($netPaye) Fc</td>
+                                <td class="px-3 py-3">({{$findVenteDetail->devise}}) @formaMille($netPaye) <br>
+                                    (cdf) @formaMille($netPaye *$findVenteDetail->taux)
+                                </td>
                             </tr>
                             
                         </tfoot>

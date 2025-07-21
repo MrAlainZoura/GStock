@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>facture user - {{$findVenteDetail->user->name."". $findVenteDetail->created_at ."".$findVenteDetail->code  }}</title>
     <style>
         @page {
             margin: 0;
@@ -69,6 +69,15 @@
             text-align: center;
             font-weight: 600;
         }
+        .footer-cell, .left{
+            text-align: left;
+        }
+        .right{
+            text-align: right;
+        }
+        .center{
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -91,7 +100,7 @@
             <div class="logo">
                 <img src="data:image/jpeg;base64,{{ base64_encode(file_get_contents(public_path('img/icon.jpg'))) }}" alt="logo">
             </div>
-        <h3>Détails de la Facture</h3>
+        <h3>Détails de la Vente</h3>
         <h3>Ste. Ujisha</h3>
         <div class="idnat">
             RCCM:KNG/RCCM/22-A-01256 ID.NAT : <br> 01-G4701-N998728, N.Impot: A23119069 <br>
@@ -102,7 +111,7 @@
             Contact@ujisha.com
         </div>
         <div class="sansInterligne">
-            <p> 
+            <p class="left"> 
                 Facture établi par {{$findVenteDetail->user->name}} 
                 @if($findVenteDetail->user->prenom !=null)
                     {{$findVenteDetail->user->prenom}}
@@ -110,9 +119,9 @@
                     {{$findVenteDetail->user->postnom}}
                 @endif
             </p>
-            <p>Date : {{ $findVenteDetail->created_at }}</p>
-            <p>Client : {{ $findVenteDetail->client->name }} {{ $findVenteDetail->client->tel }}</p>
-            <p>Numéro de Facture : {{ $findVenteDetail->code }}</p>
+            <p class="left">Date : {{ $findVenteDetail->created_at }}</p>
+            <p class="left">Client : {{ $findVenteDetail->client->name }} {{ $findVenteDetail->client->tel }}</p>
+            <p class="left">Numéro de Facture : {{ $findVenteDetail->code }}</p>
         </div>
     </div>
         <div class="table-wrapper">
@@ -142,39 +151,42 @@
                         {{$item->quantite}}
                     </td>
                     <td >
-                        @formaMille($item->prixT) Fc
+                        @formaMille($item->prixT) {{ $findVenteDetail->devise }}
                     </td>
                 </tr>
             @endforeach
             <tr class="separated">
-                <td colspan="3">Paiement</td>
+                <td colspan="3">Paiement (taux d'échange : {{  $findVenteDetail->taux }})</td>
             </tr>
             </tbody>
             <tfoot>
                 <tr>
-                    <th colspan="2">Date</th>
-                    <th>Montant</th>
+                    <th colspan="2" class="left">Date</th>
+                    <th class="right">Montant</th>
                     
                 </tr>
                 @if($findVenteDetail->paiement != null)
 
                     @foreach($findVenteDetail->paiement as $cle=>$valeur)
                         <tr>
-                            <td colspan="2">{{$valeur->created_at}}</td>
-                            <td>@formaMille($valeur->avance) fc</td>
+                            <td colspan="2" class="left">{{$valeur->created_at}}</td>
+                            <td class="center">@formaMille($valeur->avance) {{ $findVenteDetail->devise }}</td>
                         </tr>
                     @endforeach
 
                     @if($valeur->solde > 0)
                     <tr>
-                        <th colspan="2">Reste</th>
-                        <th>@formaMille($valeur->solde) fc</th>
+                        <th colspan="2" class="left">Reste</th>
+                        <th>@formaMille($valeur->solde) {{ $findVenteDetail->devise }}</th>
                     </tr>
                     @endif
                 @endif
                 <tr class="footer-row trHead">
                     <th class="footer-cell" colspan="2">Total</th>
-                    <th class="footer-cell"> @formaMille($netPaye) Fc</th>
+                    <th class="footer-cell">
+                        ({{ $findVenteDetail->devise }}) @formaMille($netPaye)<br> 
+                        (cdf) @formaMille($netPaye*$findVenteDetail->taux)
+                    </th>
                 </tr>
             </tfoot>
         </table>

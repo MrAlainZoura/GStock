@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Depot;
 use App\Models\Vente;
 use App\Models\Client;
+use App\Models\Devise;
 use App\Models\Paiement;
 use App\Models\Categorie;
 use Carbon\CarbonInterface;
@@ -43,6 +44,7 @@ class VenteController extends Controller
     public function store(Request $request, $depot)
     {
         // dd($request->all());
+        
         $validateDate = Validator::make($request->all(),
         [
             'nom_client'=>'string|required',
@@ -53,10 +55,19 @@ class VenteController extends Controller
         if($validateDate->fails()){
             return back()->with('echec',$validateDate->errors());
         }
+
+        preg_match('/^(\d+)-(.*)$/', $request->monnaie, $m)
+            ? [$devise, $libele] = [$m[1], $m[2]]
+            : [$devise, $libele] = [null, null];
+
+        $getDeviseId = Devise::where('id', $devise)->where('libele',$libele)->first();
+        $devise_id = ($getDeviseId) ? $getDeviseId->id : null;
+        // dd($devise_id);
+
         $a =Auth::user()->name[0] ;
         $b = (Auth::user()->postnom !=null)?Auth::user()->postnom[0]:null ;
         $c =(Auth::user()->prenom !=null)? Auth::user()->prenom[0]:null;
-
+        
         $initialUser = "$a$b$c";
         $numero = Vente::where("user_id", Auth::user()->id)->where("created_at",'like','%'.Carbon::now()->format('Y-m-d').'%')->count()+1;
         $numero =($numero < 10)?"0$numero":$numero;
@@ -76,6 +87,9 @@ class VenteController extends Controller
             $findClient = Client::where('tel',$tel)->orWhere('tel',$lonTel)->first();
             if($findClient != null){
                 $client_id =$findClient->id;
+            }else{
+                $createClient = Client::create($filterDataClient);
+                $client_id = $createClient->id;
             }
         }else{
             $createClient = Client::create($filterDataClient);
@@ -103,7 +117,9 @@ class VenteController extends Controller
                 'depot_id'=>$request->depot_id/98123,
                 'code'=>"N°$numero/$initialUser",
                 'client_id'=>$client_id,
-                'type'=>$request->lieu_de_vente
+                'type'=>$request->lieu_de_vente,
+                'devise_id'=>$devise_id,
+                'updateTaux'=>$request->updateDevise
             ] ;
 
             $createVente = Vente::create($dataVente);
@@ -157,7 +173,10 @@ class VenteController extends Controller
     {
         $id= $vente/56745264509;
         $detailVente = Vente::where('id',$id)->first();
-        // dd($detailVente->venteProduit[0]->produit->image);
+
+        $detailVente->devise = $detailVente->devise ? $detailVente->devise->libele : "inc";
+        $detailVente->taux = ($detailVente->updateTaux != null) ? $detailVente->updateTaux : 1;
+        // dd($detailVente->venteProduit[0]->produit->image, $detailVente->taux, $detailVente->devise);
         return view('vente.show', compact('detailVente')) ;
     }
 

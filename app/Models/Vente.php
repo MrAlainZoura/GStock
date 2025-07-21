@@ -11,7 +11,9 @@ class Vente extends Model
         'depot_id',
         'client_id',
         'code',
-        'type'
+        'type', 
+        'devise_id',
+        'updateTaux'
     ] ;
 
     public function user(){
@@ -22,6 +24,9 @@ class Vente extends Model
     }
     public function client(){
         return $this->belongsTo(Client::class);
+    }
+    public function devise(){
+        return $this->belongsTo(Devise::class);
     }
 
     public function venteProduit(){

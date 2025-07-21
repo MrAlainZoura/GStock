@@ -231,10 +231,12 @@ class RapportController extends Controller
 
             $findVenteDetail->user = $objet;
         }
-         $data =[
-                'findVenteDetail'=>$findVenteDetail, 
-            ];
-
+        $findVenteDetail->devise = $findVenteDetail->devise ? $findVenteDetail->devise->libele : "inc";
+        $findVenteDetail->taux = ($findVenteDetail->updateTaux != null) ? $findVenteDetail->updateTaux : 1;
+        $data =[
+            'findVenteDetail'=>$findVenteDetail, 
+        ];
+        // dd($findVenteDetail->taux);
         $code = str_replace('/', '-', $findVenteDetail->code);
         $facture = ($findVenteDetail->user != null)
             ? "facture ".$findVenteDetail->user->name." ".$findVenteDetail->created_at." ".$code .".pdf"
