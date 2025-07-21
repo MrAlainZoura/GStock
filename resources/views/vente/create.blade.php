@@ -98,6 +98,15 @@
                                     <option value="Livraison">Livraison</option>
                                 </select>
                             </div>
+                            <div class="w-full sm:col-span-2">
+                                <label for="deviseSelect" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Choisir une Monnaie</label>
+                                <select id="deviseSelect" name="monnaie" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
+                                    
+                                </select>
+                            </div>
+                            <div class="w-full sm:col-span-2" >
+                                <input type="number" required min="1" name="updateDevise" id="updateDevise" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="1000" >
+                            </div>
                             <div class="w-full sm:col-span-2" onclick="event.stopImmediatePropagation();">
                                 <input type="text" 
                                     id="autocompleteInput"
@@ -158,6 +167,8 @@
 <script>
     
 let users = @json($produit);
+const devise = @json($depot->devise);
+
 let prodListTab=[];
 // console.log(users)
 function onkeyUp(e) {
@@ -211,6 +222,7 @@ document.addEventListener("DOMContentLoaded", () => {
   submitMyForm();
   tranche();
   alertErreurProduitSend('hide');
+  deviseRender();
 });
 
 function renderOptions(options) {
@@ -379,10 +391,14 @@ const setTotal = (inputQte, inputPx, showT) => {
   const inputPrx = document.getElementById(inputPx);
   const showTt = document.getElementById(showT);
   const netPayer =document.getElementById('netPayer');
+  const devise = document.getElementById('deviseSelect').value.trim();
+  const getDevise =  devise.substring(devise.indexOf('-') + 1);
 
   const calculNet = (net)=>{
     let somme = 0;
     const inputs = document.querySelectorAll('.putainDesabled');
+    const updateDevise = document.getElementById('updateDevise').value.trim();
+
     inputs.forEach((input)=>{
       const total = input.value.split(" ");
       let tabTobal = total[0];
@@ -395,10 +411,12 @@ const setTotal = (inputQte, inputPx, showT) => {
        if (document.getElementById('tranche')) {
         const maxTranchePaie = document.getElementById('tranche');
         maxTranchePaie.max = somme; //Ajouter du maximum au champ de premiere tranche
-    }
-      const sommeFormater = somme.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
-      net.textContent = `Montant net à payer ${sommeFormater} Fc`;
+      }
     });
+    const sommeFormater = somme.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
+    let sommeFc =somme * updateDevise;
+        sommeFc =sommeFc.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    net.textContent = `Montant net à payer ${sommeFormater} ${getDevise} / ${sommeFc} Fc`;
   }
   const idStr = (str)=>{
     const getId = str.match(/\D*(\d+)/);
@@ -407,10 +425,10 @@ const setTotal = (inputQte, inputPx, showT) => {
     }
   }
 
-  const renderTt = (quantity,prix,text, idInter,net)=>{
+  const renderTt = (quantity,prix,text, idInter,net, devise)=>{
     let total = quantity * prix;
     total = total.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-    text.value = `${total} Fc`;
+    text.value = `${total} ${devise}`;
     const id = idStr(idInter);
     text.name= `produits[${id}][${inputQt.value}]`;
     calculNet(net);
@@ -418,12 +436,12 @@ const setTotal = (inputQte, inputPx, showT) => {
 
   inputPrx.addEventListener('input', (event)=>{
    if( inputQt.value !=null){
-    renderTt(inputQt.value,inputPrx.value,showTt, inputQt.id, netPayer)
+    renderTt(inputQt.value,inputPrx.value,showTt, inputQt.id, netPayer, getDevise)
    }
   });
   inputQt.addEventListener('input', (event)=>{
    if( inputPrx.value !=null){
-    renderTt(inputQt.value,inputPrx.value,showTt, inputQt.id, netPayer)
+    renderTt(inputQt.value,inputPrx.value,showTt, inputQt.id, netPayer, getDevise)
    }
   });
   
@@ -472,8 +490,28 @@ console.log(prodListTab.length);
 (prodListTab.length==0)?alertErreurProduitSend('show'):myFormVente.submit();
   // myFormVente.submit();
   })
-}
+};
 
+const deviseRender = () => {
+  const seltDevise = document.getElementById('deviseSelect');
+  const updateDevise = document.getElementById('updateDevise');
 
+  devise.forEach(dev => {
+    const option = document.createElement("option");
+    option.value = `${dev.id}-${dev.libele}`;
+    option.setAttribute('data-taux', dev.taux);
+    option.textContent = `${dev.libele} ${dev.taux}`;
+    seltDevise.appendChild(option);
+  });
+
+  seltDevise.addEventListener('change', function () {
+    const selected = seltDevise.options[seltDevise.selectedIndex];
+    const attributTaux = selected.dataset.taux; // ou getAttribute('data-taux')
+
+    // console.log(seltDevise.value, attributTaux);
+    updateDevise.value = attributTaux;
+  });
+  seltDevise.dispatchEvent(new Event('change'));
+};
     
 </script>
