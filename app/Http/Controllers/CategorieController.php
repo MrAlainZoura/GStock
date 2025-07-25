@@ -86,31 +86,46 @@ class CategorieController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Categorie $categorie)
+    public function edit( $categorie)
     {
-        //
+        $data = json_decode($categorie, true);
+
+        $roleAutorises = ['Administrateur', 'Super admin'];
+        if (!in_array(Auth::user()->user_role->role->libele, $roleAutorises)) {
+            // dd('Accès refusé', Auth::user()->user_role->role->libele);
+            return back()->with('echec', 'Vous ne disposez pas de droit nécessaire pour effectuer cette action !');
+        }
+        $getCategorie = Categorie::where('id',(int)$data[1]/432)->where('libele', $data[0])->first();
+        if($getCategorie ){
+            // dd( $getCategorie);
+            return view('categorie.edit',data: compact('getCategorie'));
+
+        }
+        return back()->with('echec', 'Erreur inattendue, veuillez réessayer!');
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, $id)
     {
-        $validateDate = Validator::make($request->all(),
-        [
-            'id'=>'required',
-            'libele'=>'required|string|max:255',
-        ]);
-
-        if($validateDate->fails()){
-            return $validateDate->errors();
-        }
+        // dd($request->all(), $id/432);
+        $id = $id/432;
         $data = [
-            'libele'=>$request->libele,
+            'libele'=>$request->categorie,
         ];
-
-        $cat = Categorie::where('id',$id)->update($data);
-        return response()->json(['success'=>true, 'data'=>Categorie::find($id)]);
+        $marqueUp = $request->marqueUp;
+        foreach($request->marqueUp as $key => $value) {
+            $updateMarque = Marque::where('id',$key)->where('categorie_id', $id)->update(['libele'=>$value]);
+        }
+        if($request->marqueNew != null){
+            $addMArque = MArque::firstOrCreate(['libele'=>$request->marqueNew, 'categorie_id'=>$id]);
+        }
+        $catUPdate = Categorie::where('id',$id)->update($data);
+        if($catUPdate){
+            return back()->with('success',"Information mise à jour avec succès"); 
+        }
+        return back()->with('echec', "Une erreur s'est produit"); 
     }
 
     /**

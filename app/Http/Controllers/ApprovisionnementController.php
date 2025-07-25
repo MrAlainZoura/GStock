@@ -123,11 +123,17 @@ class ApprovisionnementController extends Controller
         if($updateConfirm==null){
             return back()->with('echec',"Desolé, vous ne pouvez pas confirmé approvisionnement deux fois");
         }
-        if($updateConfirm->user_id==Auth::user()->id)
-        {
-            return back()->with('echec',"Desolé, vous ne pouvez pas confirmé votre prore approvisionnement");
+        // if($updateConfirm->user_id==Auth::user()->id AND Auth::user()->user_role->role->libele !='Administrateur' || Auth::user()->user_role->role->libele!='Super admin')
+        // {
+        //     return back()->with('echec',"Desolé, vous ne pouvez pas confirmé votre prore approvisionnement");
+        // }
+       if (
+            $updateConfirm->user_id == Auth::user()->id &&
+            !in_array(Auth::user()->user_role->role->libele, ['Administrateur', 'Super admin'])
+        ) {
+            return back()->with('echec', "Désolé, vous ne pouvez pas confirmer votre propre approvisionnement");
         }
-       
+
         if($updateConfirm->origine !=null){
             $updateConfirmAll = Approvisionnement::where('origine',$updateConfirm->origine)->where('confirm',false);
             $dataUpdateAll = [

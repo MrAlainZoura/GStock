@@ -16,7 +16,8 @@ use App\Http\Controllers\RapportController;
 // Route::get('/', function () {
 //     return view('home');
 // });
-Route::get('/',[HomeController::class, 'home'])->name('home');
+// Route::get('/',[HomeController::class, 'home'])->name('home');
+Route::get('/',[UserController::class, 'loginCreate'])->name('home');
 Route::get('dashbord',[HomeController::class, 'dashboard'])->name('dashboard')->middleware(AuthentifyMiddleware::class);
 
 Route::get('sing_in',[UserController::class, 'loginCreate'])->name('loginCreate');
