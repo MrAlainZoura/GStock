@@ -1,8 +1,8 @@
 @extends('base')
-@section('title', "Accueil")
+@section('title', "Catégorie de produit")
 
 @section('header')
-  @include('composant.hearder', ['user_email'=>"$user->email", 'user_name'=>"$user->name"])
+  @include('composant.hearder', ['user_email'=>auth()->user()->id, 'user_name'=>auth()->user()->name])
 @endsection
 
 @section('main')  
@@ -17,9 +17,9 @@
         @include('composant.alert_echec', ['message'=>session('echec')])
     </div>
     @endif
-    <div class="p-5 flex gap-5">
+    <div class="flex flex-wrap justify-left items-left gap-4 p-4 sm:items-center     ">
         @foreach($cat as $key=>$v)
-            @include('composant.cat', ['image'=>"$v->image" ,'libele'=>"$v->libele",'marque'=>count($v->marque),'tab'=>$v->marque])
+            @include('composant.cat', ['id'=>$v->id,'image'=>"$v->image" ,'libele'=>"$v->libele",'marque'=>count($v->marque),'tab'=>$v->marque])
         @endforeach   
     </div>
 

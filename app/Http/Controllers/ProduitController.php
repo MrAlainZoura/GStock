@@ -183,14 +183,14 @@ class ProduitController extends Controller
                     }
                     // dd($dataProduit, 'enregistrement', $v['quantite']);
                     if($v['libele']!=null){
-                        $findProdExist = Produit::where('libele', $dataProduit['libele'])->first();
-                        ($findProdExist!=null)?$produitId=$findProdExist->id:$createNewProd = Produit::firstOrcreate($dataProduit);
+                        $findProdExist = Produit::where('libele', $dataProduit['libele'])->where('etat', $dataProduit['etat'])->first();
+                        ($findProdExist!=null)?$produitId=$findProdExist->id:$produitId = Produit::firstOrcreate($dataProduit)->id;
                         
                             if($v['quantite']!= null){
                                 $dataApro = [
                                 'user_id'=>auth()->user()->id,
                                 'depot_id'=>$request->depot_id,
-                                'produit_id'=>($findProdExist!=null)?$produitId:$createNewProd->id,
+                                'produit_id'=>$produitId,
                                 'quantite'=>$v['quantite'],
                                 'confirm'=>false,
                                 'receptionUser'=>null
@@ -198,7 +198,7 @@ class ProduitController extends Controller
                         $approvisionnement = Approvisionnement::create($dataApro);
                             }
                         $dataProD = ['depot_id'=>$request->depot_id,
-                                    'produit_id'=>($findProdExist!=null)?$produitId:$createNewProd->id,
+                                    'produit_id'=>$produitId,
                                     'quantite'=>$v['quantite']
                                 ];
                         $produitDepot = ProduitDepot::create($dataProD);  

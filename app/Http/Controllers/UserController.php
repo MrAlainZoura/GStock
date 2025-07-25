@@ -21,13 +21,12 @@ class UserController extends Controller
     public function index()
     {
         if(Auth::user()->user_role->role->libele =='Administrateur' || Auth::user()->user_role->role->libele=='Super admin'){
-          $user = User::whereHas('depotUser.depot', function ($query) {
+            $user = User::whereHas('depotUser.depot', function ($query) {
                     $query->where('libele', session('depot'));
                 })->with(['depotUser.depot'])->get();
-
+            $user->prepend(Auth::user()); //ajoute admin au debut
         }else{
             $user[] = Auth::user();
-            // dd('user simple' , Auth::user()->user_role->role->libele);
         }
         return view('users.index', compact('user'));
     }
@@ -75,7 +74,7 @@ class UserController extends Controller
         ]);
 
         if($validateDate->fails()){
-            // return back()->with('echec',$validateDate->errors());
+            return back()->with('echec',$validateDate->errors());
         }
         $fichier = $request->file('image');
         $type = ($request->file('image')!=null)?$fichier->getClientOriginalExtension():null;
@@ -151,17 +150,34 @@ class UserController extends Controller
      */
     public function edit(string $userEdit)
     {
-        $string = $userEdit;
-        $id = "";
-        $name="";
-        $parts = explode(" ", $string);
-        if (count($parts) == 2) {
-            $name = $parts[0];
-            $id = $parts[1]/6789012345;
+        
+        [$name, $id] = [
+            preg_replace('/[0-9]+/', '', $userEdit),
+            preg_replace('/[^0-9]/', '', $userEdit)
+        ];
+
+        $roleAutorises = ['Administrateur', 'Super admin'];
+        if (!in_array(Auth::user()->user_role->role->libele, $roleAutorises)) {
+            $depot[]=Auth::user()->depotUser[0]->depot;
+            // dd('user', $depot);
+        }else{
+            $depot = Auth::user()->depot;
+            if(Auth::user()->user_role->role->libele == $roleAutorises[1]){
+                $adminDepot = Depot::where('libele', session('depot'))->where('id', session('depot_id'))->first();
+                $depot = $adminDepot->user->depot;
+            }
         }
-        $depot = Depot::orderBy('libele')->get();
-        $user= User::where("id","=", $id)->where('name',$name)->with('depotUser')->first();
-        return view('users.profil',compact('user','depot'));
+        if (!empty(trim($name)) && !empty($id)) {
+            $user_id = (int)$id/6789012345;
+            $user = User::where("id","=", $user_id)->where('name',$name)->with('depotUser')->first();
+            // dd($user, $depot);
+            if($user){
+                return view('users.profil',compact('user','depot'));
+            }
+            return back()->with('echec',"Une erreur inattendue s'est produite reessayer plus tard");
+        }else{
+            return back()->with('echec',"Une erreur inattendue s'est produite reessayer plus tard");
+        }
     }
 
     /**

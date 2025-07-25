@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\api;
 
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
@@ -15,6 +16,7 @@ class UserController extends Controller
      */
     public function index()
     {
+        return 'ok';
         $user = User::latest()->get();
         return response()->json(['success'=>true, 'data'=>$user]);
     }
@@ -153,5 +155,8 @@ class UserController extends Controller
     public function logout(){
         Auth::logout();
         return 'redirect(url("/"))';
+    }
+    public function admin(Request $request){
+        //creer user super admin
     }
 }
