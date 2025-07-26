@@ -229,7 +229,7 @@ function renderOptions(options) {
   let dropdownEl = document.querySelector("#dropdown");
 
   let newHtml = ``;
-
+  let compteur = 0;
   options.forEach((user,indice) => {
     newHtml += `<div
       onclick="updateDivProduit('${indice}')"
@@ -238,9 +238,12 @@ function renderOptions(options) {
       ${user.produit.marque.libele} ${user.produit.libele}
     </div>`;
 
+      if(compteur < 3){
+        dropdownEl.innerHTML = newHtml;
+        compteur++;
+      }
     });
-  dropdownEl.innerHTML = newHtml;
-}
+  }
 
 function updateDivProduit(index){
   prodListTab = [...prodListTab, users[index]];

@@ -17,6 +17,9 @@
                   Montant
                 </th>
                 <th scope="col" class="px-6 py-3">
+                  Taux vente
+                </th>
+                <th scope="col" class="px-6 py-3">
                     Lieu
                 </th>
                 <th scope="col" class="px-6 py-3">
@@ -27,6 +30,7 @@
         <tbody>
             @php
                 $recette =0;
+                $recetteFc =0;
             @endphp
         @foreach ($data as $key=>$item )
 
@@ -44,11 +48,15 @@
                 <td class="px-6 py-4">
                     @php
                         $recette +=$v->prixT;
+                        $recetteFc +=$recette * $item->updateTaux;
                     @endphp
-                @formaMille($v->prixT) Fc
+                @formaMille($v->prixT) {{ $item->devise->libele }}
                 </td>
                 <td class="px-6 py-4">
-                {{$v->vente->type}}
+                    {{$item->updateTaux}}Fc
+                </td>
+                <td class="px-6 py-4">
+                    {{$v->vente->type}}
                 </td>
                 <td class="px-6 py-4">
                 @if($v->vente->user != null)
@@ -69,7 +77,12 @@
                 <td></td>
                 <td></td>
                 <th scope="row" class="px-6 py-4 text-xl uppercase text-gray-900 whitespace-nowrap dark:text-white">
-                     @formaMille( $recette ) Fc
+                     @formaMille( $recetteFc) Fc<br>
+                    @if (count($data) >0)
+                        @foreach ($item->depot->devise as $cle=>$dev )
+                            @formaMille( $recetteFc/$dev->taux ) {{ $dev->libele }} ({{ $dev->taux }}) <br>
+                        @endforeach
+                    @endif
                 </th>
             </tr>
         </tbody>
