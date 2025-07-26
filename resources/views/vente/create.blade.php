@@ -229,10 +229,12 @@ function renderOptions(options) {
   let dropdownEl = document.querySelector("#dropdown");
 
   let newHtml = ``;
-  let compteur = 0;
+  let compteur=0;
+
+
   options.forEach((user,indice) => {
     newHtml += `<div
-      onclick="updateDivProduit('${indice}')"
+      onclick="updateDivProduit(${user.produit.id})"
       class="px-5 py-3 border-b border-gray-200 text-stone-600 cursor-pointer hover:bg-slate-100 transition-colors"
     >
       ${user.produit.marque.libele} ${user.produit.libele}
@@ -243,11 +245,15 @@ function renderOptions(options) {
         compteur++;
       }
     });
-  }
+}
 
 function updateDivProduit(index){
-  prodListTab = [...prodListTab, users[index]];
-  users = removeObjectByIndex(users, index);
+  const produit_id = index;
+   let original = users.find(o => o.produit.id === produit_id);
+   let indexOrigin = users.findIndex(o => o.produit.id === produit_id);
+  // console.log('produit id ',indexOrigin)
+  prodListTab = [...prodListTab, original];
+  users = removeObjectByIndex(users, parseInt(indexOrigin));
   const dernierProduit = prodListTab.length-1;
   const div = prodListTab[dernierProduit]
   selectOption(`${div.produit.marque.libele} ${div.produit.libele}`, `${div.produit.id}`, `${dernierProduit}`)
