@@ -25,9 +25,9 @@
 
     <div class=" w-full p-10">
         <div class="p-4 w-full rounded-lg  ">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                <div class="flex gap-4 p-2 items-center justify-center h-24 rounded-sm bg-blue-500">
-                    <p class="text-2xl ">
+            <div class="w-full grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                <div class="flex gap-4 p-2 items-center justify-center h-auto rounded-sm bg-blue-500">
+                    <p class="flex text-2xl ">
                         Total vente du mois
                     </p>
                     <p class="flex items-center p-2 justify-center text-xl w-auto h-10  rounded-full ring-2 ring-gray-300 dark:ring-gray-500">
@@ -35,8 +35,8 @@
                     </p>
                 </div>
                 <div class="flex gap-4 p-2 items-center justify-center h-24 rounded-sm bg-green-500 ">
-                    <p class="text-2xl ">
-                        Total approvisionnement du mois
+                    <p class="flex text-2xl ">
+                        Total Appro du mois
                     </p>
                     <p class="flex items-center justify-center p-2 text-xl w-auto h-10  rounded-full ring-2 ring-gray-300 dark:ring-gray-500">
                        {{$depot->approMois}}
@@ -52,7 +52,7 @@
                 </div>
                 
             </div>
-            <div class="flex items-center justify-center  m-4 rounded-sm bg-gray-50 hidden sm:block dark:bg-gray-800">
+            <div class="flex items-center justify-center  m-4 rounded-sm bg-gray-50 hidden md:block dark:bg-gray-800">
             <div class="w-2/3 sm:w-full p-4">
                 <div class="card">
                     <div class="card-body ">

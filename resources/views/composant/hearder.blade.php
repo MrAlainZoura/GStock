@@ -25,7 +25,7 @@
         <ul class="py-2" aria-labelledby="user-menu-button ">
         
           <li>
-            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">Profil</a>
+            <a  href="{{route('user.edit',Auth::user()->id*6789012345)}}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">Profil</a>
           </li>
           <li> 
             <form action="{{route('logout')}}" method="post">
@@ -63,7 +63,7 @@
             @endif
       </li>
       @endif
-      @if(Auth::user()->user_role->role->libele=='Administrateur' || Auth::user()->user_role->role->libele=='Super admin')
+      @if(Auth::user()->user_role->role->libele =='Administrateur' || Auth::user()->user_role->role->libele=='Super admin')
       
       @if(Route::current()->getName() =='cat-pro.index')
         <li>    
@@ -90,6 +90,18 @@
           class='block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700'>
             Ajouter 
           </a>
+        </li>
+        @if($user->user_role->role->libele=='Administrateur' ||  Auth::user()->user_role->role->libele=='Super admin')
+        <form action="{{route('approConfirm',['appro'=>0, 'action'=>'all'])}}" method="post">
+          @csrf
+          @method('post')
+          <button type="submit"
+            class='block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700'>
+              Confimer Tout 
+          </button>
+        </form>
+          
+          @endif
         </li>
       @endif
     </ul>

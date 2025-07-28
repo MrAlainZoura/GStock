@@ -20,11 +20,27 @@
     
 
     <section class="p-10 gap-5 w-full">
-     
+         <div id="alert-additional-content-2" class="hidden p-4 mb-4 text-red-800 border border-red-300 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400 dark:border-red-800" role="alert">
+      <div class="flex items-center">
+        <svg class="shrink-0 w-4 h-4 me-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+          <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
+        </svg>
+        <span class="sr-only">Info</span>
+        <h3 class="text-lg font-medium">Erreur, transfert impossible</h3>
+      </div>
+      <div class="mt-2 mb-4 text-sm">
+          Veuillez au moins choisir un produit pour effectuer ce trnasfert, sinon ça n'aura pas de sens !
+      </div>
+      <div class="flex item-center justify-center">
+        <button type="button" onclick="alertErreurProduitSend('hide')" class="text-red-800 bg-transparent border border-red-800 hover:bg-red-900 hover:text-white focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-xs px-3 py-1.5 text-center dark:hover:bg-red-600 dark:border-red-600 dark:text-red-500 dark:hover:text-white dark:focus:ring-red-800">
+          Reprennez
+        </button>
+      </div>
+    </div>
     <section class="bg-white dark:bg-gray-900">
   <div class="py-8 px-4 mx-auto max-w-2xl lg:py-16">
       <h2 class="mb-4 text-xl font-bold text-gray-900 dark:text-white">Approvisionnement Produit {{$depot->libele}}</h2>
-      <form  action="{{route('approStore', $depot->libele)}}" method="post">
+      <form  action="{{route('approStore', $depot->libele)}}" method="post" id="formAppro">
         @method('post')
         @csrf
         <input type="hidden" name="depot_id" value="{{$depot->id}}">
@@ -77,44 +93,63 @@
 <script>
     
 let users = @json($produit);
+let prodList = [];
 // console.log(users)
 function onkeyUp(e) {
   let keyword = e.target.value;
   let dropdownEl = document.querySelector("#dropdown");
-  dropdownEl.classList.remove("hidden");
+  if (document.activeElement===e.target) {
+    dropdownEl.classList.remove("hidden"); 
+  }
 
-  let filteredusers = users.filter((c) =>
-    // {return users.every(filter => {
-    //   return c.description.toLowerCase().includes(keyword.toLowerCase());
-    // });}
-    c.description.toLowerCase().includes(keyword.toLowerCase())
-  );
+  let filteredusers = users.filter((c) => {
+    if (c.produit.libele.toLowerCase().includes(keyword.toLowerCase())) {
+        return true; 
+    }
+    if (c.produit.description.toLowerCase().includes(keyword.toLowerCase())) {
+        return true; 
+    }
+    if (c.produit.marque.libele.toLowerCase().includes(keyword.toLowerCase())) {
+        return true; 
+    }
+    if (c.produit.marque.categorie.libele.toLowerCase().includes(keyword.toLowerCase())) {
+        return true; 
+    }
+    return false;
+});
 
   renderOptions(filteredusers);
 }
 
 document.addEventListener("DOMContentLoaded", () => {
   renderOptions(users);
+  submitMyForm();
+  alertErreurProduitSend();
 });
 
 function renderOptions(options) {
   let dropdownEl = document.querySelector("#dropdown");
 
   let newHtml = ``;
+  let compteur=0;
 
   options.forEach((user,indice) => {
     newHtml += `<div
-      onclick="selectOption('${user.marque.libele} ${user.libele}', '${user.id}', '${indice}')"
+      onclick="selectOption('${user.produit.marque.libele} ${user.produit.libele}', '${user.produit.id}')"
       class="px-5 py-3 border-b border-gray-200 text-stone-600 cursor-pointer hover:bg-slate-100 transition-colors"
     >
-      ${user.marque.libele} ${user.libele}
+      ${user.produit.marque.libele} ${user.produit.libele}
     </div>`;
 
+    if(compteur < 3){
+      dropdownEl.innerHTML = newHtml;
+      compteur++;
+    }
   });
-  dropdownEl.innerHTML = newHtml;
+  // dropdownEl.innerHTML = newHtml;
 }
 
-function selectOption(selectedOption, inputValue, indeX) {
+function selectOption(selectedOption, inputValue) {
   hideDropdown();
   let input = document.querySelector("#autocompleteInput");
   input.value = '';
@@ -141,7 +176,12 @@ function selectOption(selectedOption, inputValue, indeX) {
   form.appendChild(newInputContainer);
   form.appendChild(newInputNumber);
 
-  users = removeObjectByIndex(users, indeX);
+  const produit_id = parseInt(inputValue)
+  let original = users.find(o => o.produit.id === produit_id);
+  let indexOrigin = users.findIndex(o => o.produit.id === produit_id);
+
+  prodList = [...prodList, original];
+  users = removeObjectByIndex(users, indexOrigin);
   // console.log(indeX,'supprimer Object');
 }
 
@@ -160,6 +200,23 @@ function removeObjectByIndex(users, index) {
     ...users.slice(index + 1)
   ];
 }
+ const submitMyForm = ()=>{
+  const myFormTrans =document.getElementById('formAppro');
+  myFormTrans.addEventListener('submit', (event)=>{
+    event.preventDefault();
+   const inputs = myFormTrans.querySelectorAll('.putainDesabled');
 
+  (prodList.length==0)?alertErreurProduitSend('show'):myFormTrans.submit();
+  })
+};
 
+ const alertErreurProduitSend = (action)=>{
+  const divErreur = document.getElementById('alert-additional-content-2')
+  if(action=='hide'){
+      divErreur.classList.add('hidden');
+    }
+    if(action=="show"){
+      divErreur.classList.remove("hidden");
+    }
+}
 </script>

@@ -133,29 +133,32 @@ class UserController extends Controller
      */
     public function show(string $userShow)
     {
-        $string = $userShow;
-        $id = "";
-        $name="";
-        $parts = explode(" ", $string);
-        if (count($parts) == 2) {
-            $name = $parts[0];
-            $id = $parts[1]/6789012345;
-        }
-                $user= User::where("id","=", $id)->where('name',$name)->first();
+        $id = (int)$userShow/6789012345;
+        // $id = "";
+        // $name="";
+        // $parts = explode(" ", $string);
+        // if (count($parts) == 2) {
+        //     $name = $parts[0];
+        //     $id = $parts[1]/6789012345;
+        // }
+            $user= User::where("id","=", $id)->first();
+            if($user){
                 return back()->with('success',"Voir plus, Bientot disponible !");
             }
+            return back()->with('echec',value: "Utilisateur introuvable !");
+        }
 
     /**
      * Show the form for editing the specified resource.
      */
     public function edit(string $userEdit)
     {
-        
-        [$name, $id] = [
-            preg_replace('/[0-9]+/', '', $userEdit),
-            preg_replace('/[^0-9]/', '', $userEdit)
-        ];
-
+        // dd($userEdit);
+        // [$name, $id] = [
+        //     preg_replace('/[0-9]+/', '', $userEdit),
+        //     preg_replace('/[^0-9]/', '', $userEdit)
+        // ];
+        $id = (int)$userEdit;
         $roleAutorises = ['Administrateur', 'Super admin'];
         if (!in_array(Auth::user()->user_role->role->libele, $roleAutorises)) {
             $depot[]=Auth::user()->depotUser[0]->depot;
@@ -167,16 +170,16 @@ class UserController extends Controller
                 $depot = $adminDepot->user->depot;
             }
         }
-        if (!empty(trim($name)) && !empty($id)) {
-            $user_id = (int)$id/6789012345;
-            $user = User::where("id","=", $user_id)->where('name',$name)->with('depotUser')->first();
+        if (!empty($id)) {
+            $user_id = $id/6789012345;
+            $user = User::where("id","=", $user_id)->with('depotUser')->first();
             // dd($user, $depot);
             if($user){
                 return view('users.profil',compact('user','depot'));
             }
-            return back()->with('echec',"Une erreur inattendue s'est produite reessayer plus tard");
+            return back()->with('echec',"Une erreur inattendue utilisateur introuvable s'est produite reessayer plus tard");
         }else{
-            return back()->with('echec',"Une erreur inattendue s'est produite reessayer plus tard");
+            return back()->with('echec',"Une erreur inattendue de format s'est produite reessayer plus tard");
         }
     }
 
@@ -274,14 +277,14 @@ class UserController extends Controller
     {
         $string = $userDelete;
         $dossier="users";
-        $id = "";
-        $name="";
-        $parts = explode(" ", $string);
-        if (count($parts) == 2) {
-            $name = $parts[0];
-            $id = $parts[1]/6789012345;
-        }
-        $user= User::where("id", $id)->where('name',$name)->first();
+        $id = (int) $userDelete/6789012345;
+        // $name="";
+        // $parts = explode(" ", $string);
+        // if (count($parts) == 2) {
+        //     $name = $parts[0];
+        //     $id = $parts[1]/6789012345;
+        // }
+        $user= User::where("id", $id)->first();
         if($user != null){
             $image=$user->image;
             if($user->delete()){

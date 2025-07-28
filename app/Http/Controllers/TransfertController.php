@@ -30,10 +30,13 @@ class TransfertController extends Controller
     public function create($var_depot)
     {
         // dd(Transfert::all(), Approvisionnement::latest()->first(), ProduitDepot::latest()->first(), $var_depot);
-        $depot=Depot::where("libele",$var_depot)->with('produitDepot')->first();
-        $produit = ProduitDepot::where("depot_id",$depot->id)->with('produit.marque')->get();
-        $depotList=Depot::where("libele",'!=',$var_depot)->get();
-        return view("transfert.create",compact("produit","depot","depotList"));
+        $depot = Depot::where("libele",$var_depot)->where('id',session('depot_id'))->with('produitDepot')->first();
+        if($depot){
+            $produit = ProduitDepot::where("depot_id",$depot->id)->with("produit.marque","produit.marque.categorie")->get();
+            $depotList=Depot::where("libele",'!=',$var_depot)->where('user_id',$depot->user_id)->get();
+            return view("transfert.create",compact("produit","depot","depotList"));
+        }
+            return back()->with('echec',"Depot introuvable !");
     }
 
     /**
@@ -72,7 +75,7 @@ class TransfertController extends Controller
         foreach($request->produits as $ke => $val){
             $findProduit = ProduitDepot::where('produit_id',$ke)->where('depot_id',$request->depot_id)->first();
             if($findProduit != null && $findProduit->quantite > $val){
-                $verifTransData [$ke] = $val;
+                ($val > 0) ? $verifTransData [$ke] = $val:null;   
             }
         }
         if($verifTransData!=null) {
@@ -113,7 +116,7 @@ class TransfertController extends Controller
             }
         }else{
 
-            return back()->with('echec',"Une erreur inattendue s'est produite, veuillez réessayer");
+            return back()->with('echec',"Une erreur inattendue s'est produite : quantité 0, veuillez réessayer");
         }
         return back()->with('success',"Transfert effectué avec succcès");
     
