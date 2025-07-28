@@ -254,10 +254,15 @@
          @endif
          <li>
             <form action="{{route('logout')}}" method="post" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
-            <img src="{{asset('svg/exit.svg')}}" class="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" aria-hidden="true" alt="">
-                @csrf 
-                @method('post')
-                <button type="submit" class="ml-3">Exit</button>
+               @csrf 
+               @method('post')
+               <button type="submit" class="hover:cursor-pointer flex items-center w-full">
+                  <img src="{{asset('svg/exit.svg')}}" 
+                        class="mr-2 w-5 h-5 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" 
+                        aria-hidden="true" 
+                        alt="Exit icon"/>
+                  Exit
+               </button>
             </form>
          </li>
       </ul>
