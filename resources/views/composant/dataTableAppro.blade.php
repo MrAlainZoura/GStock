@@ -109,7 +109,7 @@
                 {{$item->produit->libele}}            
             </td>
             <td>
-                @include('composant.actionLink', ['itemName'=>$item->produit->libele,'seeRoute'=>'approShow','seeParam'=>56745264509*$item->produit->id."adft".$item->id*6789012345, 'deleteRoute'=>"approConfirm",'deleteParam'=>56745264509*$item->produit->id."adft".$item->id*6789012345, 'editeRoute'=>"approEdit",'editParam'=>$item->produit->libele." ".$item->id*6789012345])
+                @include('composant.actionLink', ['itemName'=>$item->produit->libele,'seeRoute'=>'approShow','seeParam'=>56745264509*$item->produit->id."adft".$item->id*6789012345, 'deleteRoute'=>"approConfirm",'deleteParam'=>['appro'=>56745264509*$item->produit->id."adft".$item->id*6789012345, 'action'=>'one'], 'editeRoute'=>"approEdit",'editParam'=>$item->produit->libele." ".$item->id*6789012345])
             </td>
         </tr>
         @endforeach
