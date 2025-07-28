@@ -48,7 +48,7 @@
                 <td class="px-6 py-4">
                     @php
                         $recette +=$v->prixT;
-                        $recetteFc +=$recette * $item->updateTaux;
+                        $recetteFc += $v->prixT * $item->updateTaux;
                     @endphp
                 @formaMille($v->prixT) {{ $item->devise->libele }}
                 </td>

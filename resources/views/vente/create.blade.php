@@ -18,7 +18,7 @@
     </div>
     @endif
     
-    <div id="alert-additional-content-2" class="p-4 mb-4 text-red-800 border border-red-300 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400 dark:border-red-800" role="alert">
+    <div id="alert-additional-content-2" class="hidden p-4 mb-4 text-red-800 border border-red-300 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400 dark:border-red-800" role="alert">
       <div class="flex items-center">
         <svg class="shrink-0 w-4 h-4 me-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
           <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
@@ -49,7 +49,7 @@
                             Informations sur le <span class="italic">Client</span>
                             <div class="flex items-center">
                                 <input id="link-checkbox" type="checkbox" value="false" name="ancien" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                                <label for="link-checkbox" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Ancien </label>
+                                <label for="link-checkbox" id="labeleAncien" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Voir nécessaire </label>
                             </div>
                         </div>
                         <hr class="h-px  bg-black border-0 dark:bg-gray-700">
@@ -58,11 +58,11 @@
                             <label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nom</label>
                             <input type="text" name="nom_client" id="name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="nom" required="">
                         </div>
-                        <div class="w-full">
+                        <div class="w-full" id="divPrenom">
                             <label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Prenom</label>
                             <input type="text" name="prenom" id="name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Christ" >
                         </div>
-                        <div>
+                        <div id="divGenre">
                             <label for="category" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Genre</label>
                             <select id="category" name="genre" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
                                 <option selected value="">Choisir genre client</option>
@@ -75,7 +75,7 @@
                             <label  class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Téléphone</label>
                             <input type="text" id="tel" name="contact_client" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="+243 ..." >
                         </div>
-                        <div class="w-full">
+                        <div class="w-full" id="divAdress">
                             <label  class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Adresse</label>
                             <input type="text" name="adresse"  class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Kin, Lemba, Salongo">
                         </div>
@@ -458,14 +458,27 @@ const setTotal = (inputQte, inputPx, showT) => {
 
 const ancien = ()=>{
     const ancienClient = document.getElementById('link-checkbox');
+    const labelancien = document.getElementById('labeleAncien');
+
     const tel =document.getElementById('tel');
+    const genre = document.getElementById('divGenre')
+    const prenom = document.getElementById('divPrenom')
+    const adresse = document.getElementById('divAdress')
     ancienClient.addEventListener('change', function() {
       if (this.checked) {
         this.value= true;
-        tel.required =true;
+        // tel.required =true;
+        genre.classList.add("hidden");
+        prenom.classList.add("hidden");
+        adresse.classList.add("hidden");
+        labelancien.textContent="Voir plus"
       } else {
         this.value=false;
-        tel.required=false;
+        // tel.required=false;
+        genre.classList.remove("hidden");
+        prenom.classList.remove("hidden");
+        adresse.classList.remove("hidden");
+        labelancien.textContent="Voir nécessaire"
       }
     });
 }
@@ -495,9 +508,9 @@ const submitMyForm = ()=>{
       }
       input.value = totalEntier;
    })
-console.log(prodListTab.length);
-(prodListTab.length==0)?alertErreurProduitSend('show'):myFormVente.submit();
-  // myFormVente.submit();
+  // console.log(prodListTab.length);
+  (prodListTab.length==0)?alertErreurProduitSend('show'):myFormVente.submit();
+    // myFormVente.submit();
   })
 };
 
