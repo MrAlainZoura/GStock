@@ -155,7 +155,7 @@ class VenteController extends Controller
                 }
             }
         }        
-        return back()->with("echec","Vente echouée, une erreur inattendue s'est produite.");
+        return back()->with("echec","Vente echouée, une erreur inattendue s'est produite, produit en rupture de stock.");
 
     }
 
