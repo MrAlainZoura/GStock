@@ -1,5 +1,5 @@
 @extends('base')
-@section('title', "Accueil")
+@section('title', "Parametre")
 <!-- <link rel="stylesheet" href="{{asset('bootstrap/bootstrap.min.css')}}"> -->
 <script src="{{asset('bootstrap/apexcharts.min.js')}}"></script>
 
@@ -8,6 +8,16 @@
 @endsection
 
 @section('main')  
+@if(session('success'))
+    <div class="alert-success">
+    @include('composant.alert_suc', ['message'=>session('success')])
+    </div>
+    @endif
+    @if(session('echec'))
+    <div class="alert-echec">
+        @include('composant.alert_echec', ['message'=>session('echec')])
+    </div>
+    @endif
     <div class=" w-full p-10">
         <div>
   <div class="px-4 sm:px-0">
@@ -22,11 +32,11 @@
       </div>
       <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
         <dt class="text-sm/6 font-medium text-gray-900">Adresse / localisation </dt>
-        <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">Pays Ville Commune </dd>
+        <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">{{ "$depotData->pays - $depotData->province - $depotData->ville" }} <br>{{ $depotData->avenue }} </dd>
       </div>
       <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
         <dt class="text-sm/6 font-medium text-gray-900">Contact / Email </dt>
-        <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">entreprise@example.com</dd>
+        <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">{{ "$depotData->contact1, $depotData->contact" }} / {{$depotData->email}}</dd>
       </div>
       <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
         <dt class="text-sm/6 font-medium text-gray-900">Personnel </dt>
@@ -34,7 +44,7 @@
       </div>
       <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
         <dt class="text-sm/6 font-medium text-gray-900">Autre rensiegnement</dt>
-        <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">Fugiat ipsum ipsum deserunt culpa aute sint do nostrud anim incididunt cillum culpa consequat. Excepteur qui ipsum aliquip consequat sint. Sit id mollit nulla mollit nostrud in ea officia proident. Irure nostrud pariatur mollit ad adipisicing reprehenderit deserunt qui eu.</dd>
+        <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">{{ $depotData->autres }}</dd>
       </div>
       <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
         <dt class="text-sm/6 font-medium text-gray-900">Monnaie & Devise</dt>
@@ -51,7 +61,15 @@
                     </div>
                   </div>
                   <div class="ml-4 shrink-0">
-                  <a href="#" class="font-medium text-indigo-600 hover:text-indigo-500">Editer</a>
+                  <a href="{{ route('devise.update', ['depot'=>session('depot'), 'devise'=> $val->id*145]) }}" id="editeDevise" 
+                   devise ="{{ $val->libele }}"
+                   devise_id ="{{ $val->id }}"
+                   taux ="{{ $val->taux }}"
+                   title="{{ $val->libele  }}"
+                   data-modal-target="authentication-modal" data-modal-toggle="authentication-modal"
+                   class="font-medium text-indigo-600 hover:text-indigo-500">
+                   Editer
+                  </a>
                 </div>
                 </li>
               @endforeach
@@ -70,8 +88,8 @@
                   <path fill-rule="evenodd" d="M15.621 4.379a3 3 0 0 0-4.242 0l-7 7a3 3 0 0 0 4.241 4.243h.001l.497-.5a.75.75 0 0 1 1.064 1.057l-.498.501-.002.002a4.5 4.5 0 0 1-6.364-6.364l7-7a4.5 4.5 0 0 1 6.368 6.36l-3.455 3.553A2.625 2.625 0 1 1 9.52 9.52l3.45-3.451a.75.75 0 1 1 1.061 1.06l-3.45 3.451a1.125 1.125 0 0 0 1.587 1.595l3.454-3.553a3 3 0 0 0 0-4.242Z" clip-rule="evenodd" />
                 </svg>
                 <div class="ml-4 flex min-w-0 flex-1 gap-2">
-                  <span class="truncate font-medium">Numéro national</span>
-                  <span class="shrink-0 text-gray-400">12/31ERC/134CJE/KINRDC</span>
+                  <span class="truncate font-medium">Numéro national : </span>
+                  <span class="shrink-0 text-gray-400">{{ $depotData->idNational }}</span>
                 </div>
               </div>
               <!-- <div class="ml-4 shrink-0">
@@ -84,8 +102,8 @@
                   <path fill-rule="evenodd" d="M15.621 4.379a3 3 0 0 0-4.242 0l-7 7a3 3 0 0 0 4.241 4.243h.001l.497-.5a.75.75 0 0 1 1.064 1.057l-.498.501-.002.002a4.5 4.5 0 0 1-6.364-6.364l7-7a4.5 4.5 0 0 1 6.368 6.36l-3.455 3.553A2.625 2.625 0 1 1 9.52 9.52l3.45-3.451a.75.75 0 1 1 1.061 1.06l-3.45 3.451a1.125 1.125 0 0 0 1.587 1.595l3.454-3.553a3 3 0 0 0 0-4.242Z" clip-rule="evenodd" />
                 </svg>
                 <div class="ml-4 flex min-w-0 flex-1 gap-2">
-                  <span class="truncate font-medium">Numéro impot </span>
-                  <span class="shrink-0 text-gray-400">1232334RAS4</span>
+                  <span class="truncate font-medium">Numéro impot : </span>
+                  <span class="shrink-0 text-gray-400">{{ $depotData->numImpot }}</span>
                 </div>
               </div>
               <!-- <div class="ml-4 shrink-0">
@@ -134,6 +152,46 @@
     </div>
     @include('composant.sidebar',['depot'=> session('depot')])
 
+<!-- Main modal Edite Devise -->
+<div id="authentication-modal" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+    <div class="relative p-4 w-full max-w-md max-h-full">
+        <!-- Modal content -->
+        <div class="relative bg-white rounded-lg shadow-sm dark:bg-gray-700">
+            <!-- Modal header -->
+            <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600 border-gray-200">
+                <h3 class="text-xl font-semibold text-gray-900 dark:text-white" id="textEditeDevise">
+                    Editer Devise 
+                </h3>
+                <button type="button" class="end-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="authentication-modal">
+                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                    </svg>
+                    <span class="sr-only">Close modal</span>
+                </button>
+            </div>
+            <!-- Modal body -->
+            <div class="p-4 md:p-5">
+                <form class="space-y-4" action="#" method="post" id="formDeviseUpdate">
+                   @csrf 
+                   @method('put')
+                    <div>
+                        <label for="deviseLibele" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Devise</label>
+                        <input type="text" name="devise" id="deviseLibele" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" placeholder="" required />
+                    </div>
+                    <div>
+                        <label for="tauxEchange" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Taux d'échange</label>
+                        <input type="number" step="any" min="1" name="taux" id="tauxEchange"  class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" required />
+                    </div>
+                    
+                    <button type="submit" class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Mettre à jour</button>
+                    
+                </form>
+            </div>
+        </div>
+    </div>
+</div> 
+
+
 @endsection
 
 
@@ -141,3 +199,31 @@
     @include('composant.footer')
 @endsection
 
+<script>
+  document.addEventListener("DOMContentLoaded", (event) => {
+    //modal suppression item
+   const deleteLink = document.querySelectorAll('#editeDevise');
+
+   deleteLink.forEach(link => {
+   link.addEventListener('click', (event) => {
+   event.preventDefault();
+   const hrefClicked = event.currentTarget.getAttribute('href');
+   const formDeviseUpdate =document.getElementById('formDeviseUpdate');
+   const textDeleteItem =document.getElementById('textEditeDevise');
+   const deviseLibele =document.getElementById('deviseLibele');
+   const tauxEchange =document.getElementById('tauxEchange');
+  
+   const devise = event.currentTarget.getAttribute('devise') ;
+   const devise_id = event.currentTarget.getAttribute('devise_id') ;
+   const taux = event.currentTarget.getAttribute('taux') ;
+
+  //  console.log('devise',devise, formDeviseUpdate, hrefClicked, taux, devise, devise_id)
+   
+   textDeleteItem.textContent= `Editer Devise [ ${devise} ]`;
+   tauxEchange.value = taux;
+   deviseLibele.value = devise;
+   formDeviseUpdate.setAttribute('action',hrefClicked);
+ });
+});
+  });
+</script>

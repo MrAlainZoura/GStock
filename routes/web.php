@@ -10,6 +10,7 @@ use App\Http\Controllers\CategorieController;
 use App\Http\Controllers\TransfertController;
 use App\Http\Middleware\AuthentifyMiddleware;
 use App\Http\Controllers\ApprovisionnementController;
+use App\Http\Controllers\DeviseController;
 use App\Http\Controllers\PaiementController;
 use App\Http\Controllers\RapportController;
 
@@ -58,6 +59,8 @@ Route::get('rapport/{vente}/facture/{action}', [RapportController::class,'factur
 
 Route::get('{depot}/parametre', [DepotController::class, 'depotSetting'])->name("depotSetting")->middleware(AuthentifyMiddleware::class);
 Route::get('{depot}/produits', [DepotController::class, 'showProduit'])->name("showProduit")->middleware(AuthentifyMiddleware::class);
+
+Route::put('{depot}/{devise}/update', [DeviseController::class, 'update'])->name("devise.update")->middleware(AuthentifyMiddleware::class);
 
 Route::post('import_produit',[ ProduitController::class, 'importProduitExcel'])->name('import_prod_excel')->middleware(AuthentifyMiddleware::class);
 Route::get('vente/creances/{depot}', [PaiementController::class,'creance'])->name('creanceDepot')->middleware( AuthentifyMiddleware::class);

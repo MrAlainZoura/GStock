@@ -496,7 +496,10 @@ const submitMyForm = ()=>{
   const myFormVente =document.getElementById('myFormVente');
   myFormVente.addEventListener('submit', (event)=>{
     event.preventDefault();
-   const inputs = myFormVente.querySelectorAll('.putainDesabled');
+  //  const inputs = myFormVente.querySelectorAll('.putainDesabled');
+  //  const inputs = [...myFormVente.querySelectorAll('.putainDesabled')];
+  const inputs = Array.from(myFormVente.querySelectorAll('.putainDesabled'));
+
    inputs.forEach((input)=>{
     input.removeAttribute('disabled')
     input.removeAttribute('aria-label')
@@ -507,9 +510,9 @@ const submitMyForm = ()=>{
         totalEntier = totalEntier.replace(/\./g, '');
       }
       input.value = totalEntier;
-   })
-  // console.log(prodListTab.length);
-  (prodListTab.length==0)?alertErreurProduitSend('show'):myFormVente.submit();
+   });
+  // console.log(prodListTab.length, inputs);
+  (prodListTab.length==0) ? alertErreurProduitSend('show') : myFormVente.submit();
     // myFormVente.submit();
   })
 };
