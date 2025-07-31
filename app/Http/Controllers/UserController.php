@@ -348,12 +348,30 @@ class UserController extends Controller
         }
         $data = ['email'=>$request->email, 'password'=>$request->password];
         $dataLoginByName = ['name'=>$request->email, 'password'=>$request->password];
-        if(Auth::attempt($data) || Auth::attempt($dataLoginByName)){
+        if(Auth::attempt($data)){
             $request->session()->regenerate();
             // return to_route('dashboard'); 
             return redirect()->intended('dashbord');
+        }else{
+            // Récupérer tous les utilisateurs avec ce nom d’utilisateur
+            $users = User::where('name', $dataLoginByName['name'])->get();
+            // Filtrer ceux dont le mot de passe correspond
+            $matchingUsers = $users->filter(function ($user) use ($request) {
+                return Hash::check($request->password, $user->password);
+            });
+
+            if ($matchingUsers->count() > 1) {
+                return back()->with('echec',"Ce nom d’utilisateur et mot de passe sont utilisés par plusieurs comptes. Veuillez vous connecter avec votre adresse email.");
+            }
+            if ($matchingUsers->count() === 1) {
+                if(Auth::attempt($dataLoginByName)){
+                    $request->session()->regenerate();
+                    return redirect()->intended('dashbord');
+                }
+            }
         }
-       return back()->with('echec','email ou mot de passe incorrect');
+        dd('putain');
+       return back()->with('echec',"email / nom d'utilisateur ou mot de passe incorrect, essayez de vous connecter avec votre email si vous utiliser le nom d'utilisateur");
     }
     public function logout(){
         Auth::logout();

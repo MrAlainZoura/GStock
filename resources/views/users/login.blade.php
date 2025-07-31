@@ -31,7 +31,7 @@
 
                 <div class="input-box animation" style="--i:1; --j:22">
                     <input type="text" id="email" name="email" autocomplete="off" required>
-                    <label >Email</label>
+                    <label >Email ou nom utilisateur</label>
                     <i class='bx bxs-user'></i>
                 </div>
 
@@ -50,7 +50,7 @@
         <div class="info-text login">
             <h2 class="animation" style="--i:0; --j:20">Bienvenue!</h2>
             @if(session('echec'))
-                <p class="error-message" id="alerteLog">Identifiants incorrects. Veuillez réessayer.</p>
+                <p class="error-message" id="alerteLog">{{ session('echec') }}</p>
             @endif
             <p class="animation" style="--i:1; --j:21">Renseigner vos identifiants : email et mot de passe pour vous connecter</p>
         </div>
