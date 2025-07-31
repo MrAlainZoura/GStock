@@ -204,8 +204,9 @@ class DepotController extends Controller
         $depotUpdate = Depot::where('id',session('depot_id'))->first();
         $nomFichier = $depotUpdate->logo;
         // dd($nomFichier);
+        
         if($depotUpdate->update($data)){
-            if ($request->hasFile('logo ') && $request->file('logo ')->isValid()) {
+            if ($request->hasFile('logo') && $request->file('logo')->isValid()) {
                 $cheminFichier = $dossier . '/' . $nomFichier;
                 $getDepot = Depot::find( $depotUpdate->id); 
                 $nouveauNom = $getDepot ? $getDepot->logo : null;
@@ -214,7 +215,7 @@ class DepotController extends Controller
                     Storage::disk('direct_public')->move($cheminFichier, $dossier . '/' . $nouveauNom);
                 }
                 // Enregistrer le nouveau fichier avec le nom d'origine
-                $fichier = $request->file('image')->storeAs(
+                $fichier = $request->file('logo')->storeAs(
                     $dossier,
                     $nouveauNom,
                     'direct_public'

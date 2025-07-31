@@ -78,6 +78,10 @@
         .center{
             text-align: center;
         }
+        .imprime{
+            text-align: center;
+            font-size: 6px;
+        }
     </style>
 </head>
 <body>
@@ -98,17 +102,21 @@
         <div class="container">
         <div class="invoice-header">
             <div class="logo">
-                <img src="data:image/jpeg;base64,{{ base64_encode(file_get_contents(public_path('img/icon.jpg'))) }}" alt="logo">
+                @if ($findVenteDetail->depot->logo)
+                    <img src="data:image/jpeg;base64,{{ base64_encode(file_get_contents(public_path('uploads/logo/'.$findVenteDetail->depot->logo))) }}" alt="logo">
+                @else
+                    Shop {{$findVenteDetail->depot->libele}}
+                @endif
             </div>
         <h3>Détails de la Vente</h3>
-        <h3>Ste. Ujisha</h3>
+        <h3>Ets. Ujisha</h3>
         <div class="idnat">
             RCCM:KNG/RCCM/22-A-01256 ID.NAT : <br> 01-G4701-N998728, N.Impot: A23119069 <br>
             ***
             Adresse: Croisement Des Avenues Kasongolunda N°292 Et 24 Novembre (Liberation) Ref :Station KYONDO OIL en face de l'académie de beaux-arts. Kinshasa, RDC.
             ***  <br>
             Phone: +243822109929, +243808400183 <br>
-            Contact@ujisha.com
+            <!-- Contact@ujisha.com -->
         </div>
         <div class="sansInterligne">
             <p class="left"> 
@@ -198,6 +206,7 @@
             Les marchandises vendue sont ni reprises ni échangées!<br>
             1 mois de garentie pour les ordinateurs, celle-ci n'inclut pas le display et chargeur!
         </p>
+        <p class="imprime"> imprimer par {{Auth::user()->name ." ".Auth::user()->postnom ." ".Auth::user()->prenom}}</p>
     </div>
 </div>
 </body>

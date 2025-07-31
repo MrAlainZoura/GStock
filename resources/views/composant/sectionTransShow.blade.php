@@ -71,7 +71,9 @@
                     <!-- <p class="mt-5 line-clamp-3 text-sm/6 text-gray-600">Illo sint voluptas. Error voluptates culpa eligendi. Hic vel totam vitae illo. Non aliquid explicabo necessitatibus unde. Sed exercitationem placeat consectetur nulla deserunt vel. Iusto corrupti dicta.</p> -->
                     </div>
                     <div class="relative mt-8 flex items-center gap-x-4">
-                    <img src="{{asset('uploads/produit/'.$item->produit->image)}}" alt="" class="size-14 rounded-sm bg-gray-50">
+                        @if ($item->produit->image)
+                            <img src="{{asset('uploads/produit/'.$item->produit->image)}}" alt="" class="size-14 rounded-sm bg-gray-50">
+                        @endif
                     <div class="text-sm/6">
                         <p class="font-semibold text-gray-900">
                         <a href="#">
