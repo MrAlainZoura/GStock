@@ -164,9 +164,13 @@ class VenteController extends Controller
      */
     public function showDepotVente($depotVar){
         // dd($depotVar);
-        $depot= Depot::where('libele',$depotVar)->first();
-        // dd($depot->vente);
-        return view('vente.index', compact('depot')) ;
+        $depot= Depot::where('libele',$depotVar)->where('id', session('depot_id'))->first();
+        if($depot){
+            // dd($depot->vente, $depot->devise);
+            return view('vente.index', compact('depot')) ;
+        }else{
+            return back()->with("echec","Erreur demande introuvable");
+        }
 
     }
     public function show( $vente)
