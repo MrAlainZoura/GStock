@@ -174,10 +174,17 @@ class UserController extends Controller
             $user_id = $id/6789012345;
             $user = User::where("id","=", $user_id)->with('depotUser')->first();
             // dd($user, $depot);
+            $tabAffectation =[];
             if($user){
-                return view('users.profil',compact('user','depot'));
+                if(count($user->depotUser) > 0){
+                    foreach ( $user->depotUser as $k=>$v)
+                    {
+                        $tabAffectation [] = $v->depot->libele;
+                    }
+                }
+                return view('users.profil',compact('user','depot', 'tabAffectation'));
             }
-            return back()->with('echec',"Une erreur inattendue utilisateur introuvable s'est produite reessayer plus tard");
+            return back()->with('echec',"Une erreur inattendue, utilisateur introuvable s'est produite reessayer plus tard");
         }else{
             return back()->with('echec',"Une erreur inattendue de format s'est produite reessayer plus tard");
         }
@@ -241,11 +248,44 @@ class UserController extends Controller
         ];
 
         $data2 = array_filter($data, function($val){return !is_null($val);});
-        $userUpdate = User::where('id', $id)->update($data2);
-        if($request->depot_id!=null){
-            $update_affectation = DepotUser::where('user_id',$id)->update(['depot_id'=>$request->depot_id]);
+        $userUpdate = User::where('id', $id)->first();
+    
+        if(is_array($request->affectation) && count($request->affectation) > 0){
+            $tableauAffectation = $request->affectation;
+            $affectationSize = count($request->affectation);
+            $depotUserSize = count( $userUpdate->depotUser);
+            if($affectationSize == $depotUserSize)
+            {
+                foreach($userUpdate->depotUser as $key=>$depotUser){
+                    $depotUser->depot_id = $tableauAffectation[$key];
+                    $depotUser->save();
+                }
+            }elseif($affectationSize > $depotUserSize){
+                // dd('on fait la mise à jour de ce qui existe et on ajoute'); 
+                foreach ($tableauAffectation as $key => $affectation) {
+                    if (isset($userUpdate->depotUser[$key])) {
+                        $userUpdate->depotUser[$key]->update(['depot_id' => $affectation]);
+                    } else {
+                        DepotUser::firstOrCreate([
+                            'depot_id' => $affectation,
+                            'user_id' => $userUpdate->id
+                        ]);
+                    }
+                }
+            }elseif($affectationSize < $depotUserSize){
+                // dd('on fait la mise à jour de ce qui existe et on supprime'); 
+                foreach($userUpdate->depotUser as $key=>$depotUser){
+                    if(isset($tableauAffectation[$key])){
+                        $depotUser->depot_id = $tableauAffectation[$key];
+                        $depotUser->save();
+                    }else{
+                        $depotUser->delete();
+                    }
+                }   
+            }
+
         }
-        if($userUpdate) {
+        if($userUpdate->update($data2)) {
             return back()->with('success',"Profil mis à jour avec succès !");
         }
         return back()->with('echec',"Aucune modification apportée à ce profil !");

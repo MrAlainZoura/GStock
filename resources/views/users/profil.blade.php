@@ -105,25 +105,7 @@
                     <div class="w-full">
                         <label for="price" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Fonction</label>
                         <input type="text" value="{{$user->fonction}}" name="fonction" id="price" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Livreur" required="">
-                    </div>
-                    <div>
-                        <label for="shop" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Affectation</label>
-                        <select name="depot_id" id="shop" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
-                            @if(count($user->depotUser)>0)
-                                <option selected value="{{$user->depotUser[0]->depot->id}}">
-                                    {{$user->depotUser[0]->depot->libele}} 
-                                </option>
-                            @else
-                            <option selected value="">
-                                    Choisir une affectation 
-                                </option>
-                            @endif
-                                
-                            @foreach ($depot as $itm )
-                                <option value="{{$itm->id}}">{{$itm->libele}}</option>
-                            @endforeach  
-                        </select>
-                    </div>
+                    </div>                    
                     <div class="w-full">
                         <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Niveau d'étude</label>
                         <input type="text" value="{{$user->niveauEtude}}" name="niveauEtude"  class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="D6, G3, L2, Master" >
@@ -142,6 +124,26 @@
                     </div>
                 </div>
           
+                 <div class="mt-3">
+                    <label  class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Affectation</label>
+                    <div class="grid gap-4 sm:grid-cols-2 sm:gap-6">
+                        @if(count($depot) > 0)
+                            @foreach ($depot as $k => $v)
+                                @if(in_array($v->libele, $tabAffectation))
+                                    <div class="flex items-center ps-4 border border-gray-200 rounded-sm dark:border-gray-700">
+                                        <input checked id="bordered-checkbox-{{ $v->id }}" type="checkbox" name="affectation[]" value="{{ $v->id }}" name="bordered-checkbox" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                        <label for="bordered-checkbox-{{ $v->id }}" class="w-full py-4 ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">{{ $v->libele }}</label>
+                                    </div>
+                                    @else
+                                    <div class="flex items-center ps-4 border border-gray-200 rounded-sm dark:border-gray-700">
+                                        <input id="bordered-checkbox-{{ $v->id }}" type="checkbox" name="affectation[]" value="{{ $v->id }}" name="bordered-checkbox" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                        <label for="bordered-checkbox-{{ $v->id }}" class="w-full py-4 ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">{{ $v->libele }}</label>
+                                    </div>
+                                @endif
+                            @endforeach
+                        @endif
+                    </div>
+                </div>
                  <div class="flex justify-center m-5">
                     <button type="submit"  class="btn-primary w-1/2 px-3 py-2 text-xs font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Mettre à jour</button>
                 </div>

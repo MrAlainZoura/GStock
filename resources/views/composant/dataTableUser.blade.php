@@ -74,8 +74,10 @@
                 
             </td>
             <td>
-                @if(count($item->depotUser)>0)
-                    {{$item->depotUser[0]->depot->libele}} 
+                @if(count($item->depotUser) > 0)
+                    @foreach ( $item->depotUser as $k=>$v)
+                        {{ $v->depot->libele }}<br>
+                    @endforeach
                 @endif
             </td>
             <td> 

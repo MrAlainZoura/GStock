@@ -54,7 +54,10 @@
         </tr>
     </thead>
     <tbody>
-
+        @php
+            $recette = 0;
+            $recetteFc = 0;
+        @endphp
         @foreach ($data as $key=>$item )
         <tr>
             <td class="font-medium text-gray-900  dark:text-white">
@@ -91,19 +94,39 @@
                         $paiment +=$val->prixT;
                     @endphp
                 @endforeach
-                @formaMille($paiment) Fc
+                @formaMille($paiment)
+                @if($item->devise) 
+                    {{ $item->devise->libele }} 
+                @endif
+                <input type="text" class="hidden totalPaie"  value="{{ $paiment *$item->updateTaux }}">
             </td>
 
             <td>
                 @include('composant.actionLink', ['itemName'=>$item->code,'seeRoute'=>'venteShow','seeParam'=>56745264509*$item->id, 'deleteRoute'=>"venteDelete",'deleteParam'=>56745264509*$item->id, 'editeRoute'=>"venteEdit",'editParam'=>$item->id*6789012345])
             </td>
         </tr>
+        @php
+            $recette +=$paiment;
+            $recetteFc +=$paiment *$item->updateTaux ;
+        @endphp
         @endforeach
-
     </tbody>
 </table>
+@if(Auth::user()->user_role->role->libele =='Administrateur' || Auth::user()->user_role->role->libele=='Super admin')
+<div class="flex p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" role="alert">
+  <svg class="shrink-0 inline w-4 h-4 me-3 mt-[2px]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+    <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
+  </svg>
+  <span class="sr-only">Danger</span>
+  <div>
+    <span class="font-medium">Recette pour ce tableau @formaMille($recetteFc) cdf</span>
+      <ul class="mt-1.5 list-disc list-inside" id="listeDevise">
+        
+    </ul>
+  </div>
+</div>
+@endif
 @include('composant.modalDelete')
-
 <script>
     
 if (document.getElementById("search-table") && typeof simpleDatatables.DataTable !== 'undefined') {
@@ -116,18 +139,52 @@ if (document.getElementById("search-table") && typeof simpleDatatables.DataTable
     });
 }
 
+document.addEventListener('DOMContentLoaded', () => {
+    if (typeof renderRecette === 'function') {
+        renderRecette();
+    }  
+});
+
+
    //modal suppression item
    const deleteLink = document.querySelectorAll('#linkDelete');
 
     deleteLink.forEach(link => {
-    link.addEventListener('click', (event) => {
-    event.preventDefault();
-    const hrefClicked = event.currentTarget.getAttribute('href');
-    const formDelete =document.getElementById('deleteForm');
-    const textDeleteItem =document.getElementById('textDeleteItem');
-    const itemName = event.currentTarget.getAttribute('itemName') ;
-    textDeleteItem.textContent= `Confirmer la suppression de la vente ${itemName}`;
-    formDelete.setAttribute('action',hrefClicked);
+        link.addEventListener('click', (event) => {
+            event.preventDefault();
+            const hrefClicked = event.currentTarget.getAttribute('href');
+            const formDelete =document.getElementById('deleteForm');
+            const textDeleteItem =document.getElementById('textDeleteItem');
+            const itemName = event.currentTarget.getAttribute('itemName') ;
+            textDeleteItem.textContent= `Confirmer la suppression de la vente ${itemName}`;
+            formDelete.setAttribute('action',hrefClicked);
+        });
     });
-    });
+
+    const data = @json($data);
+    const renderRecette = ()=>{
+        if(data.length > 0){
+            const deviseList = @json($deviseList);
+            let recette = 0;
+            let recetteFc = 0;
+            const ul = document.getElementById('listeDevise');
+            const totalPaie = [...document.querySelectorAll('.totalPaie')];
+
+            if(totalPaie){
+                totalPaie.forEach(paie=>{
+                    recetteFc +=parseFloat(paie.value);
+                    // console.log(paie.value, recetteFc)
+                });
+            }
+            
+            if(ul){
+                deviseList.forEach(dev=>{
+                    const li = `<li> ${dev.libele} => ${dev.taux} : ${parseFloat((recetteFc/dev.taux).toFixed(2))}</li>`
+                    ul.innerHTML += li;
+                    // console.log(dev.taux, dev.libele);
+                });
+            }
+        };
+
+    }
 </script>
