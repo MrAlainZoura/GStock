@@ -31,7 +31,7 @@
                         Total vente du mois
                     </p>
                     <p class="flex items-center p-2 justify-center text-xl w-auto h-10  rounded-full ring-2 ring-gray-300 dark:ring-gray-500">
-                        {{$depot->totalVente}}
+                        <!-- {{$depot->totalVente}} -->
                     </p>
                 </div>
                 <div class="flex gap-4 p-2 items-center justify-center h-24 rounded-sm bg-green-500 ">
