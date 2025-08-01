@@ -83,7 +83,7 @@
                 </div> 
             </td>
            <td>
-               ... <!-- @include('composant.actionLink', ['itemName'=>$item->produit->libele,'seeRoute'=>'prod.show','seeParam'=>450*$item->produit->id, 'deleteRoute'=>"prod.destroy",'deleteParam'=>450*$item->produit->id, 'editeRoute'=>"approEdit",'editParam'=>$item->produit->libele." ".$item->id*6789012345]) -->
+               @include('composant.actionLink', ['itemName'=>$item->produit->libele,'seeRoute'=>'prod.show','seeParam'=>450*$item->produit->id, 'deleteRoute'=>"prod.show",'deleteParam'=>450*$item->produit->id, 'editeRoute'=>"prod.edit",'editParam'=>$item->produit->id*450])
             </td>
         </tr>
         @endforeach

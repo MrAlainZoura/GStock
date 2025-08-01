@@ -31,8 +31,12 @@ class ProduitController extends Controller
     public function create()
     {
         $tab = Categorie::orderby('libele')->with('marque')->get();
-        $depot_id=Depot::where('libele',session('depot'))->first()->id;
-        return view('produit.create', compact('tab','depot_id'));
+        $depot = Depot::where('libele',session('depot'))->where('id',  session('depot_id'))->first();
+        if($depot!=null){
+            $depot_id = $depot->id;
+            return view('produit.create', compact('tab','depot_id'));
+        }
+        return back()->with('echec','Désolé, nous ne pouvons pas satisfaire votre demande actuellement !');
     }
 
     /**
@@ -42,10 +46,7 @@ class ProduitController extends Controller
     {
         // dd($request->all());
         $dossier = 'produit';
-        // Vérifier si le dossier existe, sinon le créer
-        // if (!Storage::disk('public')->exists($dossier)) {
-        //     Storage::disk('public')->makeDirectory($dossier);
-        // }
+        
         if (!Storage::disk('direct_public')->exists($dossier)) {
             Storage::disk('direct_public')->makeDirectory($dossier);
         }
@@ -81,10 +82,7 @@ class ProduitController extends Controller
         if($getProduit === null){
             $produit = Produit::create($data);
         }
-        // dd($produit);
-        // if($request->file('image') != null){
-        //     $fichier = $request->file('image')->storeAs($dossier,"$produit->libele.$type",'public');
-        // }
+        
          if ($request->hasFile('image')) {
                 $fichier = $request->file('image')->storeAs(
                     $dossier,
@@ -249,6 +247,7 @@ class ProduitController extends Controller
      */
     public function show(string $id)
     {
+        return back()->with("success","Bientôt disponible");
         $produit = Produit::where("id",$id)->get();
         return response()->json(['success'=>true, 'data'=>$produit]);
     }
@@ -256,16 +255,24 @@ class ProduitController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Produit $produit)
+    public function edit($produit)
     {
-        return back()->with('success',"Bientôt disponible"); 
+        // dd($produit);
+        $id =$produit/450;
+        $produit = Produit::where('id',$id)->first();
+        if($produit != null){
+            $tab = Categorie::orderby('libele')->with('marque')->get();
+            $depot_id = Depot::where('libele',session('depot'))->where('id',session('depot_id'))->first()->id;
+            return view('produit.edit', compact('tab','depot_id','produit'));
+        }
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, string $getId)
     {
+        // dd($request->all(), $id/220);
         $validateDate = Validator::make($request->all(),
         [
             'id'=>'required',
@@ -273,21 +280,25 @@ class ProduitController extends Controller
         ]);
 
         if($validateDate->fails()){
-            return $validateDate->errors();
+            // return $validateDate->errors();
         }
-        $data = [
-            'libele'=>$request->libele,
-            'marque_id'=>$request->marque_id,
-            'description'=>$request->description,
-            'prix'=>$request->prix,
-            'quatité'=>$request->quatité,
-            'etat'=>$request->etat,
-            'image'=>$request->image
+        $id = $getId/220;
+        $dataUpdate=[ 
+            "marque_id" =>$request->marque_id ,
+            "depot_id" => $request->depot_id,
+            "libele" =>$request-> libele,
+            "prix" => $request->prix,
+            "etat" => $request->etat,
+            "description" =>$request->description
         ];
+        $data = array_filter($dataUpdate, function($val){return !is_null($val);});
 
-        $produit = Produit::where('id',$id)->update($data);
-        return response()->json(['success'=>true, 'data'=>Produit::find($id)]);
-        //
+        $produit = Produit::find($id);
+
+        if ($produit && $produit->update($data)) {
+            return back()->with('success','Produit mis à jour avec success !');
+        }
+        return back()->with('echec', "Mis à jour de produit échouée, certaines données incorrectes !");
     }
 
     /**
@@ -295,6 +306,7 @@ class ProduitController extends Controller
      */
     public function destroy(string $id)
     {
+        return back()->with("success","Bientôt disponible");
         $delete = Produit::where('id',$id)->delete();
         if(!$delete){
             return response()->json(['success'=>true, 'data'=>'echec de suppression']);

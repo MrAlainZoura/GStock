@@ -8,7 +8,16 @@
 @endsection
 
 @section('main')  
-
+    @if(session('success'))
+      <div class="alert-success">
+        @include('composant.alert_suc', ['message'=>session('success')])
+      </div>
+    @endif
+    @if(session('echec'))
+      <div class="alert-echec">
+          @include('composant.alert_echec', ['message'=>session('echec')])
+      </div>
+    @endif
     <div class=" w-full p-10">
         <div>
             <div class="px-4 sm:px-0">
