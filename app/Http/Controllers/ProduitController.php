@@ -131,6 +131,7 @@ class ProduitController extends Controller
                         'confirm'=>false,
                         'receptionUser'=>null
                     ];
+                    dd($depotId);
                     $approvisionnement = Approvisionnement::create($dataApro);
                     $produitDepot = ProduitDepot::create($dataProD);
                     return back()->with('success','Enregistrement reussi avec succès plus approvisionnement !');
