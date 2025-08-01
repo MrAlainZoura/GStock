@@ -105,7 +105,7 @@ class ProduitController extends Controller
                 ];
                 $dataProD =['depot_id'=>session('depot_id'),
                             'produit_id'=>$produit->id,
-                            'quantite'=>$request->quantite];
+                            'quantite'=>($request->quantite!=null)?$request->quantite:0];
                 $approvisionnement = Approvisionnement::create($dataApro);
                 $produitDepot = ProduitDepot::create($dataProD);
             }else{
@@ -114,8 +114,33 @@ class ProduitController extends Controller
             
             return back()->with('success','Enregistrement reussi avec succès plus approvisionnement !');
             
+        }else{
+            // dd('ok i$on verifie');
+            $getDepotProduitExist =ProduitDepot::where('depot_id',$request->depot_id)->where('produit_id',$getProduit->id)->first();
+            if($getDepotProduitExist == null){
+                // dd('affection');
+                $dataProD =['depot_id'=>session('depot_id'),
+                                'produit_id'=>$getProduit->id,
+                                'quantite'=>$request->quantite];
+                if($request->quantite != null && $request->quantite >0){
+                    $dataApro = [
+                        'user_id'=>auth()->user()->id,
+                        'depot_id'=>$request->depot_id,
+                        'produit_id'=>$getProduit->id,
+                        'quantite'=>$request->quantite,
+                        'confirm'=>false,
+                        'receptionUser'=>null
+                    ];
+                    $approvisionnement = Approvisionnement::create($dataApro);
+                    $produitDepot = ProduitDepot::create($dataProD);
+                    return back()->with('success','Enregistrement reussi avec succès plus approvisionnement !');
+                }else{
+                    $produitDepot = ProduitDepot::create($dataProD);
+                    return back()->with('success',"Enregistrement reussi sans approvisionnement !");
+                }
+            }
+            return back()->with('echec',"Enregistrement n'a pas abouti, il est probable que ce produit existe déjà !");
         }
-        return back()->with('echec',"Enregistrement n'a pas abouti, il est probable que ce produit existe déjà !");
     }
 
     public function importProduitExcel(Request $request){
