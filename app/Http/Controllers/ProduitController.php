@@ -40,7 +40,7 @@ class ProduitController extends Controller
      */
     public function store(Request $request)
     {
-        dd($request->all());
+        // dd($request->all());
         $dossier = 'produit';
         // Vérifier si le dossier existe, sinon le créer
         // if (!Storage::disk('public')->exists($dossier)) {
@@ -131,7 +131,7 @@ class ProduitController extends Controller
                         'confirm'=>false,
                         'receptionUser'=>null
                     ];
-                    dd($depotId);
+                    // dd($depotId);
                     $approvisionnement = Approvisionnement::create($dataApro);
                     $produitDepot = ProduitDepot::create($dataProD);
                     return back()->with('success','Enregistrement reussi avec succès plus approvisionnement !');
