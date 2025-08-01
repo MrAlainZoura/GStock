@@ -153,18 +153,18 @@
                     <th >
                         {{$item->produit->marque->libele}} 
                         {{$item->produit->libele}}<br>
-                        {{$item->produit->etat}}
+                        <!-- {{$item->produit->etat}} -->
                     </th>
                     <td >
                         {{$item->quantite}}
                     </td>
                     <td >
-                        @formaMille($item->prixT) {{ $findVenteDetail->devise }}
+                        @formaMille($item->prixT * $findVenteDetail->taux ) cdf
                     </td>
                 </tr>
             @endforeach
             <tr class="separated">
-                <td colspan="3">Paiement (taux d'échange : {{  $findVenteDetail->taux }})</td>
+                <td colspan="3">Paiement</td>
             </tr>
             </tbody>
             <tfoot>
@@ -178,22 +178,22 @@
                     @foreach($findVenteDetail->paiement as $cle=>$valeur)
                         <tr>
                             <td colspan="2" class="left">{{$valeur->created_at}}</td>
-                            <td class="center">@formaMille($valeur->avance) {{ $findVenteDetail->devise }}</td>
+                            <td class="center">@formaMille($valeur->avance *$findVenteDetail->taux ) cdf</td>
                         </tr>
                     @endforeach
 
                     @if($valeur->solde > 0)
                     <tr>
                         <th colspan="2" class="left">Reste</th>
-                        <th>@formaMille($valeur->solde) {{ $findVenteDetail->devise }}</th>
+                        <th>@formaMille($valeur->solde *$findVenteDetail->taux) cdf</th>
                     </tr>
                     @endif
                 @endif
                 <tr class="footer-row trHead">
                     <th class="footer-cell" colspan="2">Total</th>
                     <th class="footer-cell">
-                        ({{ $findVenteDetail->devise }}) @formaMille($netPaye)<br> 
-                        (cdf) @formaMille($netPaye*$findVenteDetail->taux)
+                        (cdf) @formaMille($netPaye*$findVenteDetail->taux)<br>
+                        ({{ $findVenteDetail->devise }}) @formaMille($netPaye)
                     </th>
                 </tr>
             </tfoot>
