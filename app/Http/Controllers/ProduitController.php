@@ -40,7 +40,7 @@ class ProduitController extends Controller
      */
     public function store(Request $request)
     {
-        // dd($request->all());
+        dd($request->all());
         $dossier = 'produit';
         // Vérifier si le dossier existe, sinon le créer
         // if (!Storage::disk('public')->exists($dossier)) {
