@@ -66,7 +66,7 @@ class ProduitController extends Controller
 
         $fichier = $request->file('image');
         $type =($request->file('image')!=null)? $fichier->getClientOriginalExtension():'';
-
+        $depotId= $request->depot_id;
         $data = [
             'marque_id'=>$request->marque_id,
             'libele'=>$request->libele,
@@ -97,7 +97,7 @@ class ProduitController extends Controller
             if($request->quantite != null){
                 $dataApro = [
                     'user_id'=>auth()->user()->id,
-                    'depot_id'=>$request->depot_id,
+                    'depot_id'=>$depotId,
                     'produit_id'=>$produit->id,
                     'quantite'=>$request->quantite,
                     'confirm'=>false,
@@ -125,7 +125,7 @@ class ProduitController extends Controller
                 if($request->quantite != null && $request->quantite >0){
                     $dataApro = [
                         'user_id'=>auth()->user()->id,
-                        'depot_id'=>$request->depot_id,
+                        'depot_id'=>$depotId,
                         'produit_id'=>$getProduit->id,
                         'quantite'=>$request->quantite,
                         'confirm'=>false,
