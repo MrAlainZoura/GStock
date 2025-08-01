@@ -26,10 +26,10 @@
           <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
         </svg>
         <span class="sr-only">Info</span>
-        <h3 class="text-lg font-medium">Erreur, transfert impossible</h3>
+        <h3 class="text-lg font-medium">Erreur, Approvisionnement impossible</h3>
       </div>
       <div class="mt-2 mb-4 text-sm">
-          Veuillez au moins choisir un produit pour effectuer ce trnasfert, sinon ça n'aura pas de sens !
+          Veuillez au moins choisir un produit pour effectuer cette opération, sinon ça n'aura pas de sens !
       </div>
       <div class="flex item-center justify-center">
         <button type="button" onclick="alertErreurProduitSend('hide')" class="text-red-800 bg-transparent border border-red-800 hover:bg-red-900 hover:text-white focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-xs px-3 py-1.5 text-center dark:hover:bg-red-600 dark:border-red-600 dark:text-red-500 dark:hover:text-white dark:focus:ring-red-800">

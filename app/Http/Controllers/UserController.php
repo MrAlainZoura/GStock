@@ -325,8 +325,9 @@ class UserController extends Controller
         //     $id = $parts[1]/6789012345;
         // }
         $user= User::where("id", $id)->first();
-        if($user != null){
+        if($user != null && !in_array($user->user_role->role->libele, ['Administrateur', 'Super admin'])){
             $image=$user->image;
+            dd($user->user_role->role->libele);
             if($user->delete()){
                 if (Storage::exists("public/uploads/$dossier/$image")) {
                     Storage::delete("public/uploads/$dossier/$image");
@@ -335,7 +336,7 @@ class UserController extends Controller
             }
             return back()->with('echec',"Erreur inattendue, utilisateur est lié à un processus encours!");
         }
-        return back()->with('echec',"Erreur inattendue !");
+        return back()->with('echec',"Erreur inattendue, suppression échouée!");
     }
 
     public function login(Request $request){
@@ -370,8 +371,7 @@ class UserController extends Controller
                 }
             }
         }
-        dd('putain');
-       return back()->with('echec',"email / nom d'utilisateur ou mot de passe incorrect, essayez de vous connecter avec votre email si vous utiliser le nom d'utilisateur");
+       return back()->with('echec',"email / nom d'utilisateur ou mot de passe incorrect");
     }
     public function logout(){
         Auth::logout();
