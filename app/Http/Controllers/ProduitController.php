@@ -98,7 +98,7 @@ class ProduitController extends Controller
                     'confirm'=>false,
                     'receptionUser'=>null
                 ];
-                $dataProD =['depot_id'=>$request->depot_id,
+                $dataProD =['depot_id'=>session('depot_id'),
                             'produit_id'=>$produit->id,
                             'quantite'=>$request->quantite];
                 $approvisionnement = Approvisionnement::create($dataApro);
