@@ -125,11 +125,14 @@ class DepotController extends Controller
             }
         }
         arsort($tabProdVendu);
-        (count($totalVenteMois)>9)?count($totalVenteMois):$totalVenteMois="0".count($totalVenteMois);
+        $nombreVentes = count($totalVenteMois);
+        $affichage = ($nombreVentes > 9) ? $nombreVentes : "0" . $nombreVentes;
+
+        // (count($totalVenteMois)>9)?count($totalVenteMois):$totalVenteMois="0".count($totalVenteMois);
         (count($approMois1)>9)?$approMois=count($approMois1):$approMois="0".count($approMois1);
         (count($transMois1)>9)?$transMois=count($transMois1):$transMois="0". count($transMois1);
         
-        $depot->totalVente = $totalVenteMois;
+        $depot->totalVente = $affichage;
         $depot->totalApro = $totalApro;
         $depot->totalTrans = $totalTrans;
         $depot->approMois = $approMois;
