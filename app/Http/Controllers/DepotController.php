@@ -125,7 +125,7 @@ class DepotController extends Controller
             }
         }
         arsort($tabProdVendu);
-        (count($totalVenteMois)>9)?:$totalVenteMois="0".count($totalVenteMois);
+        (count($totalVenteMois)>9)?count($totalVenteMois):$totalVenteMois="0".count($totalVenteMois);
         (count($approMois1)>9)?$approMois=count($approMois1):$approMois="0".count($approMois1);
         (count($transMois1)>9)?$transMois=count($transMois1):$transMois="0". count($transMois1);
         
