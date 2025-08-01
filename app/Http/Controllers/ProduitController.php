@@ -76,7 +76,12 @@ class ProduitController extends Controller
             'image'=>($request->file('image')!=null)? "$request->libele.$type":null,
         ];
 // dd($data);
-        $produit = Produit::create($data);
+        $produit = null;
+        $getProduit = Produit::where("libele",$request->libele)->where('etat',$request->etat)->first();
+        if($getProduit === null){
+            $produit = Produit::create($data);
+        }
+        // dd($produit);
         // if($request->file('image') != null){
         //     $fichier = $request->file('image')->storeAs($dossier,"$produit->libele.$type",'public');
         // }
@@ -87,7 +92,7 @@ class ProduitController extends Controller
                     'direct_public'
                 );
         }
-        if($produit){
+        if($produit !== null){
 
             if($request->quantite != null){
                 $dataApro = [
@@ -110,7 +115,7 @@ class ProduitController extends Controller
             return back()->with('success','Enregistrement reussi avec succès plus approvisionnement !');
             
         }
-        return back()->with('echec',"Enregistrement n'a pas abouti !");
+        return back()->with('echec',"Enregistrement n'a pas abouti, il est probable que ce produit existe déjà !");
     }
 
     public function importProduitExcel(Request $request){
