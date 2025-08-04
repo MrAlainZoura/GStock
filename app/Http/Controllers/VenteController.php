@@ -178,10 +178,40 @@ class VenteController extends Controller
         $id= $vente/56745264509;
         $detailVente = Vente::where('id',$id)->first();
 
+        $depotId = $detailVente->depot->id;
+        $userRole = Auth::user()->user_role->role->libele;
+        $user_id = Auth::user()->id;
+        $userDepotAffectation = Auth::user()->depotUser;
+
         $detailVente->devise = $detailVente->devise ? $detailVente->devise->libele : "inc";
         $detailVente->taux = ($detailVente->updateTaux != null) ? $detailVente->updateTaux : 1;
-        // dd($detailVente->venteProduit[0]->produit->image, $detailVente->taux, $detailVente->devise);
-        return view('vente.show', compact('detailVente')) ;
+
+        $existAffectation = $userDepotAffectation->filter(function ($u) use ($depotId) {
+                        return isset($u->depot_id) && $u->depot_id === $depotId;
+                    })->first();
+
+         $roleAutorises = ['Administrateur', 'Super admin'];
+        if (!in_array($userRole, $roleAutorises)) {
+            if($existAffectation === null){
+                // dd($affectation,"pas d'acces dans ce depot");
+                return to_route('dashboard')->with('echec',"Vous n'avez pas accès à ce depot!"); 
+            }
+            // dd($detailVente->venteProduit[0]->produit->image, $detailVente->taux, $detailVente->devise);
+            return view('vente.show', compact('detailVente')) ;
+        }
+        if($userRole === $roleAutorises[0]){
+            $adminDepotCreateur = Auth::user()->depot->filter(function ($u) use ($user_id) {
+                return isset($u->user_id) && $u->user_id === $user_id;
+            })->first();
+            // dd(  'administrateur', $adminDepotCreateur); 
+            if( $adminDepotCreateur === null ){
+                return to_route('dashboard')->with('echec',"Vous n'avez pas accès à ce depot!"); 
+            }
+            return view('vente.show', compact('detailVente')) ;
+        }
+        if($userRole === $roleAutorises[1]){
+            return view('vente.show', compact('detailVente')) ;
+        }   
     }
 
     /**
