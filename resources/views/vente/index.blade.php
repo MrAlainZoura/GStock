@@ -1,5 +1,5 @@
 @extends('base')
-@section('title', "Liste utilisateurs")
+@section('title', "Liste de vente")
 
 @section('header')
   @include('composant.hearder', ['user_email'=>Auth::user()->email, 'user_name'=>Auth::user()->name])

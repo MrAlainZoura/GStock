@@ -1,5 +1,5 @@
 @extends('base')
-@section('title', "Vente ". session('depot'))
+@section('title', "Vente ")
 
 @section('header')
   @include('composant.hearder', ['user_email'=>Auth::user()->email, 'user_name'=>Auth::user()->name])
