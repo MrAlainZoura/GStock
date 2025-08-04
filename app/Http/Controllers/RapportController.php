@@ -281,7 +281,7 @@ class RapportController extends Controller
         }elseif($action === 'download') {
             return $dompdf2->stream($facture, ['Attachment' => true]);
         }else{
-            back()->with('echec','Erreur inattendue');
+           return back()->with('echec','Erreur inattendue');
         }
     }
 
