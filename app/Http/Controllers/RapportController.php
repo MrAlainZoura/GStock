@@ -276,8 +276,21 @@ class RapportController extends Controller
         $dompdf2->setPaper([0, 0, 226.77, $hauteurReelle]);
         $dompdf2->loadHtml($html);
         $dompdf2->render();
-        if($action === 'print') {
-            return $dompdf2->stream($facture, ['Attachment' => false]);
+
+          // Étape 2 – Rendu final avec hauteur exacte
+        $dompdf2 = new Dompdf();
+        $dompdf2->setPaper([0, 0, 226.77, $hauteurReelle]);
+        $dompdf2->loadHtml($html);
+        $dompdf2->render();
+        
+        // if($action === 'print') {
+        //     return $dompdf2->stream($facture, ['Attachment' => false]);
+        // }
+        
+        if ($action === 'print') {
+            return response($dompdf2->output(), 200)
+                ->header('Content-Type', 'application/pdf')
+                ->header('Content-Disposition', 'inline; filename="' . $facture . '"');
         }elseif($action === 'download') {
             return $dompdf2->stream($facture, ['Attachment' => true]);
         }else{
