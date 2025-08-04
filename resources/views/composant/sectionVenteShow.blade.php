@@ -215,7 +215,7 @@ if($findVenteDetail->user != null){
 
                     if (fenetre.document.readyState === 'complete') {
                         clearInterval(timer);
-                        // alert('Impression du document en cours...');
+                        alert('Impression du document en cours...');
                         fenetre.print();
                     } else if (++tentatives >= maxTentatives) {
                         clearInterval(timer);
