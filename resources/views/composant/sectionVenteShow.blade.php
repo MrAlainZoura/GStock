@@ -181,10 +181,56 @@ if($findVenteDetail->user != null){
     </section>
 
     <script>
+    // function imprimerPDF(url) {
+    //     const fenetre = window.open(url, '_blank');
+    //     fenetre.onload = function () {
+    //         fenetre.print();
+    //     };
+    // }
     function imprimerPDF(url) {
-        const fenetre = window.open(url, '_blank');
-        fenetre.onload = function () {
-            fenetre.print();
-        };
+        if (!url || typeof url !== 'string') {
+            alert('URL invalide. Impossible d’imprimer le document.');
+            return;
+        }
+
+        try {
+            const fenetre = window.open(url, '_blank');
+
+            if (!fenetre) {
+                alert('Impossible d’ouvrir la fenêtre. Vérifiez si votre navigateur bloque les popups.');
+                return;
+            }
+
+            let tentatives = 0;
+            const maxTentatives = 6;
+            const delay = 500;
+
+            const timer = setInterval(() => {
+                try {
+                    if (fenetre.closed) {
+                        clearInterval(timer);
+                        alert('La fenêtre a été fermée avant le lancement de l’impression.');
+                        return;
+                    }
+
+                    if (fenetre.document.readyState === 'complete') {
+                        clearInterval(timer);
+                        // alert('Impression du document en cours...');
+                        fenetre.print();
+                    } else if (++tentatives >= maxTentatives) {
+                        clearInterval(timer);
+                        alert('Impression forcée après plusieurs tentatives...');
+                        fenetre.print();
+                    }
+                } catch (e) {
+                    clearInterval(timer);
+                    alert('Une erreur est survenue pendant l’impression. Veuillez réessayer.');
+                    console.error('Erreur JS :', e.message);
+                }
+            }, delay);
+        } catch (erreur) {
+            alert('Erreur inattendue. Impossible de lancer l’impression.');
+            console.error('Exception JS :', erreur.message);
+        }
     }
 </script>
