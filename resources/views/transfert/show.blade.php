@@ -20,7 +20,7 @@
     
     @include('composant.sectionTransShow',['findTransDetails'=>$findTransDetails])
     
-    @include('composant.sidebar',['depot'=> session('depot')])
+    @include('composant.sidebar',['depot'=> $findTransDetails->depot->libele, 'depot_id'=>$findTransDetails->depot_id])
     @endsection
 
 

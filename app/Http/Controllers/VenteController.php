@@ -177,7 +177,11 @@ class VenteController extends Controller
     {
         $id= $vente/56745264509;
         $detailVente = Vente::where('id',$id)->first();
-
+        if($detailVente == null){
+            return back()->with('echec','Renseignements fournient sont invalides');
+        }
+        session(['depot' => $detailVente->libele]);
+        session(['depot_id' => $detailVente->id]);
         $depotId = $detailVente->depot->id;
         $userRole = Auth::user()->user_role->role->libele;
         $user_id = Auth::user()->id;

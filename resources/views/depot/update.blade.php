@@ -191,7 +191,7 @@
         </form>
 
     </div>
-    @include('composant.sidebar',['depot'=> session('depot')])
+    @include('composant.sidebar',['depot'=> $getDepotInformation->libele, 'depot_id'=>$getDepotInformation->id])
 
 @endsection
 

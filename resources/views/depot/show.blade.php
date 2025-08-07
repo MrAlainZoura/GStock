@@ -147,7 +147,7 @@
     </div> 
    
     @include('composant.dataTable',['data'=>$depot->produitDepot])
-    @include('composant.sidebar',['depot'=> $depot->libele])
+    @include('composant.sidebar',['depot'=> $depot->libele, 'depot_id'=>$depot->id])
 
    </section>
 @endsection

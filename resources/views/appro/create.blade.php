@@ -82,7 +82,7 @@
     </section>
     
 
-    @include('composant.sidebar',['depot'=> $depot->libele])
+    @include('composant.sidebar',['depot'=> $depot->libele, 'depot_id'=>$depot->id])
     @endsection
 
 

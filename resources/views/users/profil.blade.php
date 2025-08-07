@@ -204,7 +204,7 @@
 
     </section>
 
-        @include('composant.sidebar',['depot'=>session('depot')])
+        @include('composant.sidebar',['depot'=>session('depot'), 'depot_id'=>session('depot_id')])
     @endsection
 
 
