@@ -156,7 +156,7 @@
           </form>
     </div>
     
-    @include('composant.sidebar',['depot'=> session('depot')])
+    @include('composant.sidebar',['depot'=> $depot->libele, 'depot_id'=>$depot->id])
     @endsection
 
 

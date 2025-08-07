@@ -88,7 +88,8 @@ class PaiementController extends Controller
 
     public function creance($depot){
 
-        $depotId = Depot::where('libele', $depot)->first()->id;
+        $depot = Depot::where('libele', $depot)->where('id', session('depot_id'))->first();
+        $depotId = $depot->id;
         $depotCreance = Vente::with(['client', 'venteProduit']) 
                         ->whereHas('paiement', function ($query) {
                             $query->where('completed', false);
@@ -113,7 +114,8 @@ class PaiementController extends Controller
                     'prod'=>$prod, 
                     'tranche'=>$tranche, 
                     'net'=>$v->paiement[0]->net,
-                    'completed'=>$completed
+                    'completed'=>$completed,
+                    'devise'=>$v->devise->libele
                 ];
                 $prod=[];
                 $tranche=[];
@@ -121,6 +123,6 @@ class PaiementController extends Controller
     
         }
         // dd($tabSyntese, 'ok');
-        return view('vente.creance', compact('tabSyntese'));
+        return view('vente.creance', compact('tabSyntese',"depot"));
     }
 }

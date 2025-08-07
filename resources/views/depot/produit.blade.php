@@ -30,7 +30,7 @@
         @include('composant.modal_prod',['libele'=>'Produit', 'action'=>"prod.store",'depot_id'=> $depotData->id, 'tab'=>$cat ]) 
     </section>
 
-   @include('composant.sidebar',['depot'=> session('depot')])
+   @include('composant.sidebar',['depot'=> $depotData->libele, 'depot_id'=>$depotData->id])
 @endsection
 
 

@@ -26,7 +26,7 @@
     <section >        
         @include('composant.modal_cat',['libele'=>'Catégorie de produit', 'action'=>"cat-pro.store",'user_id'=> $user->id ]) 
     </section>
-    @include('composant.sidebar',['depot'=> session('depot')])
+    @include('composant.sidebar',['depot'=> session('depot'), 'depot_id'=> session('depot_id')])
 
 @endsection
 

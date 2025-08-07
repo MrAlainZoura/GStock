@@ -108,14 +108,14 @@
                             @endforeach
                     </td>
                     <td >
-                       {{$item['net']}}
+                       {{$item['net'] ."   ".$item['devise']}} 
                        
                     </td>
                    
         
                     <td>
                         @if($item['completed']!=true)
-                        <a data-modal-target="crud-modal" data-modal-toggle="crud-modal"  key="{{$vT}}" itemNet ="{{$item['net']}}" id="linkPaie" href="{{route('creanceStore', $key*8943)}}" class="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-teal-300 to-lime-300 group-hover:from-teal-300 group-hover:to-lime-300 dark:text-white dark:hover:text-gray-900 focus:ring-4 focus:outline-none focus:ring-lime-200 dark:focus:ring-lime-800">
+                        <a data-modal-target="crud-modal" data-modal-toggle="crud-modal" devise="{{ $item['devise'] }}"  key="{{$vT}}" itemNet ="{{$item['net']}}" id="linkPaie" href="{{route('creanceStore', $key*8943)}}" class="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-teal-300 to-lime-300 group-hover:from-teal-300 group-hover:to-lime-300 dark:text-white dark:hover:text-gray-900 focus:ring-4 focus:outline-none focus:ring-lime-200 dark:focus:ring-lime-800">
                             <span class="flex relative p-1 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-transparent group-hover:dark:bg-transparent">
                                 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
                                 <!-- Uploaded to: SVG Repo, www.svgrepo.com, Transformed by: SVG Repo Mixer Tools -->
@@ -177,7 +177,7 @@
                         <label id="solde" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Solde à payer </label>
                     </div>
                     <div class="col-span-2 sm:col-span-1">
-                        <label for="priceNew" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Paiment actuel</label>
+                        <label for="priceNew" id="paieNow" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Paiment actuel</label>
                         <input type="number" name="paiment" id="priceNew" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="1000" required="">
                     </div>
                     
@@ -197,7 +197,7 @@
        
     </section>
 
-    @include('composant.sidebar',['depot'=> session('depot')])
+    @include('composant.sidebar',['depot'=> $depot->libele, 'depot_id'=>$depot->id])
     @endsection
 
 
@@ -230,14 +230,18 @@
                 const labelDernierV = document.getElementById('dernierV');
                 const labelsolde = document.getElementById('solde');
                 const newPaie = document.getElementById('priceNew');
+                const paieNow = document.getElementById('paieNow');
+                      
 
                 const paiementBrut = event.currentTarget.getAttribute('key') ;
+                const devise = event.currentTarget.getAttribute('devise') ;
                 const [avance, solde] = paiementBrut.trim().split(" - ").map(Number);
                 
-                labelNet.textContent= `Total net à payer ${itemNet} Fc`;
-                labelDernierV.textContent = `Dernier versement ${parseInt(event.currentTarget.getAttribute('key'))} FC`;
-                labelsolde.textContent = `Solde à payer ${solde} Fc`;
+                labelNet.textContent= `Total net à payer ${itemNet} ${devise}`;
+                labelDernierV.textContent = `Dernier versement ${parseInt(event.currentTarget.getAttribute('key'))} ${devise}`;
+                labelsolde.textContent = `Solde à payer ${solde} ${devise}`;
                 newPaie.max = `${solde}`;
+                paieNow.textContent =`Paiement actuel en ${devise}`
                 paieForm.setAttribute('action',hrefClicked);
             });
         });

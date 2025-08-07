@@ -20,7 +20,7 @@
     
     @include('composant.sectionVenteShow',['findVenteDetail'=>$detailVente])
 
-    @include('composant.sidebar',['depot'=> $detailVente->depot->libele])
+    @include('composant.sidebar',['depot'=> $detailVente->depot->libele, 'depot_id'=>$detailVente->depot->id])
     @endsection
 
 
