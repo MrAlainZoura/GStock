@@ -438,7 +438,7 @@ class RapportController extends Controller
             if($sendMailRapport->getData()->status == true){
                 return back()->with('success',"Email envoyé avec succes à l'administrateur !");
             }
-            return back()->with('echec',"Email non envoyé, adresse mail invalide !");
+            return back()->with('echec',"Email non envoyé, adresse mail invalide << $to >>!");
             // dd($sendMailRapport->getData()->status);
         }
         return back()->with('echec',"Email non envoyé, renseignements fournient sont erronés !");
