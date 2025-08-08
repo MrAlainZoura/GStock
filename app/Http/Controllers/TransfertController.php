@@ -29,6 +29,9 @@ class TransfertController extends Controller
      */
     public function create($var_depot)
     {
+       if(session('depot') === null){
+            return to_route('dashboard');
+        }
         // dd(Transfert::all(), Approvisionnement::latest()->first(), ProduitDepot::latest()->first(), $var_depot);
         $depot = Depot::where("libele",$var_depot)->where('id',session('depot_id'))->with('produitDepot')->first();
         if($depot){
@@ -126,7 +129,10 @@ class TransfertController extends Controller
      * Display the specified resource.
      */
     public function showDepotTrans($depot){
-        $findDepotId = Depot::where('libele',$depot)->first();
+        if(session('depot') === null){
+            return to_route('dashboard');
+        }
+        $findDepotId = Depot::where('libele',$depot)->where('id', session('depot_id'))->first();
         $findTransDepot = Transfert::where('depot_id',$findDepotId->id)->with('produitTransfert')->get();
         return view('transfert.index',compact('findTransDepot'));
 

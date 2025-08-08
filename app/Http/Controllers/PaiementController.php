@@ -88,6 +88,10 @@ class PaiementController extends Controller
 
     public function creance($depot){
 
+        if(session('depot') === null){
+            return to_route('dashboard');
+        }
+
         $depot = Depot::where('libele', $depot)->where('id', session('depot_id'))->first();
         $depotId = $depot->id;
         $depotCreance = Vente::with(['client', 'venteProduit']) 

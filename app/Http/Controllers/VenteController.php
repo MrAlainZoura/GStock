@@ -167,6 +167,9 @@ class VenteController extends Controller
      */
     public function showDepotVente($depotVar){
         // dd($depotVar);
+        if(session('depot') === null){
+            return to_route('dashboard');
+        }
         $depot= Depot::where('libele',$depotVar)->where('id', session('depot_id'))->first();
         if($depot){
             // dd($depot->vente, $depot->devise);

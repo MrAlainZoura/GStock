@@ -20,7 +20,7 @@ if($findVenteDetail->user != null){
                 <p class="mt-2 text-lg/8 text-gray-600"> Description de la vente : <br>
                     Vente numero {{$findVenteDetail->code}} effectué par 
                     {{$user}} {{$postnom}} {{$prenom}}
-                     pour le compte de {{session('depot')}} en date du 
+                     pour le compte de {{$findVenteDetail->depot->libele}} en date du 
                      {{$findVenteDetail->created_at}} au client {{$findVenteDetail->client->name}} {{$findVenteDetail->client->prenom}} qui a acheté 
                      {{count($findVenteDetail->venteProduit) }}
                      produit(s) dont 
