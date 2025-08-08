@@ -25,7 +25,7 @@ class UserController extends Controller
         }
         if(Auth::user()->user_role->role->libele =='Administrateur' || Auth::user()->user_role->role->libele=='Super admin'){
             $user = User::whereHas('depotUser.depot', function ($query) {
-                    $query->where('libele', session('depot'));
+                    $query->where('id', session('depot_id'));
                 })->with(['depotUser.depot'])->get();
             $user->prepend(Auth::user()); //ajoute admin au debut
         }else{
