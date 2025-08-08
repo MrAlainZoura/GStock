@@ -38,7 +38,7 @@
 
     <div class="p-10">
 
-        <form id="myFormVente" action="{{route('venteStore',session('depot'))}}" method="post" enctype="multipart/form-data">
+        <form id="myFormVente" action="{{route('venteStore',$depot->libele)}}" method="post" enctype="multipart/form-data">
             @csrf
             @method('post')
             <input type="hidden" name="depot_id" value="{{$depot->id*98123}}">

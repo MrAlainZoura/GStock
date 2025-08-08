@@ -31,7 +31,10 @@ class VenteController extends Controller
      */
     public function create($depot)
     {
-        $depot= Depot::where("libele",$depot)->first();
+        if(session('depot') === null){
+            return to_route('dashboard');
+        }
+        $depot= Depot::where("libele",$depot)->where('id', session('depot_id'))->first();
         $cat = Categorie::all();
         $client =Client::all();
         $produit = ProduitDepot::where("depot_id",$depot->id)->with("produit.marque","produit.marque.categorie")->get();
