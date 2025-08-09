@@ -326,6 +326,7 @@ class ProduitController extends Controller
                         if($value->depot_id == $id){
                             $value->delete();
                         }
+                    }
                     $prod->delete();
                     return back()->with("success","Produit supprimé avec succès !");
                 }
