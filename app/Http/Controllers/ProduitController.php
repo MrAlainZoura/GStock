@@ -304,13 +304,34 @@ class ProduitController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Request $request, string $getId)
     {
-        return back()->with("success","Bientôt disponible");
-        $delete = Produit::where('id',$id)->delete();
-        if(!$delete){
-            return response()->json(['success'=>true, 'data'=>'echec de suppression']);
+        $id = $getId/450;
+        $prod = Produit::find($id);
+        if($prod){
+            $depotLink = (!empty($prod->produitDepot))
+                ?count($prod->produitDepot)
+                : null;
+            $prodVente = (!empty($prod->venteProduit))
+                ? count($prod->venteProduit)
+                : null;
+            $prodTrans = (!empty($prod->produitTransfert))
+                ? count($prod->produitTransfert)
+                : null;
+
+                if($depotLink == 1 || $prodVente > 0 || $prodTrans > 0){
+                    // dd($depotLink, $prodVente, $prodTrans, "apres analyse on peut effacer");
+                    $prod->produitDepot[0]->delete();
+                    foreach($prod->approvisionnement as $key => $value){
+                        $value->delete();
+                    }
+                    $prod->delete();
+                    return back()->with("success","Produit supprimé avec succès !");
+                }
+
+            return back()->with("echec", "Echec de suppression, ce produit est lié à une transaction en cours!");
+        }else{
+            return back()->with("echec", "Echec de suppression, ce produit introuvable!");
         }
-        return response()->json(['success'=>true, 'data'=>'Suppression reussie!']);
     }
 }
