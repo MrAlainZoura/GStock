@@ -323,8 +323,9 @@ class ProduitController extends Controller
                     // dd($depotLink, $prodVente, $prodTrans, "apres analyse on peut effacer");
                     $prod->produitDepot[0]->delete();
                     foreach($prod->approvisionnement as $key => $value){
-                        $value->delete();
-                    }
+                        if($value->depot_id == $id){
+                            $value->delete();
+                        }
                     $prod->delete();
                     return back()->with("success","Produit supprimé avec succès !");
                 }
