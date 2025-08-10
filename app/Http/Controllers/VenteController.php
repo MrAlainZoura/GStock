@@ -247,18 +247,32 @@ class VenteController extends Controller
     {
         $idVente = $vente/56745264509;
         $deleteVente = Vente::where('id', $idVente)->first();
-        $produitRelatif = VenteProduit::where('vente_id', $idVente);
-        $paimentRelatif = Paiement::where('vente_id', $idVente);
+       
+        foreach($deleteVente->venteProduit as $c=>$v){
+            $verifQTe = ProduitDepot::where('depot_id',$deleteVente->depot_id)
+                ->where('produit_id',$v->produit_id)
+                ->first();
+            $newQt =$verifQTe->quantite + $v->quantite;
+            $verifQTe->update(['quantite'=>(int)$newQt]);
+        }
 
-        if(auth::user()->id==null){
+        if(in_array(Auth::user()->user_role->role->libele,  ['Administrateur', 'Super admin'])){
             //verification de role d'admin
+            // $deleteVente->venteProduit()->delete();
+            // $deleteVente->paiement()->delete();
             $deleteVente->delete();
-            $produitRelatif->delete();
-            $paimentRelatif->delete();
             return back()->with("success","Vente effacée avec succès");
         }else{
             // dd($produitRelatif->get(), $paimentRelatif->get());
             return back()->with("echec","Vous ne disposez pas de droit necessaire pour effectuer cette action");
         }
     }
+     public function restore($id){
+        $vente = Vente::with(['venteProduit', 'paiement'])->onlyTrashed()->find($id);
+        return back()->with('success', "Bientot disponible");
+     }
+
+     public function venteTrashed($depot){
+        return back()->with('success', "Bientot disponible");
+     }
 }

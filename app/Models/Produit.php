@@ -28,7 +28,7 @@ class Produit extends Model
     public function venteProduit(){
         return $this->hasMany(VenteProduit::class);
     }
-
-
-
+    public function produitTransfert(){
+        return $this->hasMany(ProduitTransfert::class);
+    }
 }

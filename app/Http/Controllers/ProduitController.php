@@ -11,6 +11,7 @@ use App\Models\ProduitDepot;
 use Illuminate\Http\Request;
 use App\Imports\ProduitImport;
 use App\Models\Approvisionnement;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
@@ -30,6 +31,9 @@ class ProduitController extends Controller
      */
     public function create()
     {
+         if(session('depot') === null){
+            return to_route('dashboard');
+        }
         $tab = Categorie::orderby('libele')->with('marque')->get();
         $depot = Depot::where('libele',session('depot'))->where('id',  session('depot_id'))->first();
         if($depot!=null){
@@ -217,20 +221,26 @@ class ProduitController extends Controller
                         
                             if($v['quantite']!= null){
                                 $dataApro = [
-                                'user_id'=>auth()->user()->id,
-                                'depot_id'=>$request->depot_id,
-                                'produit_id'=>$produitId,
-                                'quantite'=>$v['quantite'],
-                                'confirm'=>false,
-                                'receptionUser'=>null
-                            ];
-                        $approvisionnement = Approvisionnement::create($dataApro);
+                                    'user_id'=>auth()->user()->id,
+                                    'depot_id'=>$request->depot_id,
+                                    'produit_id'=>$produitId,
+                                    'quantite'=>(int)$v['quantite'],
+                                    'confirm'=>false,
+                                    'receptionUser'=>null
+                                ];
+                                // $approvisionnement = Approvisionnement::create($dataApro);
                             }
                         $dataProD = ['depot_id'=>$request->depot_id,
                                     'produit_id'=>$produitId,
                                     'quantite'=>$v['quantite']
                                 ];
-                        $produitDepot = ProduitDepot::create($dataProD);  
+                        $getProdDepot = ProduitDepot::where('produit_id', $produitId)
+                            ->where('depot_id', $request->depot_id)
+                            ->first();
+                        ($getProdDepot != null) 
+                            ? $getProdDepot->increment('quantite',(int)$v['quantite']) 
+                            : $produitDepot = ProduitDepot::create($dataProD); 
+                        
                     }
                     // dd('Enregistrement effectué');
                 }
@@ -257,7 +267,10 @@ class ProduitController extends Controller
      */
     public function edit($produit)
     {
-        // dd($produit);
+       
+         if(session('depot') === null){
+            return to_route('dashboard');
+        }
         $id =$produit/450;
         $produit = Produit::where('id',$id)->first();
         if($produit != null){
@@ -265,6 +278,7 @@ class ProduitController extends Controller
             $depot_id = Depot::where('libele',session('depot'))->where('id',session('depot_id'))->first()->id;
             return view('produit.edit', compact('tab','depot_id','produit'));
         }
+        return back()->with('echec', 'Produit introuvable');
     }
 
     /**
@@ -304,13 +318,34 @@ class ProduitController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Request $request, string $getId)
     {
-        return back()->with("success","Bientôt disponible");
-        $delete = Produit::where('id',$id)->delete();
-        if(!$delete){
-            return response()->json(['success'=>true, 'data'=>'echec de suppression']);
+        $id = $getId/450;
+        $prod = Produit::find($id);
+        if($prod){
+            $depotLink = (!empty($prod->produitDepot))
+                ?count($prod->produitDepot)
+                : null;
+            $prodVente = (!empty($prod->venteProduit))
+                ? count($prod->venteProduit)
+                : null;
+            $prodTrans = (!empty($prod->produitTransfert))
+                ? count($prod->produitTransfert)
+                : null;
+
+                if($prodVente == 0 ){
+                    // dd($depotLink, $prodVente, $prodTrans, "apres analyse on peut effacer");
+                    $prod->produitDepot()->delete();
+                    $prod->venteProduit()->delete();
+                    $prod->produitTransfert()->delete();
+                    $prod->approvisionnement()->delete();
+                    $prod->delete();
+                    return back()->with("success","Produit supprimé avec succès !");
+                }
+
+            return back()->with("echec", "Echec de suppression, ce produit est lié à une transaction en cours! vente : $prodVente, transfert : $prodTrans");
+        }else{
+            return back()->with("echec", "Echec de suppression, ce produit introuvable!");
         }
-        return response()->json(['success'=>true, 'data'=>'Suppression reussie!']);
     }
 }
