@@ -330,7 +330,7 @@ class UserController extends Controller
         $user= User::where("id", $id)->first();
         if($user != null && !in_array($user->user_role->role->libele, ['Administrateur', 'Super admin'])){
             $image=$user->image;
-            dd($user->user_role->role->libele);
+            // dd($user->user_role->role->libele);
             if($user->delete()){
                 if (Storage::exists("public/uploads/$dossier/$image")) {
                     Storage::delete("public/uploads/$dossier/$image");

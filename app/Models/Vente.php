@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Vente extends Model
 {
+     use SoftDeletes;
     protected $fillable = [
         'user_id',
         'depot_id',
@@ -35,4 +38,20 @@ class Vente extends Model
     public function paiement(){
         return $this->hasMany(Paiement::class);
     }
+
+    protected static function booted()
+    {
+        static::deleting(function ($vente) {
+            $vente->venteProduit()->delete();
+            $vente->paiement()->delete();
+        });
+
+        static::restoring(function ($vente) {
+            $vente->venteProduit()->onlyTrashed()->restore();
+            $vente->paiement()->onlyTrashed()->restore();
+        });
+    }
+
+
+
 }
