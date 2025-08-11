@@ -45,11 +45,14 @@ Route::get('transfert/{transfert}/edit', [TransfertController::class,'edit'])->n
 Route::delete('transfert/{transfert}/delete', [TransfertController::class,'destroy'])->name('transDelete')->middleware( AuthentifyMiddleware::class);
 
 Route::get('vente/{depot}', [VenteController::class,'showDepotVente'])->name('venteDepot')->middleware( AuthentifyMiddleware::class);
+Route::get('vente/{depot}/supprimer', [VenteController::class,'venteTrashed'])->name('venteTrashed')->middleware( AuthentifyMiddleware::class);
 Route::get('vente/{depot}/create', [VenteController::class,'create'])->name('venteCreate')->middleware( AuthentifyMiddleware::class);
 Route::post('vente/{depot}/store', [VenteController::class,'store'])->name('venteStore')->middleware( AuthentifyMiddleware::class);
 Route::get('vente/{vente}/show', [VenteController::class,'show'])->name('venteShow')->middleware( AuthentifyMiddleware::class);
 Route::get('vente/{vente}/edit', [VenteController::class,'edit'])->name('venteEdit')->middleware( AuthentifyMiddleware::class);
 Route::delete('vente/{vente}/delete', [VenteController::class,'destroy'])->name('venteDelete')->middleware( AuthentifyMiddleware::class);
+Route::delete('vente/{vente}/delete-force', [VenteController::class,'forcedelete'])->name('forcedelete')->middleware( AuthentifyMiddleware::class);
+Route::put('vente/{vente}/restore', [VenteController::class,'restore'])->name('restore')->middleware( AuthentifyMiddleware::class);
 
 Route::get('rapport/{depot}/journalier', [RapportController::class,'journalier'])->name('rapport.jour')->middleware( AuthentifyMiddleware::class);
 Route::get('rapport/{depot}/mensuel', [RapportController::class,'mensuel'])->name('rapport.mois')->middleware( AuthentifyMiddleware::class);
