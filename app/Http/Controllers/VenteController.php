@@ -245,6 +245,10 @@ class VenteController extends Controller
      */
     public function destroy($vente)
     {
+        if(!in_array(Auth::user()->user_role->role->libele,  ['Administrateur', 'Super admin'])){
+            return back()->with("echec","Vous ne disposez pas de droit necessaire pour effectuer cette action");
+        }
+
         $idVente = $vente/56745264509;
         $deleteVente = Vente::where('id', $idVente)->first();
        
@@ -256,23 +260,60 @@ class VenteController extends Controller
             $verifQTe->update(['quantite'=>(int)$newQt]);
         }
 
-        if(in_array(Auth::user()->user_role->role->libele,  ['Administrateur', 'Super admin'])){
-            //verification de role d'admin
-            // $deleteVente->venteProduit()->delete();
-            // $deleteVente->paiement()->delete();
-            $deleteVente->delete();
+        if( $deleteVente->delete())  {
             return back()->with("success","Vente effacée avec succès");
-        }else{
-            // dd($produitRelatif->get(), $paimentRelatif->get());
+        }
+        return back()->with("echec","Une erreur s'est produite, veuillez réessayer plus tard !");
+    }
+     public function restore($venteId){
+
+        if(!in_array(Auth::user()->user_role->role->libele,  ['Administrateur', 'Super admin'])){
             return back()->with("echec","Vous ne disposez pas de droit necessaire pour effectuer cette action");
         }
-    }
-     public function restore($id){
+        $id = $venteId/12;
         $vente = Vente::with(['venteProduit', 'paiement'])->onlyTrashed()->find($id);
-        return back()->with('success', "Bientot disponible");
+        if($vente){
+            $vente->restore();
+            return back()->with('success', "Vente restorée avec succès !");
+        }
+        return back()->with('success', "Erreur, renseignement fourni incorrect !");
      }
 
      public function venteTrashed($depot){
-        return back()->with('success', "Bientot disponible");
+        // dd($depot/12);
+        if(!in_array(Auth::user()->user_role->role->libele,  ['Administrateur', 'Super admin'])){
+            return back()->with("echec","Vous ne disposez pas de droit necessaire pour effectuer cette action");
+        }
+        $depot_id = $depot/12;
+        $depot= Depot::where('id', $depot_id)->first();
+        if($depot){
+            // dd($depot->vente, $depot->devise);
+           $vente= Vente::where('depot_id', $depot->id)
+           ->onlyTrashed()
+           ->with([
+                'venteProduit' => function ($query) {
+                    $query->withTrashed();
+                },
+                'paiement' => function ($query) {
+                    $query->withTrashed();
+                }
+            ])->get();
+            return view('vente.trashed', compact('depot', 'vente')) ;
+        }else{
+            return back()->with("echec","Erreur demande introuvable");
+        }
+     }
+     public function forcedelete($vente){
+        if(!in_array(Auth::user()->user_role->role->libele,  ['Administrateur', 'Super admin'])){
+            return back()->with("echec","Vous ne disposez pas de droit necessaire pour effectuer cette action");
+        }
+        $id = $vente/12;
+        $vente = Vente::onlyTrashed()->find($id);
+        // dd($vente);
+        if($vente){
+            $vente->forceDelete();
+            return back()->with('success', "Vente supprimée définitivement avec succès !");
+        }
+        return back()->with('echec', "Suppression échouée, erreur inattendue s'est produite!");
      }
 }

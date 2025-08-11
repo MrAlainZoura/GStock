@@ -310,7 +310,8 @@ function selectOption(selectedOption, inputValue, index) {
     newInputPrx.setAttribute("oninput", `setTotal('${newInputQte.id}','${newInputPrx.id}','${newInputTotal.id}')`);
     newInputPrx.required = true;
 
-newInputTotal.name = `produits[${inputValue}][${newInputQte.value}]`;
+   newInputTotal.name = `produits[${inputValue}][${newInputQte.value}]`;
+   newInputQte.setAttribute("oninput", `setTotal('${newInputQte.id}','${newInputPrx.id}','${newInputTotal.id}')`);
 
   const divQtPrix = document.createElement('div');
         divQtPrix.className="flex gap-2";

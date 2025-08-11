@@ -50,6 +50,12 @@ class Vente extends Model
             $vente->venteProduit()->onlyTrashed()->restore();
             $vente->paiement()->onlyTrashed()->restore();
         });
+
+        static::forceDeleting(function ($vente) {
+            $vente->venteProduit()->withTrashed()->forceDelete();
+            $vente->paiement()->withTrashed()->forceDelete();
+        });
+
     }
 
 

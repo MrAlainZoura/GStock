@@ -434,9 +434,16 @@ class RapportController extends Controller
         if($getDepot != null){
             // dd($getDepot->user->email);
             $to = $getDepot->user->email;
+            $user = Auth::user()->email;
             $sendMailRapport = $this->rapport_send_mail($to,$getDepot->libele,$getDepot->id);
             if($sendMailRapport->getData()->status == true){
-                return back()->with('success',"Email envoyé avec succes à l'administrateur !");
+                if($to !== $user){
+                    $sendMailRapportUser = $this->rapport_send_mail($user,$getDepot->libele,$getDepot->id);
+                   return ($sendMailRapportUser->getData()->status==true) 
+                        ?  back()->with('success',"Email envoyé avec succes à l'administrateur et à $user!")
+                        :  back()->with('success',"Email envoyé avec succes à l'administrateur et  échec à $user!");
+                }
+                return back()->with('success',"Email envoyé avec succes à l'administrateur!");
             }
             return back()->with('echec',"Email non envoyé, adresse mail invalide << $to >>!");
             // dd($sendMailRapport->getData()->status);
