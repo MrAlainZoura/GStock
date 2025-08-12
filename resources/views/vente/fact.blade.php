@@ -180,15 +180,15 @@
 
                     @foreach($findVenteDetail->paiement as $cle=>$valeur)
                         <tr>
-                            <td colspan="2" class="left">{{$valeur->created_at}}</td>
-                            <td class="center">@formaMille($valeur->avance *$findVenteDetail->taux ) cdf</td>
+                            <td class="left">{{$valeur->created_at}}</td>
+                            <td colspan="2" class="center">@formaMille($valeur->avance *$findVenteDetail->taux ) cdf</td>
                         </tr>
                     @endforeach
 
                     @if($valeur->solde > 0)
                     <tr>
-                        <th colspan="2" class="left">Reste</th>
-                        <th>@formaMille($valeur->solde *$findVenteDetail->taux) cdf</th>
+                        <th class="left">Reste</th>
+                        <th colspan="2" >@formaMille($valeur->solde *$findVenteDetail->taux) cdf</th>
                     </tr>
                     @endif
                 @endif
