@@ -274,6 +274,14 @@ class VenteController extends Controller
         $vente = Vente::with(['venteProduit', 'paiement'])->onlyTrashed()->find($id);
         if($vente){
             $vente->restore();
+            //UPDATE QTE
+            foreach($vente->venteProduit as $c=>$v){
+                $verifQTe = ProduitDepot::where('depot_id',$vente->depot_id)
+                    ->where('produit_id',$v->produit_id)
+                    ->first();
+                $newQt = $verifQTe->quantite - $v->quantite;
+                $verifQTe->update(['quantite'=>(int)$newQt]);
+            }
             return back()->with('success', "Vente restorée avec succès !");
         }
         return back()->with('success', "Erreur, renseignement fourni incorrect !");
