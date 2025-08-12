@@ -80,7 +80,10 @@
         }
         .imprime{
             text-align: center;
-            font-size: 6px;
+            font-size: 10px;
+        }
+        .pad{
+            padding: 5px;
         }
     </style>
 </head>
@@ -150,7 +153,7 @@
             <tbody>
             @foreach ($findVenteDetail->venteProduit as $item)
                 <tr class="tdDashed">
-                    <th >
+                    <th class="left pad">
                         {{$item->produit->marque->libele}} 
                         {{$item->produit->libele}}<br>
                         <!-- {{$item->produit->etat}} -->
@@ -190,8 +193,8 @@
                     @endif
                 @endif
                 <tr class="footer-row trHead">
-                    <th class="footer-cell" colspan="2">Total</th>
-                    <th class="footer-cell">
+                    <th class="footer-cell" >Total</th>
+                    <th class="footer-cell" colspan="2">
                         (cdf) @formaMille($netPaye*$findVenteDetail->taux)<br>
                         ({{ $findVenteDetail->devise }}) @formaMille($netPaye)
                     </th>
