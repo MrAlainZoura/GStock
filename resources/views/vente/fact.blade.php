@@ -83,7 +83,8 @@
             font-size: 10px;
         }
         .pad{
-            padding: 5px;
+            padding-bottom: 5px;
+            padding-top: 5px;
         }
     </style>
 </head>
