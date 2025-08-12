@@ -27,6 +27,11 @@ class UserController extends Controller
             $user = User::whereHas('depotUser.depot', function ($query) {
                     $query->where('id', session('depot_id'));
                 })->with(['depotUser.depot'])->get();
+            $getAdminDepot = Depot::find(session('depot_id'));
+            (Auth::user()->user_role->role->libele=='Super admin')
+                ? $user->prepend($getAdminDepot->user)
+                : null;
+            
             $user->prepend(Auth::user()); //ajoute admin au debut
         }else{
             $user[] = Auth::user();
