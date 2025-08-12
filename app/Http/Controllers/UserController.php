@@ -348,6 +348,7 @@ class UserController extends Controller
     }
 
     public function login(Request $request){
+        // dd('ok');
         $daliation = Validator::make($request->all(),[
             'email'=>'required',
             'password'=>'required|min:4'
@@ -355,15 +356,19 @@ class UserController extends Controller
         if($daliation->fails()){
             return back()->with('echec',$daliation->errors());
         }
-        $data = ['email'=>$request->email, 'password'=>$request->password];
-        $dataLoginByName = ['name'=>$request->email, 'password'=>$request->password];
-        if(Auth::attempt($data)){
+        $user = User::whereRaw('LOWER(email) = ?', [$request->email])
+                ->orWhereRaw('LOWER(name) = ?', [$request->email])
+                ->first();
+        // dd($user);
+        $password = $request->password;
+       if ($user && Auth::attempt(['email' => $user->email, 'password' => $password])) {
             $request->session()->regenerate();
-            // return to_route('dashboard'); 
             return redirect()->intended('dashbord');
         }else{
             // Récupérer tous les utilisateurs avec ce nom d’utilisateur
-            $users = User::where('name', $dataLoginByName['name'])->get();
+            $users = User::whereRaw('LOWER(name) = ?', [$request->email])
+                ->get();
+            // User::where('name', $request->email)->get();
             // Filtrer ceux dont le mot de passe correspond
             $matchingUsers = $users->filter(function ($user) use ($request) {
                 return Hash::check($request->password, $user->password);
@@ -373,7 +378,7 @@ class UserController extends Controller
                 return back()->with('echec',"Ce nom d’utilisateur et mot de passe sont utilisés par plusieurs comptes. Veuillez vous connecter avec votre adresse email.");
             }
             if ($matchingUsers->count() === 1) {
-                if(Auth::attempt($dataLoginByName)){
+                if ($user && Auth::attempt(['name' => $user->name, 'password' => $password])) {
                     $request->session()->regenerate();
                     return redirect()->intended('dashbord');
                 }
