@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\api;
 
+use App\Models\Role;
 use App\Models\User;
+use App\Models\UserRole;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -158,5 +160,42 @@ class UserController extends Controller
     }
     public function admin(Request $request){
         //creer user super admin
+        $validateDate = Validator::make($request->all(),
+        [
+            'name'=>'required',
+            'email'=>'required|email|max:255|unique:users',
+            'password'=>'required|min:4'
+        ]);
+
+        if($validateDate->fails()){
+            return response()->json(['success'=>false, 'data'=>$validateDate->errors()]);
+        }
+        $data = [
+            'name'=>$request->name,
+            'email'=>$request->email,
+            'password'=>Hash::make($request->password)
+        ];
+
+        // dd($data);
+        $createAdmin = User::create($data);
+        if($createAdmin){ 
+            $getAdminRoleId = Role::where('libele', 'Super admin')->first();
+            if($getAdminRoleId !== null){
+                $roleId=$getAdminRoleId->id;
+            }else{
+                $dataAllRole = [
+                    'Super admin',
+                    'Administrateur',
+                    'user'
+                ];
+                foreach($dataAllRole as $role){
+                   $createAdminRole = Role::firstOrCreate(['libele'=>$role]);
+                   ($role == 'Super admin')?$roleId =$createAdminRole->id:"";
+                }
+            }
+            $dataRoleUser = ['user_id'=>$createAdmin->id, 'role_id'=>$roleId];
+            $createRoleUSer = UserRole::create($dataRoleUser);
+        }
+        return response()->json(['success'=>false, 'data'=>$createAdmin]);
     }
 }
