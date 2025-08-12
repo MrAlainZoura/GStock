@@ -82,7 +82,14 @@ class ProduitController extends Controller
         ];
 // dd($data);
         $produit = null;
-        $getProduit = Produit::where("libele",$request->libele)->where('etat',$request->etat)->first();
+        $marque = $request->marque_id;
+        $getProduit = Produit::whereHas('marque', function ($query) use ($marque) {
+                $query->where('id', $marque);
+            })
+            ->where('libele', $request->libele)
+            ->where('etat', $request->etat)
+            ->first();    
+        // dd($getProduit);
         if($getProduit === null){
             $produit = Produit::create($data);
         }
@@ -95,8 +102,11 @@ class ProduitController extends Controller
                 );
         }
         if($produit !== null){
-
-            if($request->quantite != null){
+            $dataProD =['depot_id'=>$request->depot_id,
+                        'produit_id'=>$produit->id,
+                        'quantite'=>($request->quantite!=null)?$request->quantite:0];
+            $produitDepot = ProduitDepot::create($dataProD);
+            if($request->quantite != null && $request->quantite > 0 ){
                 $dataApro = [
                     'user_id'=>auth()->user()->id,
                     'depot_id'=>$depotId,
@@ -105,11 +115,8 @@ class ProduitController extends Controller
                     'confirm'=>false,
                     'receptionUser'=>null
                 ];
-                $dataProD =['depot_id'=>session('depot_id'),
-                            'produit_id'=>$produit->id,
-                            'quantite'=>($request->quantite!=null)?$request->quantite:0];
                 $approvisionnement = Approvisionnement::create($dataApro);
-                $produitDepot = ProduitDepot::create($dataProD);
+        
             }else{
                 return back()->with('success',"Enregistrement reussi sans approvisionnement !");
             }
@@ -121,9 +128,10 @@ class ProduitController extends Controller
             $getDepotProduitExist =ProduitDepot::where('depot_id',$request->depot_id)->where('produit_id',$getProduit->id)->first();
             if($getDepotProduitExist == null){
                 // dd('affection');
-                $dataProD =['depot_id'=>session('depot_id'),
+                $dataProD =['depot_id'=>$request->depot_id,
                                 'produit_id'=>$getProduit->id,
-                                'quantite'=>$request->quantite];
+                                'quantite'=>($request->quantite!=null)?$request->quantite:0];
+                $produitDepot = ProduitDepot::create($dataProD);
                 if($request->quantite != null && $request->quantite >0){
                     $dataApro = [
                         'user_id'=>auth()->user()->id,
@@ -135,14 +143,14 @@ class ProduitController extends Controller
                     ];
                     // dd($depotId);
                     $approvisionnement = Approvisionnement::create($dataApro);
-                    $produitDepot = ProduitDepot::create($dataProD);
+                    
                     return back()->with('success','Enregistrement reussi avec succès plus approvisionnement !');
                 }else{
                     $produitDepot = ProduitDepot::create($dataProD);
                     return back()->with('success',"Enregistrement reussi sans approvisionnement !");
                 }
             }
-            return back()->with('echec',"Enregistrement n'a pas abouti, il est probable que ce produit existe déjà !");
+            return back()->with('echec',"Enregistrement n'a pas abouti, il est probable que ce produit existe déjà ! Veuillez approvisionner.");
         }
     }
 
@@ -183,7 +191,7 @@ class ProduitController extends Controller
                             ->with(['marque' => function ($query) use ($nomMarque) {
                                 $query->where('libele', $nomMarque);
                             }])->first();
-
+                    
                     if (!$categorie) {
                         //on cree la categorie si non nulle
                         if($nomCategorie != null){
@@ -216,7 +224,9 @@ class ProduitController extends Controller
                     }
                     // dd($dataProduit, 'enregistrement', $v['quantite']);
                     if($v['libele']!=null){
-                        $findProdExist = Produit::where('libele', $dataProduit['libele'])->where('etat', $dataProduit['etat'])->first();
+                        //ajoute la marque dans la verification
+                        $findProdExist = Produit::where('libele', $dataProduit['libele'])->where('etat', $dataProduit['etat'])->where('marque_id',$dataProduit['marque_id'])->first();
+                        // dd($findProdExist, $dataProduit);
                         ($findProdExist!=null)?$produitId=$findProdExist->id:$produitId = Produit::firstOrcreate($dataProduit)->id;
                         
                             if($v['quantite']!= null){
