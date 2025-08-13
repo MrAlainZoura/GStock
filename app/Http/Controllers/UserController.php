@@ -360,15 +360,13 @@ class UserController extends Controller
                 ->orWhereRaw('LOWER(name) = ?', [$request->email])
                 ->first();
         // dd($user);
-        $password = $request->password;
-       if ($user && Auth::attempt(['email' => $user->email, 'password' => $password])) {
-            $request->session()->regenerate();
+        $data = ['email'=>$request->email, 'password'=>$request->password];
+        $dataLoginByName = ['name'=>$request->email, 'password'=>$request->password];
+        if(Auth::attempt($data)){
+             $request->session()->regenerate();
             return redirect()->intended('dashbord');
         }else{
-            // Récupérer tous les utilisateurs avec ce nom d’utilisateur
-            $users = User::whereRaw('LOWER(name) = ?', [$request->email])
-                ->get();
-            // User::where('name', $request->email)->get();
+          $users=User::where('name', $request->email)->get();
             // Filtrer ceux dont le mot de passe correspond
             $matchingUsers = $users->filter(function ($user) use ($request) {
                 return Hash::check($request->password, $user->password);
@@ -376,14 +374,39 @@ class UserController extends Controller
 
             if ($matchingUsers->count() > 1) {
                 return back()->with('echec',"Ce nom d’utilisateur et mot de passe sont utilisés par plusieurs comptes. Veuillez vous connecter avec votre adresse email.");
-            }
+            } 
             if ($matchingUsers->count() === 1) {
-                if ($user && Auth::attempt(['name' => $user->name, 'password' => $password])) {
+                if (Auth::attempt($dataLoginByName)) {
                     $request->session()->regenerate();
                     return redirect()->intended('dashbord');
                 }
-            }
+            } 
         }
+
+        // $password = $request->password;
+    //    if ($user && Auth::attempt(['email' => $user->email, 'password' => $password])) {
+    //         $request->session()->regenerate();
+    //         return redirect()->intended('dashbord');
+    //     }else{
+    //         // Récupérer tous les utilisateurs avec ce nom d’utilisateur
+    //         $users = User::whereRaw('LOWER(name) = ?', [$request->email])
+    //             ->get();
+    //         // User::where('name', $request->email)->get();
+    //         // Filtrer ceux dont le mot de passe correspond
+    //         $matchingUsers = $users->filter(function ($user) use ($request) {
+    //             return Hash::check($request->password, $user->password);
+    //         });
+
+    //         if ($matchingUsers->count() > 1) {
+    //             return back()->with('echec',"Ce nom d’utilisateur et mot de passe sont utilisés par plusieurs comptes. Veuillez vous connecter avec votre adresse email.");
+    //         }
+    //         if ($matchingUsers->count() === 1) {
+    //             if (Auth::attempt(['name' => $user->name, 'password' => $password])) {
+    //                 $request->session()->regenerate();
+    //                 return redirect()->intended('dashbord');
+    //             }
+    //         }
+    //     }
        return back()->with('echec',"email / nom d'utilisateur ou mot de passe incorrect");
     }
     public function logout(){
