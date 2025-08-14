@@ -133,10 +133,11 @@ class VenteController extends Controller
                         'produit_id'=>$valeur['id'],
                         'vente_id'=>$createVente->id,
                         'quantite'=>$valeur['qt'],
-                        'prixU'=>(int)$valeur['pt']/(int)$valeur['qt'],
+                        'prixU'=>(int)$valeur['pt']/(float)$valeur['qt'],
                         'prixT'=>$valeur['pt']
                     ];
-                    $netPayer+=(int)$valeur['pt'];
+                    $netPayer+=(float)$valeur['pt'];
+                    // dd($dataVenteProduit, $netPayer);
                     $createVenteProduit = VenteProduit::create($dataVenteProduit);
                 }
                 $checkTranche = filter_var($request->tranche, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
@@ -144,12 +145,11 @@ class VenteController extends Controller
                 $dataPaiement  = [
                     'vente_id'=>$createVente->id,
                     "tranche"=>1,
-                    "avance"=>($checkTranche==true)?(int)$request->trancheP:$netPayer,
-                    "solde"=>($checkTranche==true)?$netPayer - (int)$request->trancheP:0,
+                    "avance"=>($checkTranche==true)?(float)$request->trancheP:$netPayer,
+                    "solde"=>($checkTranche==true)?$netPayer - (float)$request->trancheP:0,
                     "net"=>$netPayer,
                     "completed"=>($checkTranche==true)?false:true
                 ];
-
                 $createPaiement = Paiement::create($dataPaiement);
 
                 if($createVenteProduit){
