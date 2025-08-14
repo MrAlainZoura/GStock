@@ -12,10 +12,17 @@
     @include('composant.alert_suc', ['message'=>session('success')])
     </div>
     @endif
-    @if(session('echec'))
-    <div class="alert-echec">
-        @include('composant.alert_echec', ['message'=>session('echec')])
+    <div class="alert-success">
+      @include('composant.alert_suc', ['message'=>"Vous effectuer cette vente pour le compte de ".$depot->libele])
     </div>
+      <div class="alert-echec-submit hidden" id="submitErreur">
+          @include('composant.alert_echec', ['message'=>"Actualiser la page et réessayer si c'était par erreur que vous avez cliqué sur Ajouter"])
+      </div>
+    
+    @if(session('echec') )
+      <div class="alert-echec">
+          @include('composant.alert_echec', ['message'=>session('echec')])
+      </div>
     @endif
     
     <div id="alert-additional-content-2" class="hidden p-4 mb-4 text-red-800 border border-red-300 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400 dark:border-red-800" role="alert">
@@ -106,6 +113,10 @@
                             </div>
                             <div class="w-full sm:col-span-2" >
                                 <input type="number" required min="1" name="updateDevise" id="updateDevise" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="1000" >
+                            </div>
+                            <div class="flex items-center">
+                                <input id="venteFC" type="checkbox" value="false" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                <label for="venteFC" id="venteFC" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Vendre en CDF</label>
                             </div>
                             <div class="w-full sm:col-span-2" onclick="event.stopImmediatePropagation();">
                                 <input type="text" 
@@ -403,7 +414,14 @@ const setTotal = (inputQte, inputPx, showT) => {
   const netPayer =document.getElementById('netPayer');
   const devise = document.getElementById('deviseSelect').value.trim();
   const getDevise =  devise.substring(devise.indexOf('-') + 1);
-
+  
+  const paieFc = document.getElementById('venteFC');
+     const valeur = ()=>  {paieFc.addEventListener('change', function (){
+        this.value = this.checked ? true : false;
+      });
+      return paieFc.checked;
+    }
+  const monnaieTransaction = (valeur())?'cdf':getDevise;
   const calculNet = (net)=>{
     let somme = 0;
     const inputs = document.querySelectorAll('.putainDesabled');
@@ -423,10 +441,18 @@ const setTotal = (inputQte, inputPx, showT) => {
         maxTranchePaie.max = somme; //Ajouter du maximum au champ de premiere tranche
       }
     });
-    const sommeFormater = somme.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
-    let sommeFc =somme * updateDevise;
-        sommeFc =sommeFc.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-    net.textContent = `Montant net à payer ${sommeFormater} ${getDevise} / ${sommeFc} Fc`;
+    //recupere paiement en franc
+    if(valeur()){
+      const sommeFormater = somme.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
+      let sommeDevise =(somme / updateDevise).toFixed(2);
+      sommeDevise = sommeDevise.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+      net.textContent = `Montant net à payer ${sommeDevise} ${getDevise} / ${somme} cdf`;
+    }else{
+      const sommeFormater = somme.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
+      let sommeFc =somme * updateDevise;
+      sommeFc =sommeFc.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+      net.textContent = `Montant net à payer ${sommeFormater} ${getDevise} / ${sommeFc} cdf`;
+    }
   }
   const idStr = (str)=>{
     const getId = str.match(/\D*(\d+)/);
@@ -435,23 +461,24 @@ const setTotal = (inputQte, inputPx, showT) => {
     }
   }
 
-  const renderTt = (quantity,prix,text, idInter,net, devise)=>{
+  const renderTt = (quantity,prix,text, idInter,net, monnaieTransaction)=>{
     let total = quantity * prix;
     total = total.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-    text.value = `${total} ${devise}`;
+    text.value = `${total} ${monnaieTransaction}`;
     const id = idStr(idInter);
     text.name= `produits[${id}][${inputQt.value}]`;
+    // console.log(monnaieTransaction);
     calculNet(net);
   }
 
   inputPrx.addEventListener('input', (event)=>{
    if( inputQt.value !=null){
-    renderTt(inputQt.value,inputPrx.value,showTt, inputQt.id, netPayer, getDevise)
+    renderTt(inputQt.value,inputPrx.value,showTt, inputQt.id, netPayer, monnaieTransaction)
    }
   });
   inputQt.addEventListener('input', (event)=>{
    if( inputPrx.value !=null){
-    renderTt(inputQt.value,inputPrx.value,showTt, inputQt.id, netPayer, getDevise)
+    renderTt(inputQt.value,inputPrx.value,showTt, inputQt.id, netPayer, monnaieTransaction)
    }
   });
   
@@ -493,11 +520,20 @@ const alertErreurProduitSend = (action)=>{
       divErreur.classList.remove("hidden");
     }
 }
+let compteurSubmit = 0;
 const submitMyForm = ()=>{
+
   const myFormVente =document.getElementById('myFormVente');
   myFormVente.addEventListener('submit', (event)=>{
     event.preventDefault();
-  //  const inputs = myFormVente.querySelectorAll('.putainDesabled');
+    const paiementFc = document.getElementById('venteFC');
+    let updateDevise = document.getElementById('updateDevise').value.trim();
+    const valeur = ()=>  {paiementFc.addEventListener('change', function (){
+        this.value = this.checked ? true : false;
+      });
+      return paiementFc.checked;
+    }
+    //  const inputs = myFormVente.querySelectorAll('.putainDesabled');
   //  const inputs = [...myFormVente.querySelectorAll('.putainDesabled')];
   const inputs = Array.from(myFormVente.querySelectorAll('.putainDesabled'));
 
@@ -505,15 +541,32 @@ const submitMyForm = ()=>{
     input.removeAttribute('disabled')
     input.removeAttribute('aria-label')
 
-    const total = input.value.split(" ");
+     const total = input.value.split(" ");
       let totalEntier = total[0];
       if(totalEntier.length > 4){
         totalEntier = totalEntier.replace(/\./g, '');
       }
-      input.value = totalEntier;
+      if(compteurSubmit == 0){
+        if(!valeur()){
+          input.value = totalEntier;
+        }else{
+          input.value = (parseFloat(totalEntier)/updateDevise).toFixed(2);
+        }
+      }
+      // console.log(input.value, paiementFc.value, updateDevise);
+      // console.log(totalEntier, updateDevise, input.value, paiementFc, compteurSubmit)
    });
-  // console.log(prodListTab.length, inputs);
-  (prodListTab.length==0) ? alertErreurProduitSend('show') : myFormVente.submit();
+   compteurSubmit++;
+   const errreMessage = document.getElementById('submitErreur');
+   (compteurSubmit >0)?errreMessage.classList.remove('hidden'):"";
+   
+   const maxTranchePaie = document.getElementById('tranche');
+   if(valeur() && maxTranchePaie && !isNaN(updateDevise) && updateDevise !== 0)
+      {
+        maxTranchePaie.value=(parseFloat(maxTranchePaie.value)/updateDevise).toFixed(2);
+      }
+   // console.log(prodListTab.length, inputs, paiementFc.value);
+   (prodListTab.length==0) ? alertErreurProduitSend('show') : myFormVente.submit();
     // myFormVente.submit();
   })
 };
@@ -539,5 +592,4 @@ const deviseRender = () => {
   });
   seltDevise.dispatchEvent(new Event('change'));
 };
-    
 </script>

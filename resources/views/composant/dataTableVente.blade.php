@@ -119,9 +119,17 @@
   </svg>
   <span class="sr-only">Danger</span>
   <div>
-    <span class="font-medium">Recette pour ce tableau @formaMille($recetteFc) cdf</span>
+    <span class="font-medium">Recette de toutes les ventes confondues du dépôt :  @formaMille($recetteFc) cdf</span>
       <ul class="mt-1.5 list-disc list-inside" id="listeDevise">
-        
+        @if (!empty($data))
+            @foreach ($deviseList as $dev )
+                @php
+                    $montantDev = $recetteFc / $dev->taux;
+                    number_format($montantDev, 2);
+                @endphp
+                <li>{{ $dev->libele }} ({{ $dev->taux }}) : @formaMille($montantDev)</li>
+            @endforeach
+        @endif
     </ul>
   </div>
 </div>
@@ -140,51 +148,55 @@ if (document.getElementById("search-table") && typeof simpleDatatables.DataTable
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    if (typeof renderRecette === 'function') {
-        renderRecette();
-    }  
+    // const data = @json($data);
+    // // console.log(data);
+    // if (typeof renderRecette === 'function') {
+    //     renderRecette(data);
+    //     console.log('fonction');
+    // }  
+    //modal suppression item
+    const deleteLink = document.querySelectorAll('#linkDelete');
+    
+     deleteLink.forEach(link => {
+         link.addEventListener('click', (event) => {
+             event.preventDefault();
+             const hrefClicked = event.currentTarget.getAttribute('href');
+             const formDelete =document.getElementById('deleteForm');
+             const textDeleteItem =document.getElementById('textDeleteItem');
+             const itemName = event.currentTarget.getAttribute('itemName') ;
+             textDeleteItem.textContent= `Confirmer la suppression de la vente ${itemName}`;
+             formDelete.setAttribute('action',hrefClicked);
+         });
+     });
 });
 
 
-   //modal suppression item
-   const deleteLink = document.querySelectorAll('#linkDelete');
 
-    deleteLink.forEach(link => {
-        link.addEventListener('click', (event) => {
-            event.preventDefault();
-            const hrefClicked = event.currentTarget.getAttribute('href');
-            const formDelete =document.getElementById('deleteForm');
-            const textDeleteItem =document.getElementById('textDeleteItem');
-            const itemName = event.currentTarget.getAttribute('itemName') ;
-            textDeleteItem.textContent= `Confirmer la suppression de la vente ${itemName}`;
-            formDelete.setAttribute('action',hrefClicked);
-        });
-    });
-
-    const data = @json($data);
-    const renderRecette = ()=>{
-        if(data.length > 0){
-            const deviseList = @json($deviseList);
-            let recette = 0;
-            let recetteFc = 0;
-            const ul = document.getElementById('listeDevise');
-            const totalPaie = [...document.querySelectorAll('.totalPaie')];
-
-            if(totalPaie){
-                totalPaie.forEach(paie=>{
-                    recetteFc +=parseFloat(paie.value);
-                    // console.log(paie.value, recetteFc)
-                });
-            }
+    
+    // const renderRecette = (data)=>{
+    //     if(data.length > 0){
             
-            if(ul){
-                deviseList.forEach(dev=>{
-                    const li = `<li> ${dev.libele} => ${dev.taux} : ${parseFloat((recetteFc/dev.taux).toFixed(2))}</li>`
-                    ul.innerHTML += li;
-                    // console.log(dev.taux, dev.libele);
-                });
-            }
-        };
+    //         const deviseList = @json($deviseList);
+    //         let recette = 0;
+    //         let recetteFc = 0;
+    //         const ul = document.getElementById('listeDevise');
+    //         const totalPaie = [...document.querySelectorAll('.totalPaie')];
 
-    }
+    //         if(totalPaie){
+    //             totalPaie.forEach(paie=>{
+    //                 recetteFc +=parseFloat(paie.value);
+    //                 console.log(paie.value, recetteFc)
+    //             });
+    //         }
+            
+    //         if(ul){
+    //             deviseList.forEach(dev=>{
+    //                 const li = `<li> ${dev.libele} => ${dev.taux} : ${parseFloat((recetteFc/dev.taux).toFixed(2))}</li>`
+    //                 ul.innerHTML += li;
+    //                 console.log(dev.taux, dev.libele);
+    //             });
+    //         }
+    //     };
+
+    // }
 </script>
