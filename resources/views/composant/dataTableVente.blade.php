@@ -102,7 +102,7 @@
             </td>
 
             <td>
-                @include('composant.actionLink', ['itemName'=>$item->code,'seeRoute'=>'venteShow','seeParam'=>56745264509*$item->id, 'deleteRoute'=>"venteDelete",'deleteParam'=>56745264509*$item->id, 'editeRoute'=>"venteEdit",'editParam'=>$item->id*6789012345])
+                @include('composant.actionLink', ['itemName'=>$item->code,'seeRoute'=>'venteShow','seeParam'=>56745264509*$item->id, 'deleteRoute'=>"venteDelete",'deleteParam'=>56745264509*$item->id, 'editeRoute'=>"compCreate",'editParam'=>['depot'=>$item->depot->libele, 'vente_id'=>$item->id]])
             </td>
         </tr>
         @php
