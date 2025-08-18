@@ -91,7 +91,11 @@
                 @endphp
                 @foreach ( $item->venteProduit as $val)
                     @php
-                        $paiment +=$val->prixT;
+                       // $paiment +=(float)$val->prixT;
+                        $prix = preg_replace('/[^\d.]/', '', $val->prixT);
+                        if (is_numeric($prix)) {
+                            $paiment += (float) $prix;
+                        }
                     @endphp
                 @endforeach
                 @formaMille($paiment)

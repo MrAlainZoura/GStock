@@ -17,6 +17,7 @@ class CompassassionController extends Controller
         return Compassassion::all();
     }
     public function create($depot ,$vente_id){
+        return back()->with('success', "Bientot disponible");
         $vente= Vente::find($vente_id);
         // dd($vente, $vente_id);
         if($vente){
