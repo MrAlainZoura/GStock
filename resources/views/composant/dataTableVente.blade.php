@@ -91,7 +91,11 @@
                 @endphp
                 @foreach ( $item->venteProduit as $val)
                     @php
-                        $paiment +=$val->prixT;
+                       // $paiment +=(float)$val->prixT;
+                        $prix = preg_replace('/[^\d.]/', '', $val->prixT);
+                        if (is_numeric($prix)) {
+                            $paiment += (float) $prix;
+                        }
                     @endphp
                 @endforeach
                 @formaMille($paiment)
@@ -102,7 +106,7 @@
             </td>
 
             <td>
-                @include('composant.actionLink', ['itemName'=>$item->code,'seeRoute'=>'venteShow','seeParam'=>56745264509*$item->id, 'deleteRoute'=>"venteDelete",'deleteParam'=>56745264509*$item->id, 'editeRoute'=>"venteEdit",'editParam'=>$item->id*6789012345])
+                @include('composant.actionLink', ['itemName'=>$item->code,'seeRoute'=>'venteShow','seeParam'=>56745264509*$item->id, 'deleteRoute'=>"venteDelete",'deleteParam'=>56745264509*$item->id, 'editeRoute'=>"compCreate",'editParam'=>['depot'=>$item->depot->libele, 'vente_id'=>$item->id]])
             </td>
         </tr>
         @php
