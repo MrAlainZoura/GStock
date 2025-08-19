@@ -133,6 +133,10 @@ class UserController extends Controller
     }
 
     public function loginCreate(){
+        if (Auth::check()) {
+            $user = Auth::user();
+            return redirect()->intended('dashbord');
+        }
         return view('users.login');
     }
 
