@@ -46,7 +46,7 @@ Route::get('transfert/{transfert}/edit', [TransfertController::class,'edit'])->n
 Route::delete('transfert/{transfert}/delete', [TransfertController::class,'destroy'])->name('transDelete')->middleware( AuthentifyMiddleware::class);
 
 Route::get('vente/{depot}', [VenteController::class,'showDepotVente'])->name('venteDepot')->middleware( AuthentifyMiddleware::class);
-Route::delete('vente/{depot}/supprimer', [VenteController::class,'venteTrashed'])->name('venteTrashed')->middleware( AuthentifyMiddleware::class);
+Route::get('vente/{depot}/supprimer', [VenteController::class,'venteTrashed'])->name('venteTrashed')->middleware( AuthentifyMiddleware::class);
 Route::get('vente/{depot}/create', [VenteController::class,'create'])->name('venteCreate')->middleware( AuthentifyMiddleware::class);
 Route::post('vente/{depot}/store', [VenteController::class,'store'])->name('venteStore')->middleware( AuthentifyMiddleware::class);
 Route::get('vente/{vente}/show', [VenteController::class,'show'])->name('venteShow')->middleware( AuthentifyMiddleware::class);
