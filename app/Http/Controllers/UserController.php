@@ -349,6 +349,10 @@ class UserController extends Controller
 
     public function login(Request $request){
         // dd('ok');
+        if (Auth::check()) {
+            $user = Auth::user();
+            return redirect()->intended('dashbord');
+        }
         $daliation = Validator::make($request->all(),[
             'email'=>'required',
             'password'=>'required|min:4'
