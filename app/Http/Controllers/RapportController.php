@@ -248,6 +248,9 @@ class RapportController extends Controller
        
         $id= $vente/56745264509;
         $findVenteDetail = Vente::where('id',$id)->first();
+        if(!$findVenteDetail){
+            return to_route('dashboard')->with('echec', "Facture introuvable. Elle a peut-être été supprimée !");
+        }
         if($findVenteDetail->user == null){
             $objet = new \stdClass();
             $objet->name = "Vendeur Suspendu";
