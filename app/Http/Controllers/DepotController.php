@@ -80,6 +80,10 @@ class DepotController extends Controller
             $getDepot = $getDepot/12726654;
             $depot = Depot::where("id",$getDepot)->first();
         }
+
+        if(!$depot){
+            return to_route('dashboard')->with('echec',"Choisissez unn dépôt pour effectuer vos opérations!"); 
+        }
         session(['depot' => $depot->libele]);
         session(['depot_id' => $depot->id]);
         $user = Auth::user();
