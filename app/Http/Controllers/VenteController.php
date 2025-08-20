@@ -29,12 +29,12 @@ class VenteController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create($depot)
+    public function create($depot, $depot_id)
     {
-        if(session('depot') === null){
-            return to_route('dashboard');
-        }
-        $depot= Depot::where("libele",$depot)->where('id', session('depot_id'))->first();
+        // if(session('depot') === null){
+        //     return to_route('dashboard');
+        // }
+        $depot= Depot::where("libele",$depot)->where('id', $depot_id)->first();
         $cat = Categorie::all();
         $client =Client::all();
         $produit = ProduitDepot::where("depot_id",$depot->id)->with("produit.marque","produit.marque.categorie")->get();
@@ -165,12 +165,12 @@ class VenteController extends Controller
     /**
      * Display the specified resource.
      */
-    public function showDepotVente($depotVar){
+    public function showDepotVente($depotVar, $id){
         // dd($depotVar);
-        if(session('depot') === null){
-            return to_route('dashboard');
-        }
-        $depot= Depot::where('libele',$depotVar)->where('id', session('depot_id'))->first();
+        // if(session('depot') === null){
+        //     return to_route('dashboard');
+        // }
+        $depot= Depot::where('libele',$depotVar)->where('id', $id)->first();
         if($depot){
             // dd($depot->vente, $depot->devise);
             return view('vente.index', compact('depot')) ;

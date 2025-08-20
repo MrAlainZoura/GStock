@@ -13,7 +13,7 @@
     </div>
     @endif
     <div class="alert-success">
-      @include('composant.alert_suc', ['message'=>"Vous effectuer cette vente pour le compte de ".$depot->libele])
+      @include('composant.alert_suc', ['message'=>"Vous effectuer cette compassassion pour le compte de ".$depot->libele])
     </div>
       <div class="alert-echec-submit hidden" id="submitErreur">
           @include('composant.alert_echec', ['message'=>"Actualiser la page et réessayer si c'était par erreur que vous avez cliqué sur Ajouter"])
@@ -31,10 +31,10 @@
           <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
         </svg>
         <span class="sr-only">Info</span>
-        <h3 class="text-lg font-medium">Erreur, vente impossible</h3>
+        <h3 class="text-lg font-medium">Erreur, compassassion impossible</h3>
       </div>
       <div class="mt-2 mb-4 text-sm">
-          Veuillez au moins choisir un produit pour effectuer cette vente, sinon elle n'aura pas de sens!
+          Veuillez au moins choisir un produit pour échanger avec l'ancien, sinon elle n'aura pas de sens!
       </div>
       <div class="flex item-center justify-center">
         <button type="button" onclick="alertErreurProduitSend('hide')" class="text-red-800 bg-transparent border border-red-800 hover:bg-red-900 hover:text-white focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-xs px-3 py-1.5 text-center dark:hover:bg-red-600 dark:border-red-600 dark:text-red-500 dark:hover:text-white dark:focus:ring-red-800">
@@ -45,10 +45,10 @@
 
     <div class="p-10">
 
-        <form id="myFormVente" action="{{route('venteStore',$depot->libele)}}" method="post" enctype="multipart/form-data">
+        <form id="myFormVente" action="{{route('compStore',$depot->libele)}}" method="post" enctype="multipart/form-data">
             @csrf
             @method('post')
-            <input type="hidden" name="depot_id" value="{{$depot->id*98123}}">
+            <input type="hidden" name="vente_id" value="{{$vente->id}}">
               <div class="grid gap-4 sm:grid-cols-2 sm:gap-6">
                 <div>
                     <div class="sm:col-span-2 mb-2">
@@ -61,9 +61,31 @@
                         </div>
                         <hr class="h-px  bg-black border-0 dark:bg-gray-700">
                     </div>
-                      @foreach ($vente->venteProduit as $pro)
-                        {{ $pro->produit->marque->libele }} {{ $pro->produit->libele }} {{ $pro->quantite }}pc {{ $pro->prixT }} {{ $vente->devise->libele }}
-                      @endforeach
+                    <h2 class="mb-2 text-lg font-semibold text-gray-900 dark:text-white">Article acheté:</h2>
+                      <ul class="max-w-md space-y-1 text-gray-500 list-inside dark:text-gray-400">
+                        @foreach ($vente->venteProduit as $pro)
+                        <li class="flex items-center">
+                            <svg class="w-3.5 h-3.5 me-2 text-green-500 dark:text-green-400 shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z"/>
+                            </svg>
+                            {{ $pro->produit->marque->libele }} {{ $pro->produit->libele }} {{ $pro->quantite }}pc {{ $pro->prixT }} {{ $vente->devise->libele }}
+                        </li>
+                          @endforeach
+                          <li>
+                            <h2 class="mb-2 text-lg font-semibold text-gray-900 dark:text-white">
+                              Paiement reçu : 
+                                <ul>
+                                  <li class="flex items-center space-x-3 rtl:space-x-reverse">
+                                      <svg class="shrink-0 w-3.5 h-3.5 text-green-500 dark:text-green-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 12">
+                                          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5.917 5.724 10.5 15 1.5"/>
+                                      </svg>
+                                      <span>{{ $paiement }} {{ $vente->devise->libele }}</span>
+                                  </li>
+                                </ul>
+                             
+                            </h2>
+                          </li>
+                      </ul>
                         <!-- {{ $vente->venteProduit[0]->produit->marque->libele}} -->
                     </div>
                     <div>
@@ -90,7 +112,7 @@
                                 </select>
                             </div>
                             <div class="w-full sm:col-span-2" >
-                                <input type="number" required min="1" name="updateDevise" id="updateDevise" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="1000" >
+                                <input type="number" disabled required min="1" name="updateDevise" id="updateDevise" value="{{ $vente->updateTaux }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="1000" >
                             </div>
                             <div class="flex items-center">
                                 <input id="venteFC" type="checkbox" value="false" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
@@ -166,13 +188,16 @@ function removeObjectByIndex(tableau, index) {
 }
 const nettoyageProduitVente=()=>{
   let users = @json($produit);
-  venteProduit.forEach((produit)=>{
-      const indexOrigin = users.findIndex(o => o.produit.id === produit.produit_id);
-      const original = users.find(o => o.produit.id === produit.produit_id);
-      // console.log(indexOrigin, original, users.length);
-      users = removeObjectByIndex(users, parseInt(indexOrigin));
-      console.log(original)
-  });
+  if(venteProduit.length == 1){
+    venteProduit.forEach((produit)=>{
+        const indexOrigin = users.findIndex(o => o.produit.id === produit.produit_id);
+        const original = users.find(o => o.produit.id === produit.produit_id);
+        console.log(produit.quantite);
+        if(parseInt(produit.quantite)==1){
+          users = removeObjectByIndex(users, parseInt(indexOrigin));
+        }
+    });
+  }
   return users;
 }
 users = nettoyageProduitVente();
@@ -557,7 +582,7 @@ const submitMyForm = ()=>{
         maxTranchePaie.value=(parseFloat(maxTranchePaie.value)/updateDevise).toFixed(2);
       }
     // console.log(prodListTab.length, inputs, paiementFc.value);
-    //  (prodListTab.length==0) ? alertErreurProduitSend('show') : myFormVente.submit();
+     (prodListTab.length==0) ? alertErreurProduitSend('show') : myFormVente.submit();
     // myFormVente.submit();
   })
 };
@@ -579,7 +604,7 @@ const deviseRender = () => {
     const attributTaux = selected.dataset.taux; // ou getAttribute('data-taux')
 
     // console.log(seltDevise.value, attributTaux);
-    updateDevise.value = attributTaux;
+    //updateDevise.value = attributTaux;
   });
   seltDevise.dispatchEvent(new Event('change'));
 };
