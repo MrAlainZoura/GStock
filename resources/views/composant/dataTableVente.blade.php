@@ -80,24 +80,38 @@
                 </div>
             </td>
             <td >
-                 
-                @foreach ( $item->venteProduit as $val)
-                    <label for="" class="block"> {{$val->produit->libele}} : {{$val->quantite}} pc</label>
-                @endforeach
-            </td>
-            <td >
-                @php
-                    $paiment = 0;
-                @endphp
-                @foreach ( $item->venteProduit as $val)
+                @if ($item->compassassion->count()>0)
+                    @php
+                        $paiment = 0;
+                    @endphp
+                    @foreach ( $item->compassassion as $comp)
                     @php
                        // $paiment +=(float)$val->prixT;
-                        $prix = preg_replace('/[^\d.]/', '', $val->prixT);
+                        $prix = preg_replace('/[^\d.]/', '', $comp->prixT);
                         if (is_numeric($prix)) {
                             $paiment += (float) $prix;
                         }
                     @endphp
-                @endforeach
+                        <label for="" class="block"> {{$comp->produit->libele}} : {{$comp->quantite}} pc</label>
+                    @endforeach
+                @else 
+                    @php
+                        $paiment = 0;
+                    @endphp
+                    @foreach ( $item->venteProduit as $val)
+                        @php
+                        // $paiment +=(float)$val->prixT;
+                            $prix = preg_replace('/[^\d.]/', '', $val->prixT);
+                            if (is_numeric($prix)) {
+                                $paiment += (float) $prix;
+                            }
+                        @endphp
+                        <label for="" class="block"> {{$val->produit->libele}} : {{$val->quantite}} pc</label>
+                    @endforeach
+                   
+                @endif
+            </td>
+            <td >
                 @formaMille($paiment)
                 @if($item->devise) 
                     {{ $item->devise->libele }} 
@@ -106,7 +120,7 @@
             </td>
 
             <td>
-                @include('composant.actionLink', ['itemName'=>$item->code,'seeRoute'=>'venteShow','seeParam'=>56745264509*$item->id, 'deleteRoute'=>"venteDelete",'deleteParam'=>56745264509*$item->id, 'editeRoute'=>"compCreate",'editParam'=>['depot'=>$item->depot->libele, 'vente_id'=>$item->id]])
+                @include('composant.actionLink', ['itemName'=>$item->code,'seeRoute'=>'venteShow','seeParam'=>["vente"=>56745264509*$item->id, "depot"=>$item->depot_id*12], 'deleteRoute'=>"venteDelete",'deleteParam'=>56745264509*$item->id, 'editeRoute'=>"compCreate",'editParam'=>['depot'=>$item->depot->libele, 'vente_id'=>$item->id]])
             </td>
         </tr>
         @php

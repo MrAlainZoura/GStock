@@ -153,7 +153,7 @@ class VenteController extends Controller
                 $createPaiement = Paiement::create($dataPaiement);
 
                 if($createVenteProduit){
-                     $routeParam = 56745264509*$createVente->id;
+                    $routeParam = ["vente"=>56745264509*$createVente->id, "depot"=>$createVente->depot_id];
                     return to_route('venteShow',$routeParam);
                 }
             }
@@ -166,7 +166,7 @@ class VenteController extends Controller
      * Display the specified resource.
      */
     public function showDepotVente($depotVar, $id){
-        // dd($depotVar);
+        // dd($depotVar, $id);
         // if(session('depot') === null){
         //     return to_route('dashboard');
         // }
@@ -175,13 +175,16 @@ class VenteController extends Controller
             // dd($depot->vente, $depot->devise);
             return view('vente.index', compact('depot')) ;
         }else{
-            return back()->with("echec","Erreur demande introuvable");
+            return back()->with("echec","Erreur depot introuvable");
         }
 
     }
-    public function show( $vente)
+    public function show( $vente, $depot_id)
     {
         $id= $vente/56745264509;
+        $depot_id = $depot_id/12;
+        // dd ($vente, $depot_id/12);
+
         $detailVente = Vente::where('id',$id)->first();
         if($detailVente == null){
             return back()->with('echec','Renseignements fournient sont invalides');

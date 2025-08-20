@@ -68,6 +68,7 @@
             margin: 5px;
             text-align: center;
             font-weight: 600;
+            font-size: 14px;
         }
         .footer-cell, .left{
             text-align: left;
@@ -95,13 +96,6 @@
         $quantite = 0;
         $netPaye = 0;
     @endphp
-    @foreach ( $findVenteDetail->venteProduit as $val)
-        @php
-            $quantite +=$val->quantite;
-            $netPaye+=$val->prixT;
-        @endphp 
-    @endforeach            
-
 
         <div class="container">
         <div class="invoice-header">
@@ -152,21 +146,63 @@
                 </tr>
             </thead>
             <tbody>
-            @foreach ($findVenteDetail->venteProduit as $item)
-                <tr class="tdDashed">
-                    <th class="left pad">
-                        {{$item->produit->marque->libele}} 
-                        {{$item->produit->libele}}<br>
-                        <!-- {{$item->produit->etat}} -->
-                    </th>
-                    <td >
-                        {{$item->quantite}}
-                    </td>
-                    <td >
-                        @formaMille($item->prixT * $findVenteDetail->taux ) cdf
-                    </td>
-                </tr>
-            @endforeach
+                @if ($findVenteDetail->compassassion->count() > 0)
+                    @foreach ($findVenteDetail->compassassion as $item)
+                        @php
+                            $quantite +=$item->quantite;
+                            $netPaye+=$item->prixT;
+                        @endphp
+                        <tr class="tdDashed">
+                            <th class="left pad">
+                                {{$item->produit->marque->libele}} 
+                                {{$item->produit->libele}}<br>
+                                <!-- {{$item->produit->etat}} -->
+                            </th>
+                            <td >
+                                {{$item->quantite}}
+                            </td>
+                            <td >
+                                @formaMille($item->prixT * $findVenteDetail->taux ) cdf
+                            </td>
+                        </tr>
+                    @endforeach
+                    <tr><td colspan="3" class="separated">Article vente précédente </td></tr>
+                    @foreach ($findVenteDetail->venteProduit as $item)
+                        <tr class="tdDashed">
+                            <th class="left pad">
+                                {{$item->produit->marque->libele}} 
+                                {{$item->produit->libele}}<br>
+                                <!-- {{$item->produit->etat}} -->
+                            </th>
+                            <td >
+                                {{$item->quantite}}
+                            </td>
+                            <td >
+                                @formaMille($item->prixT * $findVenteDetail->taux ) cdf
+                            </td>
+                        </tr>
+                    @endforeach
+                @else
+                    @foreach ($findVenteDetail->venteProduit as $item)
+                         @php
+                            $quantite +=$item->quantite;
+                            $netPaye+=$item->prixT;
+                        @endphp
+                        <tr class="tdDashed">
+                            <th class="left pad">
+                                {{$item->produit->marque->libele}} 
+                                {{$item->produit->libele}}<br>
+                                <!-- {{$item->produit->etat}} -->
+                            </th>
+                            <td >
+                                {{$item->quantite}}
+                            </td>
+                            <td >
+                                @formaMille($item->prixT * $findVenteDetail->taux ) cdf
+                            </td>
+                        </tr>
+                    @endforeach
+                @endif
             <tr class="separated">
                 <td colspan="3">Paiement</td>
             </tr>
@@ -204,11 +240,10 @@
         </table>
     </div>
     <div class="invoice-footer">
-        
         <p>
             Merci pour votre achat ! <br>
-            Les marchandises vendue sont ni reprises ni échangées!<br>
-            1 mois de garentie pour les ordinateurs, celle-ci n'inclut pas le display et chargeur!
+            <!-- Les marchandises vendue sont ni reprises ni échangées!<br> -->
+            1 mois de garentie et celle-ci n'inclut pas le display et chargeur!
         </p>
         <p class="imprime"> imprimer par {{Auth::user()->name ." ".Auth::user()->postnom ." ".Auth::user()->prenom}}</p>
     </div>

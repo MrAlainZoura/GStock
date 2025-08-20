@@ -187,6 +187,8 @@ class CompassassionController extends Controller
              if($createCompassassion){
                 // $createPaie= Paiement::create($data);
                 $routeParam = 56745264509*$vente->id;
+                $routeParam = ["vente"=>56745264509*$vente->id, "depot"=>$vente->depot_id];
+
                 return to_route('venteShow',$routeParam);
             }
 

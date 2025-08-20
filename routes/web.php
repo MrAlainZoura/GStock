@@ -46,10 +46,10 @@ Route::get('transfert/{transfert}/edit', [TransfertController::class,'edit'])->n
 Route::delete('transfert/{transfert}/delete', [TransfertController::class,'destroy'])->name('transDelete')->middleware( AuthentifyMiddleware::class);
 
 Route::get('vente/{depot}/{depot_id}', [VenteController::class,'showDepotVente'])->name('venteDepot')->middleware( AuthentifyMiddleware::class);
-Route::get('vente/{depot}/supprimer', [VenteController::class,'venteTrashed'])->name('venteTrashed')->middleware( AuthentifyMiddleware::class);
+Route::get('vente/{depot_id}/supprimer/{depot}', [VenteController::class,'venteTrashed'])->name('venteTrashed')->middleware( AuthentifyMiddleware::class);
 Route::get('vente/{depot}/create/{depot_id}', [VenteController::class,'create'])->name('venteCreate')->middleware( AuthentifyMiddleware::class);
 Route::post('vente/{depot}/store', [VenteController::class,'store'])->name('venteStore')->middleware( AuthentifyMiddleware::class);
-Route::get('vente/{vente}/show', [VenteController::class,'show'])->name('venteShow')->middleware( AuthentifyMiddleware::class);
+Route::get('vente/{vente}/show/{depot}', [VenteController::class,'show'])->name('venteShow')->middleware( AuthentifyMiddleware::class);
 Route::get('vente/{vente}/edit', [VenteController::class,'edit'])->name('venteEdit')->middleware( AuthentifyMiddleware::class);
 Route::delete('vente/{vente}/delete', [VenteController::class,'destroy'])->name('venteDelete')->middleware( AuthentifyMiddleware::class);
 Route::delete('vente/{vente}/delete-force', [VenteController::class,'forcedelete'])->name('forcedelete')->middleware( AuthentifyMiddleware::class);
@@ -72,7 +72,7 @@ Route::get('{depot}/produits', [DepotController::class, 'showProduit'])->name("s
 Route::put('{depot}/{devise}/update', [DeviseController::class, 'update'])->name("devise.update")->middleware(AuthentifyMiddleware::class);
 
 Route::post('import_produit',[ ProduitController::class, 'importProduitExcel'])->name('import_prod_excel')->middleware(AuthentifyMiddleware::class);
-Route::get('vente/creances/{depot}', [PaiementController::class,'creance'])->name('creanceDepot')->middleware( AuthentifyMiddleware::class);
+Route::get('vente/creances/{depot}/{depot_id}', [PaiementController::class,'creance'])->name('creanceDepot')->middleware( AuthentifyMiddleware::class);
 Route::post('vente/creances/{vente}', [PaiementController::class,'store'])->name('creanceStore')->middleware( AuthentifyMiddleware::class);
 Route::resource('paiement',PaiementController::class)->middleware(AuthentifyMiddleware::class);
 Route::resource('depot', DepotController::class)->middleware(AuthentifyMiddleware::class);

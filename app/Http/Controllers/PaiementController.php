@@ -86,13 +86,14 @@ class PaiementController extends Controller
         //
     }
 
-    public function creance($depot){
+    public function creance($depot, $id){
+        // dd($depot, $id, "creance");
+        // if(session('depot') === null){
+        //     return to_route('dashboard');
+        // }
+        $id = $id/13;
 
-        if(session('depot') === null){
-            return to_route('dashboard');
-        }
-
-        $depot = Depot::where('libele', $depot)->where('id', session('depot_id'))->first();
+        $depot = Depot::where('libele', $depot)->where('id', $id)->first();
         $depotId = $depot->id;
         $depotCreance = Vente::with(['client', 'venteProduit']) 
                         ->whereHas('paiement', function ($query) {
