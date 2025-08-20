@@ -43,7 +43,7 @@
             @include('composant.rapportTableResume',['data'=> $prodArrayResume])
     </section>
 
-    @include('composant.sidebar',['depot'=> session('depot'), 'depot_id'=> session('depot_id')])
+    @include('composant.sidebar',['depot'=> $depot->libele, 'depot_id'=> $depot->id])
     @endsection
 
 

@@ -88,94 +88,198 @@ if($findVenteDetail->user != null){
                 
             </div>
             <div class="mx-auto mt-10 grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 border-t border-gray-200 pt-10 sm:mt-16 sm:pt-16 lg:mx-0 lg:max-w-none ">
-            
-                              
-
-                <div class="relative max-w-md">
-                    <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                        <thead class="text-xs text-gray-700 uppercase bg-gray-100 dark:bg-gray-700 dark:text-gray-400">
+            @if($findVenteDetail->compassassion->count() >0)
+                    <div class="relative max-w-md">
+                        <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                            <thead class="text-xs text-gray-700 uppercase bg-gray-100 dark:bg-gray-700 dark:text-gray-400">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 rounded-s-lg">
+                                        Produit
+                                    </th>
+                                    <th scope="col" class="px-6 py-3">
+                                        Qté
+                                    </th>
+                                    <th scope="col" class="px-6 py-3 rounded-e-lg">
+                                        Prix
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            @foreach ( $findVenteDetail->compassassion as $item)  
+                                <tr class="bg-white dark:bg-gray-800">
+                                    <th scope="row" class="px-3 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                        {{$item->produit->marque->libele}} 
+                                        {{$item->produit->libele}}<br>
+                                        <!-- {{$item->produit->etat}} -->
+                                    </th>
+                                    <td class="px-3 py-2">
+                                    {{$item->quantite}} pc
+                                    </td>
+                                    <td class="px-3 py-2">
+                                    @formaMille($item->prixT)  {{$findVenteDetail->devise}}
+                                    </td>
+                                </tr>
+                            @endforeach
                             <tr>
-                                <th scope="col" class="px-6 py-3 rounded-s-lg">
-                                    Produit
-                                </th>
-                                <th scope="col" class="px-6 py-3">
-                                    Qté
-                                </th>
-                                <th scope="col" class="px-6 py-3 rounded-e-lg">
-                                    Prix
-                                </th>
+                                <th colspan="3" class="text-gray-900 text-base ">Article vente précédente</th>
+                                @foreach ( $findVenteDetail->venteProduit as $item)  
+                                    <tr class="bg-white dark:bg-gray-800">
+                                        <th scope="row" class="px-3 py-2 font-medium text-gray-600 whitespace-nowrap dark:text-white">
+                                            {{$item->produit->marque->libele}} 
+                                            {{$item->produit->libele}}<br>
+                                            <!-- {{$item->produit->etat}} -->
+                                        </th>
+                                        <td class="px-3 py-2">
+                                        {{$item->quantite}} pc
+                                        </td>
+                                        <td class="px-3 py-2">
+                                        @formaMille($item->prixT)  {{$findVenteDetail->devise}}
+                                        </td>
+                                    </tr>
+                                @endforeach
                             </tr>
-                        </thead>
-                        <tbody>
-                        @foreach ( $findVenteDetail->venteProduit as $item)  
-                            <tr class="bg-white dark:bg-gray-800">
-                                <th scope="row" class="px-3 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                    {{$item->produit->marque->libele}} 
-                                    {{$item->produit->libele}}<br>
-                                    {{$item->produit->etat}}
-                                </th>
-                                <td class="px-3 py-2">
-                                {{$item->quantite}} pc
-                                </td>
-                                <td class="px-3 py-2">
-                                @formaMille($item->prixT)  {{$findVenteDetail->devise}}
-                                </td>
-                            </tr>
-                        @endforeach
-                        </tbody>
-                        <tfoot>
-                            <tr class="font-semibold text-gray-900 dark:text-white">
-                                <th scope="row" class="px-4 py-3 text-base">Total</th>
-                                <td class="px-3 py-3">
-                                  {{$quantite}}
-                                   pc
-                                </td>
-                                <td class="px-3 py-3">({{$findVenteDetail->devise}}) @formaMille($netPaye) <br>
-                                    (cdf) @formaMille($netPaye *$findVenteDetail->taux)
-                                </td>
-                            </tr>
-                            
-                        </tfoot>
-                    </table>
-                    
-                    
-                @if($findVenteDetail->paiement !=null)
-                    <div class="w-full pt-5 text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                        <div>
-                            <div class="grid grid-cols-4 p-1 text-sm font-medium text-gray-900 bg-gray-100 border-t border-b border-gray-200 gap-2 dark:bg-gray-800 dark:border-gray-700 dark:text-white">
-                                <div class="flex items-center">Date</div>
-                                <div>Versement</div>
-                                <div>Reste</div>
-                                <div>Soldé</div>
+                            </tbody>
+                            <tfoot>
+                                <tr class="font-semibold text-gray-900 dark:text-white">
+                                    <th scope="row" class="px-4 py-3 text-base">Total</th>
+                                    <td class="px-3 py-3">
+                                      {{$quantite}}
+                                       pc
+                                    </td>
+                                    <td class="px-3 py-3">({{$findVenteDetail->devise}}) @formaMille($netPaye) <br>
+                                        (cdf) @formaMille($netPaye *$findVenteDetail->taux)
+                                    </td>
+                                </tr>
+                                
+                            </tfoot>
+                        </table>
+                        
+                        
+                    @if($findVenteDetail->paiement !=null)
+                        <div class="w-full pt-5 text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                            <div>
+                                <div class="grid grid-cols-4 p-1 text-sm font-medium text-gray-900 bg-gray-100 border-t border-b border-gray-200 gap-2 dark:bg-gray-800 dark:border-gray-700 dark:text-white">
+                                    <div class="flex items-center">Date</div>
+                                    <div>Versement</div>
+                                    <div>Reste</div>
+                                    <div>Soldé</div>
+                                </div>
+                                
+                                @foreach($findVenteDetail->paiement as $cl=>$val)
+                                <div class="grid grid-cols-4  py-5 text-sm text-gray-700 border-b border-gray-200 gap-x-3 dark:border-gray-700">
+                                    <div class="text-gray-500 dark:text-gray-400">{{$val->created_at}}</div>
+                                    <div>
+                                       {{$val->avance}}
+                                    </div>
+                                    <div>
+                                        {{$val->solde}}
+                                    </div>
+                                    <div>
+                                        @if($val->completed==false)
+                                        <svg class="w-3 h-3 text-red-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                                        </svg>
+                                        @else
+                                        <svg class="w-3 h-3 text-green-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 12">
+                                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5.917 5.724 10.5 15 1.5"/>
+                                        </svg>
+                                        @endif
+                                    </div>
+                                </div>
+                                  @endforeach                          
                             </div>
-                            
-                            @foreach($findVenteDetail->paiement as $cl=>$val)
-                            <div class="grid grid-cols-4  py-5 text-sm text-gray-700 border-b border-gray-200 gap-x-3 dark:border-gray-700">
-                                <div class="text-gray-500 dark:text-gray-400">{{$val->created_at}}</div>
-                                <div>
-                                   {{$val->avance}}
-                                </div>
-                                <div>
-                                    {{$val->solde}}
-                                </div>
-                                <div>
-                                    @if($val->completed==false)
-                                    <svg class="w-3 h-3 text-red-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
-                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
-                                    </svg>
-                                    @else
-                                    <svg class="w-3 h-3 text-green-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 12">
-                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5.917 5.724 10.5 15 1.5"/>
-                                    </svg>
-                                    @endif
-                                </div>
-                            </div>
-                              @endforeach                          
                         </div>
+    
+                    @endif
                     </div>
+            @else
 
-                @endif
+            <div class="relative max-w-md">
+                <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                    <thead class="text-xs text-gray-700 uppercase bg-gray-100 dark:bg-gray-700 dark:text-gray-400">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 rounded-s-lg">
+                                Produit
+                            </th>
+                            <th scope="col" class="px-6 py-3">
+                                Qté
+                            </th>
+                            <th scope="col" class="px-6 py-3 rounded-e-lg">
+                                Prix
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @foreach ( $findVenteDetail->venteProduit as $item)  
+                        <tr class="bg-white dark:bg-gray-800">
+                            <th scope="row" class="px-3 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                {{$item->produit->marque->libele}} 
+                                {{$item->produit->libele}}<br>
+                                {{$item->produit->etat}}
+                            </th>
+                            <td class="px-3 py-2">
+                            {{$item->quantite}} pc
+                            </td>
+                            <td class="px-3 py-2">
+                            @formaMille($item->prixT)  {{$findVenteDetail->devise}}
+                            </td>
+                        </tr>
+                    @endforeach
+                    </tbody>
+                    <tfoot>
+                        <tr class="font-semibold text-gray-900 dark:text-white">
+                            <th scope="row" class="px-4 py-3 text-base">Total</th>
+                            <td class="px-3 py-3">
+                              {{$quantite}}
+                               pc
+                            </td>
+                            <td class="px-3 py-3">({{$findVenteDetail->devise}}) @formaMille($netPaye) <br>
+                                (cdf) @formaMille($netPaye *$findVenteDetail->taux)
+                            </td>
+                        </tr>
+                        
+                    </tfoot>
+                </table>
+                
+                
+            @if($findVenteDetail->paiement !=null)
+                <div class="w-full pt-5 text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                    <div>
+                        <div class="grid grid-cols-4 p-1 text-sm font-medium text-gray-900 bg-gray-100 border-t border-b border-gray-200 gap-2 dark:bg-gray-800 dark:border-gray-700 dark:text-white">
+                            <div class="flex items-center">Date</div>
+                            <div>Versement</div>
+                            <div>Reste</div>
+                            <div>Soldé</div>
+                        </div>
+                        
+                        @foreach($findVenteDetail->paiement as $cl=>$val)
+                        <div class="grid grid-cols-4  py-5 text-sm text-gray-700 border-b border-gray-200 gap-x-3 dark:border-gray-700">
+                            <div class="text-gray-500 dark:text-gray-400">{{$val->created_at}}</div>
+                            <div>
+                               {{$val->avance}}
+                            </div>
+                            <div>
+                                {{$val->solde}}
+                            </div>
+                            <div>
+                                @if($val->completed==false)
+                                <svg class="w-3 h-3 text-red-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                                </svg>
+                                @else
+                                <svg class="w-3 h-3 text-green-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 12">
+                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5.917 5.724 10.5 15 1.5"/>
+                                </svg>
+                                @endif
+                            </div>
+                        </div>
+                          @endforeach                          
+                    </div>
                 </div>
+
+            @endif
+            </div>
+            @endif
             </div>
         </div>
     </section>

@@ -35,6 +35,9 @@ class Vente extends Model
     public function venteProduit(){
         return $this->hasMany(VenteProduit::class);
     }
+    public function compassassion(){
+        return $this->hasMany(Compassassion::class);
+    }
     public function paiement(){
         return $this->hasMany(Paiement::class);
     }
