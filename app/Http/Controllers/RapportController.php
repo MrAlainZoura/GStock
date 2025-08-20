@@ -21,12 +21,15 @@ use Illuminate\Support\Facades\View;
 
 class RapportController extends Controller
 {
-    public function journalier($depot){
+    public function journalier($depot, $id){
+        // dd($depot, $id, "journalier");
 
         $today = Carbon::now()->format('Y-m-d');
         
-        $depot = Depot::where('libele',$depot)->first();
-
+        $depot = Depot::where('libele',$depot)->where('id', $id)->first();
+        if(!$depot){
+            return back()->with("echec", "Erreur, impossible de trouver le depot");
+        }
         $approJour = Approvisionnement::orderBy('user_id')->where('depot_id', $depot->id)
                     ->where('created_at','like','%'.$today.'%')
                     ->get();
@@ -75,14 +78,20 @@ class RapportController extends Controller
         });
         // dd($prodArrayResume);
         
-        return view('rapport.journalier', compact ( "approJour", "transJour", "venteJour","prodArrayResume"));
+        return view('rapport.journalier', compact ( "approJour", "transJour", "venteJour","prodArrayResume", "depot"));
     }
-    public function mensuel($depot){
+    public function mensuel($depot, $id){
+        // dd($depot, $id, "mensuel");
+        if(!$depot){
+            return back()->with("echec", "Erreur, impossible de trouver le depot");
+        }
         Carbon::setLocale('fr');
         $mois = Carbon::now()->format('m');
         $year = Carbon::now()->format('Y');
-        $depot = Depot::where('libele',$depot)->where('id', session('depot_id'))->first();
-
+        $depot = Depot::where('libele',$depot)->where('id', $id)->first();
+        if(!$depot){
+            return back()->with("echec", "Erreur, impossible de trouver le depot");
+        }
         $approMois = Approvisionnement::orderBy('user_id')->where('depot_id', $depot->id)
                     ->whereMonth('created_at',$mois)
                     ->get();
@@ -137,12 +146,15 @@ class RapportController extends Controller
         
         $mois = Carbon::now()->isoFormat('MMMM YYYY');;
                         
-        return view('rapport.mensuel', compact ( "approMois", "transMois", "venteMois","mois","prodArrayResume"));
+        return view('rapport.mensuel', compact ( "approMois", "transMois", "venteMois","mois","prodArrayResume", "depot"));
     }
-    public function annuel($depot){
+    public function annuel($depot, $id){
+        // dd($depot, $id, "annuel");
         $year = Carbon::now()->format('Y');
-        $depot = Depot::where('libele',$depot)->where('id', session('depot_id'))->first();
-
+        $depot = Depot::where('libele',$depot)->where('id', $id)->first();
+        if(!$depot){
+            return back()->with("echec", "Erreur, impossible de trouver le depot");
+        }
         $approAn = Approvisionnement::orderBy('user_id')->where('depot_id', $depot->id)
                     ->whereYear('created_at',$year)
                     ->get();
@@ -211,7 +223,7 @@ class RapportController extends Controller
         }
         // dd( $compte);
         // die('vue sur les differents depot');
-        return view('rapport.annuel', compact ( "approAn", "transAn", "venteAn","year","prodArrayResume"));
+        return view('rapport.annuel', compact ( "approAn", "transAn", "venteAn","year","prodArrayResume", "depot"));
     }
 
 

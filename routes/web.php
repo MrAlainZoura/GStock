@@ -59,9 +59,9 @@ Route::get('compassassion/{depot}/{vente_id}/create', [CompassassionController::
 Route::post('compassassion/{depot}/store', [CompassassionController::class,'store'])->name('compStore')->middleware( AuthentifyMiddleware::class);
 
 
-Route::get('rapport/{depot}/journalier', [RapportController::class,'journalier'])->name('rapport.jour')->middleware( AuthentifyMiddleware::class);
-Route::get('rapport/{depot}/mensuel', [RapportController::class,'mensuel'])->name('rapport.mois')->middleware( AuthentifyMiddleware::class);
-Route::get('rapport/{depot}/annuel', [RapportController::class,'annuel'])->name('rapport.annee')->middleware( AuthentifyMiddleware::class);
+Route::get('rapport/{depot}/journalier/{id}', [RapportController::class,'journalier'])->name('rapport.jour')->middleware( AuthentifyMiddleware::class);
+Route::get('rapport/{depot}/mensuel/{id}', [RapportController::class,'mensuel'])->name('rapport.mois')->middleware( AuthentifyMiddleware::class);
+Route::get('rapport/{depot}/annuel/{id}', [RapportController::class,'annuel'])->name('rapport.annee')->middleware( AuthentifyMiddleware::class);
 Route::get('rapport/{depot}/voir-plus/{action}', [RapportController::class,'seemore'])->name('rapport.more')->middleware( AuthentifyMiddleware::class);
 Route::get('rapport/{vente}/facture/{action}', [RapportController::class,'facture'])->name('facturePDF')->middleware( AuthentifyMiddleware::class);
 Route::get('rapport/{depot}/mail', [RapportController::class,'sendMailrapport'])->name('sendMailrapport')->middleware( AuthentifyMiddleware::class);
