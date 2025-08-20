@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Compassassion extends Model
 {
+    use SoftDeletes;
     protected $fillable=[
         'produit_id',
         'vente_id',

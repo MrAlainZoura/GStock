@@ -47,16 +47,19 @@ class Vente extends Model
         static::deleting(function ($vente) {
             $vente->venteProduit()->delete();
             $vente->paiement()->delete();
+            $vente->compassassion()->delete();
         });
 
         static::restoring(function ($vente) {
             $vente->venteProduit()->onlyTrashed()->restore();
             $vente->paiement()->onlyTrashed()->restore();
+            $vente->compassassion()->onlyTrashed()->restore();
         });
 
         static::forceDeleting(function ($vente) {
             $vente->venteProduit()->withTrashed()->forceDelete();
             $vente->paiement()->withTrashed()->forceDelete();
+            $vente->compassassion()->withTrashed()->forceDelete();
         });
 
     }
