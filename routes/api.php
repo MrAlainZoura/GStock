@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\api\ProduitDepotController;
 use App\Http\Controllers\CategorieController;
 use App\Http\Controllers\DepotController;
 use App\Http\Controllers\MarqueController;
@@ -19,3 +20,4 @@ Route::apiResource('depots',DepotController::class);
 Route::apiResource('categorie',CategorieController::class);
 Route::apiResource('marque',MarqueController::class);
 Route::apiResource('produits',ProduitController::class);
+Route::put("produit-depot-doublon", [ProduitDepotController::class, 'doublon']);
