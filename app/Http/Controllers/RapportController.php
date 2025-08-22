@@ -278,8 +278,8 @@ class RapportController extends Controller
         // dd($findVenteDetail->taux);
         $code = str_replace('/', '-', $findVenteDetail->code);
         $facture = ($findVenteDetail->user != null)
-            ? "facture ".$findVenteDetail->user->name." ".$findVenteDetail->created_at." ".$code .".pdf"
-            : "facture "." ".$findVenteDetail->created_at." ".$code .".pdf";
+            ? "facture ".$findVenteDetail->user->name." ".$findVenteDetail->created_at." ".$code ."-".$findVenteDetail->client->name." ".$findVenteDetail->client->tel.".pdf"
+            : "facture "." ".$findVenteDetail->created_at." ".$code."-".$findVenteDetail->client->name." ".$findVenteDetail->client->tel.".pdf";
       
         // $customPaper = array(0, 0, 227, 600); // (gauche, haut, droite, bas)
         // $pdf = Pdf::loadView('vente.fact', $data);
@@ -452,6 +452,8 @@ class RapportController extends Controller
     public function sendMailrapport($depot){
         $depot_id = $depot/123;
         $getDepot = Depot::find($depot_id);
+         $pdf = $this->genererPDF($depot_id);
+        $today = Carbon::now()->format('Y-m-d');
         // dd($getDepot, $depot_id);
         if($getDepot != null){
             // dd($getDepot->user->email);
@@ -459,13 +461,16 @@ class RapportController extends Controller
             $user = Auth::user()->email;
             $sendMailRapport = $this->rapport_send_mail($to,$getDepot->libele,$getDepot->id);
             if($sendMailRapport->getData()->status == true){
-                if($to !== $user){
-                    $sendMailRapportUser = $this->rapport_send_mail($user,$getDepot->libele,$getDepot->id);
-                   return ($sendMailRapportUser->getData()->status==true) 
-                        ?  back()->with('success',"Email envoyé avec succes à l'administrateur et à $user!")
-                        :  back()->with('success',"Email envoyé avec succes à l'administrateur et  échec à $user!");
-                }
-                return back()->with('success',"Email envoyé avec succes à l'administrateur!");
+                $rapportDwl= 'rapport_' . $today."_$getDepot->libele" . '.pdf';
+                return $pdf->download($rapportDwl);
+
+                // if($to !== $user){
+                //     $sendMailRapportUser = $this->rapport_send_mail($user,$getDepot->libele,$getDepot->id);
+                //    return ($sendMailRapportUser->getData()->status==true) 
+                //         ?  back()->with('success',"Email envoyé avec succes à l'administrateur et à $user!")
+                //         :  back()->with('success',"Email envoyé avec succes à l'administrateur et  échec à $user!");
+                // }
+                // return back()->with('success',"Email envoyé avec succes à l'administrateur!");
             }
             return back()->with('echec',"Email non envoyé, adresse mail invalide << $to >>!");
             // dd($sendMailRapport->getData()->status);
