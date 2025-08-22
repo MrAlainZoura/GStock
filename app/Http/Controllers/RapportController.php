@@ -25,7 +25,6 @@ class RapportController extends Controller
         // dd($depot, $id, "journalier");
 
         $today = Carbon::now()->format('Y-m-d');
-        
         $depot = Depot::where('libele',$depot)->where('id', $id)->first();
         if(!$depot){
             return back()->with("echec", "Erreur, impossible de trouver le depot");
@@ -206,21 +205,21 @@ class RapportController extends Controller
         // $envoiMail=$this->rapport_send_mail('mukendiluabeya034@gmail.com',$depot->libele,$depot->id);
         // dd($envoiMail, $envoiMail->getData()->status, $envoiMail->original['status']);
        
-        $userRoles = UserRole::whereHas('role', function ($query) {
-            $query->whereIn('libele', ['Super admin', 'Administrateur']);
-            })
-        ->with(['user.depot'])
-        ->get();
-        $compte =0;
-        foreach( $userRoles as $userRole ) {
-            // $to = $userRole->user->email;
-            $to = "a.tshiyanze@gmail.com";
-            foreach($userRole->user->depot as $depot ) {
-                // dd($depot->id);
-                $envoiMail=$this->rapport_send_mail($to,$depot->libele,$depot->id);
-            }
+        // $userRoles = UserRole::whereHas('role', function ($query) {
+        //     $query->whereIn('libele', ['Super admin', 'Administrateur']);
+        //     })
+        // ->with(['user.depot'])
+        // ->get();
+        // $compte = 0;
+        // foreach( $userRoles as $userRole ) {
+        //     // $to = $userRole->user->email;
+        //     $to = "a.tshiyanze@gmail.com";
+        //     foreach($userRole->user->depot as $depot ) {
+        //         // dd($depot->id);
+        //         $envoiMail=$this->rapport_send_mail($to,$depot->libele,$depot->id);
+        //     }
 
-        }
+        // }
         // dd( $compte);
         // die('vue sur les differents depot');
         return view('rapport.annuel', compact ( "approAn", "transAn", "venteAn","year","prodArrayResume", "depot"));
@@ -279,8 +278,8 @@ class RapportController extends Controller
         // dd($findVenteDetail->taux);
         $code = str_replace('/', '-', $findVenteDetail->code);
         $facture = ($findVenteDetail->user != null)
-            ? "facture ".$findVenteDetail->user->name." ".$findVenteDetail->created_at." ".$code .".pdf"
-            : "facture "." ".$findVenteDetail->created_at." ".$code .".pdf";
+            ? "facture ".$findVenteDetail->user->name." ".$findVenteDetail->created_at." ".$code ."-".$findVenteDetail->client->name." ".$findVenteDetail->client->tel.".pdf"
+            : "facture "." ".$findVenteDetail->created_at." ".$code."-".$findVenteDetail->client->name." ".$findVenteDetail->client->tel.".pdf";
       
         // $customPaper = array(0, 0, 227, 600); // (gauche, haut, droite, bas)
         // $pdf = Pdf::loadView('vente.fact', $data);
@@ -345,6 +344,8 @@ class RapportController extends Controller
     {
         
         $today = Carbon::now()->format('Y-m-d');
+        $mois = Carbon::now()->format('m');
+
         
         $depot = Depot::where('id',$id)->first();
 
@@ -357,6 +358,13 @@ class RapportController extends Controller
         $venteJour = Vente::orderBy('user_id')->where('depot_id', $depot->id)
                         ->where('created_at','like','%'.$today.'%')
                         ->get();
+        $vendeurs = Vente::selectRaw('user_id, COUNT(*) as count, depot_id')
+                    ->groupBy('user_id', 'depot_id')
+                    ->orderByDesc('count')
+                    ->whereMonth('created_at', (int)$mois)
+                    ->where('depot_id', $depot->id)
+                    // ->take(2)
+                    ->get();
                 //resume stock chaque produit
         $prodArrayResume = [];
         $allProdDepot = ProduitDepot::where('depot_id', $depot->id)->with('produit','produit.marque', 'produit.marque.categorie')->get();
@@ -400,7 +408,7 @@ class RapportController extends Controller
             return $restCompare;
         });
         // dd($prodArrayResume);
-        $rapport = ['approvisionnement'=>$approJour, 'transfert'=>$transJour, 'vente'=>$venteJour, 'resumeProduit'=>$prodArrayResume];
+        $rapport = ['approvisionnement'=>$approJour, 'transfert'=>$transJour, 'vente'=>$venteJour, 'resumeProduit'=>$prodArrayResume, 'vendeurs'=>$vendeurs];
         // Générer le PDF à partir de la vue
         $pdf = Pdf::loadView('mail.rapport', ['rapport' => $rapport]);
 
@@ -417,8 +425,7 @@ class RapportController extends Controller
     try {
         $pdf = $this->genererPDF($depot_id);
         $user = Auth::user();
-        $name = "$user->name $user->postnom $user->prenom";
-
+        $name = $user ? "{$user->name} {$user->postnom} {$user->prenom}" : "System automatique";
         Mail::send([], [], function ($message) use ($pdf, $to,$today, $depot, $name) {
             $message->to($to)
                     ->subject('Rapport journalier '. $today ." $depot")
@@ -445,6 +452,8 @@ class RapportController extends Controller
     public function sendMailrapport($depot){
         $depot_id = $depot/123;
         $getDepot = Depot::find($depot_id);
+         $pdf = $this->genererPDF($depot_id);
+        $today = Carbon::now()->format('Y-m-d');
         // dd($getDepot, $depot_id);
         if($getDepot != null){
             // dd($getDepot->user->email);
@@ -452,13 +461,16 @@ class RapportController extends Controller
             $user = Auth::user()->email;
             $sendMailRapport = $this->rapport_send_mail($to,$getDepot->libele,$getDepot->id);
             if($sendMailRapport->getData()->status == true){
-                if($to !== $user){
-                    $sendMailRapportUser = $this->rapport_send_mail($user,$getDepot->libele,$getDepot->id);
-                   return ($sendMailRapportUser->getData()->status==true) 
-                        ?  back()->with('success',"Email envoyé avec succes à l'administrateur et à $user!")
-                        :  back()->with('success',"Email envoyé avec succes à l'administrateur et  échec à $user!");
-                }
-                return back()->with('success',"Email envoyé avec succes à l'administrateur!");
+                $rapportDwl= 'rapport_' . $today."_$getDepot->libele" . '.pdf';
+                return $pdf->download($rapportDwl);
+
+                // if($to !== $user){
+                //     $sendMailRapportUser = $this->rapport_send_mail($user,$getDepot->libele,$getDepot->id);
+                //    return ($sendMailRapportUser->getData()->status==true) 
+                //         ?  back()->with('success',"Email envoyé avec succes à l'administrateur et à $user!")
+                //         :  back()->with('success',"Email envoyé avec succes à l'administrateur et  échec à $user!");
+                // }
+                // return back()->with('success',"Email envoyé avec succes à l'administrateur!");
             }
             return back()->with('echec',"Email non envoyé, adresse mail invalide << $to >>!");
             // dd($sendMailRapport->getData()->status);

@@ -37,8 +37,13 @@
     @php
         $recette =0;
         $recetteFc = 0;
+        $depotLiebele ="";
+        if (count( $rapport['vendeurs']) >0) {
+          $depotLiebele = $rapport['vendeurs'][0]->depot->libele;
+        }
+    
     @endphp
-  <h2>Tableau de vente </h2>
+  <h2>Tableau de vente {{ $depotLiebele }} </h2>
   <table class="table-style">
     <thead>
       <tr class="header-row">
@@ -47,7 +52,7 @@
         <th>Quantité</th>
         <th>Taux vente</th>
         <th>Montant</th>
-        <th>Lieu</th>
+        <!-- <th>Lieu</th> -->
         <th>Vendeur</th>
       </tr>
     </thead>
@@ -56,7 +61,8 @@
             @foreach ($vV->venteProduit as $kP=>$vP )
             <tr>
               <td>
-                {{$vP->vente->code}}
+                {{$vP->vente->code}} <br>
+                {{$vP->vente->created_at}}
               </td>
               <td>
                 {{$vP->produit->marque->categorie->libele }} {{$vP->produit->marque->libele }} {{$vP->produit->libele }} 
@@ -76,14 +82,13 @@
                 <!-- {{$vV->updateTaux}}Fc -->
               </td>
               <td>
-                {{ $vV->type }}
-              </td>
-              <td>
                 @if($vV->user_id != null)
                     {{$vV->user->name ." ".$vV->user->prenom}}
                 @else
                     Utilisateur Suspendu
                 @endif
+                <br>
+                # {{ $vV->type }}
               </td>
             </tr>
             @endforeach
@@ -106,11 +111,32 @@
         </tr>
     </tfoot>
   </table>        
-  <h2>Tableau de resumé de stock produit </h2>
+  <h2>Tableau Classement Vendeur du mois {{ $depotLiebele }}</h2>
+
   <table class="table-style">
     <thead>
       <tr class="header-row">
-        <th>Libele</th>
+        <th>N°</th>
+        <th>Nom complet</th>
+        <th>Vente</th>
+      </tr>
+    </thead>
+    <tbody>
+        @foreach ($rapport['vendeurs'] as $kl=>$vendeur)
+            <tr>
+              <td>{{$kl+1}}</td>
+              <td>{{$vendeur->user->name}} {{$vendeur->user->postnom}} {{$vendeur->user->prenom}} </td>
+              <td> {{$vendeur->count}}</td>
+            </tr>
+        @endforeach        
+    </tbody>
+   
+  </table> 
+  <h2>Tableau de resumé de stock produit {{ $depotLiebele }}</h2>
+  <table class="table-style">
+    <thead>
+      <tr class="header-row">
+        <th>#. Libele</th>
         <th>Categorie</th>
         <th>Entrée</th>
         <th>Transf</th>
@@ -121,7 +147,7 @@
     <tbody>
         @foreach ($rapport['resumeProduit'] as $k=>$v)
             <tr>
-              <td>{{$v['libele']}}</td>
+              <td>{{ $k+1 }}. {{$v['libele']}}</td>
               <td>{{$v['cat']}}</td>
               <td> {{$v['enter']}}</td>
               <td>{{$v['trans']}}</td>
