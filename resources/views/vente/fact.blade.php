@@ -107,13 +107,21 @@
                 @endif
             </div>
         <h3>Détails de la Vente</h3>
-        <h3>Ets. Ujisha</h3>
+        <h3>{{ $findVenteDetail->depot->cpostal }}</h3>
+        <!-- <h3>Ets. Ujisha</h3> -->
         <div class="idnat">
-            RCCM:KNG/RCCM/22-A-01256 ID.NAT : <br> 01-G4701-N998728, N.Impot: A23119069 <br>
+            {{ $findVenteDetail->depot->idNational }}
+            {{ $findVenteDetail->depot->numImpot }} <br>
+
+            ***
+               Adresse: {{ $findVenteDetail->depot->avenue}}
+            *** <br>
+            Phone : {{ $findVenteDetail->depot->contact }} {{ $findVenteDetail->depot->contact1 }}
+            <!-- RCCM:KNG/RCCM/22-A-01256 ID.NAT : <br> 01-G4701-N998728, N.Impot: A23119069 <br>
             ***
             Adresse: Croisement Des Avenues Kasongolunda N°292 Et 24 Novembre (Liberation) Ref :Station KYONDO OIL en face de l'académie de beaux-arts. Kinshasa, RDC.
             ***  <br>
-            Phone: +243822109929, +243808400183 <br>
+            Phone: +243822109929, +243808400183 <br> -->
             <!-- Contact@ujisha.com -->
         </div>
         <div class="sansInterligne">
@@ -125,7 +133,7 @@
                     {{$findVenteDetail->user->postnom}}
                 @endif
             </p>
-            <p class="left">Date : {{ $findVenteDetail->created_at }}</p>
+            <p class="left">Date : {{ $findVenteDetail->created_at }}, {{ $findVenteDetail->depot->ville }}</p>
             <p class="left">Client : {{ $findVenteDetail->client->name }} {{ $findVenteDetail->client->tel }}</p>
             <p class="left">Numéro de Facture : {{ $findVenteDetail->code }}</p>
         </div>
@@ -242,8 +250,9 @@
     <div class="invoice-footer">
         <p>
             Merci pour votre achat ! <br>
+            {{ $findVenteDetail->depot->autres }}
             <!-- Les marchandises vendue sont ni reprises ni échangées!<br> -->
-            1 mois de garentie et celle-ci n'inclut pas le display et chargeur!
+            <!-- 1 mois de garentie et celle-ci n'inclut pas le display et chargeur! -->
         </p>
         <p class="imprime"> imprimer par {{Auth::user()->name ." ".Auth::user()->postnom ." ".Auth::user()->prenom}}</p>
     </div>

@@ -53,6 +53,12 @@
                   </div>
                 </div>
                 <div class="col-span-full">
+                  <label for="ets" class="block text-sm/6 font-medium text-gray-900">Entreprise ou Société mère</label>
+                  <div class="mt-2">
+                    <input type="text" id="ets" name="codeP" value="{{ $getDepotInformation->cpostal }}" autocomplete="off" class="block w-1/3 rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6" />
+                  </div>
+                </div>
+                <div class="col-span-full">
                   <label for="photo" class="block text-sm/6 font-medium text-gray-900">Logo</label>
                   <div class="mt-2 flex items-center gap-x-3 ">
                     @if ($getDepotInformation->logo)
@@ -165,20 +171,22 @@
                   </div>
                 </div>
 
-                <div class="sm:col-span-2">
+                <!-- <div class="sm:col-span-2">
                   <label for="postal-code" class="block text-sm/6 font-medium text-gray-900">Code Postal</label>
                   <div class="mt-2">
                     <input type="text" name="codeP" value="{{ $getDepotInformation->cpostal }}" id="postal-code" autocomplete="postal-code" class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6" />
                   </div>
-                </div>
+                </div> -->
               </div>
             </div>
 
             <div class="border-b border-gray-900/10 pb-12">
               <h2 class="text-base/7 font-semibold text-gray-900">Autres détails</h2>
-              <p class="mt-1 text-sm/6 text-gray-600">Information facultative du dépôt qui pourrait servir maintenant ou plus tard.</p>
+              <p class="mt-1 text-sm/6 text-gray-600">Information facultative du dépôt en bas de a facure pour la garentie.</p>
               <div class="mt-2">
-                    <textarea name="autres" value="{{ $getDepotInformation->autres }}" id="about" rows="3" class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"></textarea>
+                    <textarea name="autres" id="about" rows="3" class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6">
+                      {{ $getDepotInformation->autres }}
+                    </textarea>
               </div>
           
             </div>
