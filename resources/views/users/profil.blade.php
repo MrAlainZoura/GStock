@@ -128,19 +128,35 @@
                     <label  class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Affectation</label>
                     <div class="grid gap-4 sm:grid-cols-2 sm:gap-6">
                         @if(count($depot) > 0)
-                            @foreach ($depot as $k => $v)
-                                @if(in_array($v->libele, $tabAffectation))
-                                    <div class="flex items-center ps-4 border border-gray-200 rounded-sm dark:border-gray-700">
-                                        <input checked id="bordered-checkbox-{{ $v->id }}" type="checkbox" name="affectation[]" value="{{ $v->id }}" name="bordered-checkbox" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                                        <label for="bordered-checkbox-{{ $v->id }}" class="w-full py-4 ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">{{ $v->libele }}</label>
-                                    </div>
-                                    @else
-                                    <div class="flex items-center ps-4 border border-gray-200 rounded-sm dark:border-gray-700">
-                                        <input id="bordered-checkbox-{{ $v->id }}" type="checkbox" name="affectation[]" value="{{ $v->id }}" name="bordered-checkbox" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                                        <label for="bordered-checkbox-{{ $v->id }}" class="w-full py-4 ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">{{ $v->libele }}</label>
-                                    </div>
-                                @endif
-                            @endforeach
+                            @if (Auth::user()->user_role->role->libele=='Administrateur' || Auth::user()->user_role->role->libele=='Super admin')
+                                @foreach ($depot as $k => $v)
+                                    @if(in_array($v->libele, $tabAffectation))
+                                        <div class="flex items-center ps-4 border border-gray-200 rounded-sm dark:border-gray-700">
+                                            <input checked id="bordered-checkbox-{{ $v->id }}" type="checkbox" name="affectation[]" value="{{ $v->id }}" name="bordered-checkbox" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                            <label for="bordered-checkbox-{{ $v->id }}" class="w-full py-4 ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">{{ $v->libele }}</label>
+                                        </div>
+                                        @else
+                                        <div class="flex items-center ps-4 border border-gray-200 rounded-sm dark:border-gray-700">
+                                            <input id="bordered-checkbox-{{ $v->id }}" type="checkbox" name="affectation[]" value="{{ $v->id }}" name="bordered-checkbox" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                            <label for="bordered-checkbox-{{ $v->id }}" class="w-full py-4 ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">{{ $v->libele }}</label>
+                                        </div>
+                                    @endif
+                                @endforeach
+                            @else 
+                                @foreach ($depot[0] as $k => $v)
+                                    @if(in_array($v->depot->libele, $tabAffectation))
+                                        <div class="flex items-center ps-4 border border-gray-200 rounded-sm dark:border-gray-700">
+                                            <input checked id="bordered-checkbox-{{ $v->id }}" type="checkbox" name="affectation[]" value="{{ $v->depot->id }}" name="bordered-checkbox" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                            <label for="bordered-checkbox-{{ $v->id }}" class="w-full py-4 ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">{{ $v->depot->libele }}</label>
+                                        </div>
+                                        @else
+                                        <div class="flex items-center ps-4 border border-gray-200 rounded-sm dark:border-gray-700">
+                                            <input id="bordered-checkbox-{{ $v->id }}" type="checkbox" name="affectation[]" value="{{ $v->id }}" name="bordered-checkbox" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                            <label for="bordered-checkbox-{{ $v->id }}" class="w-full py-4 ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">{{ $v->depot->libele }}</label>
+                                        </div>
+                                    @endif
+                                @endforeach
+                            @endif
                         @endif
                     </div>
                 </div>

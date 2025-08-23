@@ -170,10 +170,13 @@ class UserController extends Controller
         //     preg_replace('/[0-9]+/', '', $userEdit),
         //     preg_replace('/[^0-9]/', '', $userEdit)
         // ];
+        if(session('depot') === null){
+            return to_route('dashboard');
+        }
         $id = (int)$userEdit;
         $roleAutorises = ['Administrateur', 'Super admin'];
         if (!in_array(Auth::user()->user_role->role->libele, $roleAutorises)) {
-            $depot[]=Auth::user()->depotUser[0]->depot;
+            $depot[]=Auth::user()->depotUser;
             // dd('user', $depot);
         }else{
             $depot = Auth::user()->depot;
