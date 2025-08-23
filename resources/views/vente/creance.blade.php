@@ -132,7 +132,7 @@
                             <svg class="w-4 h-4 text-green-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 12">
                                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5.917 5.724 10.5 15 1.5"/>
                             </svg>
-                            <a href="{{route('venteShow',56745264509*$key)}}" class="text-blue-600 hover:underline">Soldé</a>
+                            <a href="{{route('venteShow',["vente"=>56745264509*$key, "depot"=>$depot->id*12])}}" class="text-blue-600 hover:underline">Soldé</a>
                         </div>
                         @endif
                     </td>
