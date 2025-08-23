@@ -13,6 +13,9 @@ if($findVenteDetail->user != null){
     $image = null;
 }   
 @endphp
+<div class="alert-success hidden" id="alert">
+    @include('composant.alert_suc', ['message'=>"Impression encours... et Lien copié avec succes, coller le pour le partager!"])
+</div>
 <section class="bg-white py-10 sm:py-16">
         <div class="mx-auto max-w-7xl px-6 lg:px-8">
             <div class="mx-auto max-w-2xl lg:mx-0">
@@ -293,15 +296,17 @@ if($findVenteDetail->user != null){
     // }
     function imprimerPDF(url) {
         if (!url || typeof url !== 'string') {
-            alert('URL invalide. Impossible d’imprimer le document.');
+            console.log('URL invalide. Impossible d’imprimer le document.');
             return;
         }
-
+        navigator.clipboard.writeText(url)
+            .then(() => console.log("Lien copié dans le presse-papiers !"))
+            .catch(() => console.log("Échec de la copie."));
         try {
             const fenetre = window.open(url, '_blank');
 
             if (!fenetre) {
-                alert('Impossible d’ouvrir la fenêtre. Vérifiez si votre navigateur bloque les popups.');
+                console.log('Impossible d’ouvrir la fenêtre. Vérifiez si votre navigateur bloque les popups.');
                 return;
             }
 
@@ -313,27 +318,34 @@ if($findVenteDetail->user != null){
                 try {
                     if (fenetre.closed) {
                         clearInterval(timer);
-                        alert('La fenêtre a été fermée avant le lancement de l’impression.');
+                        console.log('La fenêtre a été fermée avant le lancement de l’impression.');
                         return;
                     }
 
                     if (fenetre.document.readyState === 'complete') {
                         clearInterval(timer);
-                        alert('Impression du document en cours...');
+                        const alert = document.getElementById('alert');
+                        if(alert){
+                            alert.classList.remove('hidden');
+                            setTimeout(() => {
+                            alert.classList.add('hidden');
+                            }, 30000);
+                        }
+                        console.log('Impression du document en cours...');
                         fenetre.print();
                     } else if (++tentatives >= maxTentatives) {
                         clearInterval(timer);
-                        alert('Impression forcée après plusieurs tentatives...');
+                        console.log('Impression forcée après plusieurs tentatives...');
                         fenetre.print();
                     }
                 } catch (e) {
                     clearInterval(timer);
-                    alert('Une erreur est survenue pendant l’impression. Veuillez réessayer.');
+                    console.log('Une erreur est survenue pendant l’impression. Veuillez réessayer.');
                     console.error('Erreur JS :', e.message);
                 }
             }, delay);
         } catch (erreur) {
-            alert('Erreur inattendue. Impossible de lancer l’impression.');
+            console.log('Erreur inattendue. Impossible de lancer l’impression.');
             console.error('Exception JS :', erreur.message);
         }
     }
