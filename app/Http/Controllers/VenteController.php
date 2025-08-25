@@ -301,11 +301,15 @@ class VenteController extends Controller
             // dd($depot->vente, $depot->devise);
            $vente= Vente::where('depot_id', $depot->id)
            ->onlyTrashed()
+           ->orderBy('deleted_at', 'desc')
            ->with([
                 'venteProduit' => function ($query) {
                     $query->withTrashed();
                 },
                 'paiement' => function ($query) {
+                    $query->withTrashed();
+                },
+                'compassassion' => function ($query) {
                     $query->withTrashed();
                 }
             ])->get();
