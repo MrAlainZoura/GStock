@@ -34,6 +34,9 @@ class PaiementController extends Controller
     {
         $id = $vente/8943;
         $getVente = Paiement::where('vente_id', $id)->latest()->first();
+        if(!$getVente){
+            return back()->with('echec', "Impossible de trouver cette vente");
+        }
         $solde = $getVente->solde;
         $versement = $request->paiment;
         $newSolde = $getVente->solde - $versement;
@@ -49,7 +52,7 @@ class PaiementController extends Controller
         if($versement <= $solde){
             $createPaie= Paiement::create($data);
             $routeParam = 56745264509*$createPaie->vente_id;
-            return to_route('venteShow',$routeParam);
+            return to_route('venteShow',['vente'=>$routeParam, "depot"=>$getVente->depot_id*12]);
         }
         return back()->with('echec',"Une erreur s'est produite");    
     }
