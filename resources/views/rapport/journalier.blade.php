@@ -27,7 +27,7 @@
             <h1 class="mb-4 text-xl  tracking-tight leading-none text-gray-900 md:text-xl lg:text-xl dark:text-white">1. VENTE </h1>
         </div>
         
-        @include('composant.rapportTable',['data'=> $venteJour,"period"=>"Recette du jour"])
+        @include('composant.rapportTable',['data'=> $venteJour,"period"=>"Recette du jour", "compassassion"=>$compassassion])
 
         <div class="py-4 px-2 mx-auto max-w-screen-xl text-left lg:py-4">
             <h1 class="mb-4 text-xl  tracking-tight leading-none text-gray-900 md:text-xl lg:text-xl dark:text-white">2. APPROVISIONNEMENT </h1>

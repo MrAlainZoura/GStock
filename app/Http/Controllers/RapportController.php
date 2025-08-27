@@ -29,6 +29,13 @@ class RapportController extends Controller
         if(!$depot){
             return back()->with("echec", "Erreur, impossible de trouver le depot");
         }
+        $compassassion = Vente::whereHas('compassassion', function ($query) use ($today) {
+                $query->where('created_at', 'like', '%' . $today . '%');
+            })
+            ->with(['paiement','venteProduit','compassassion'])
+            ->get();
+        // dd($compassassion[0]->venteProduit, $compassassion[0]->compassassion, $compassassion[0]->paiement, $dernierPaiement = $compassassion[0]->paiement->sortByDesc('created_at')->first(), $compassassion);
+
         $approJour = Approvisionnement::orderBy('user_id')->where('depot_id', $depot->id)
                     ->where('created_at','like','%'.$today.'%')
                     ->get();
@@ -72,12 +79,21 @@ class RapportController extends Controller
             array_push($prodArrayResume,$singleProdResume);
         }
         //tirer le tableau selon ordre decroissant de categorie
+        // usort($prodArrayResume, function ($a, $b) {
+        //     return strcmp($b['cat'], $a['cat']);
+        // });
         usort($prodArrayResume, function ($a, $b) {
-            return strcmp($b['cat'], $a['cat']);
+            // Tri par 'rest' (numérique croissant)
+            $restCompare = $a['rest'] <=> $b['rest'];
+            // Si 'rest' est égal, on trie par 'cat' (alphabétique croissant)
+            if ($restCompare === 0) {
+                return strcmp($a['cat'], $b['cat']);
+            }
+            return $restCompare;
         });
         // dd($prodArrayResume);
         
-        return view('rapport.journalier', compact ( "approJour", "transJour", "venteJour","prodArrayResume", "depot"));
+        return view('rapport.journalier', compact ( "approJour", "transJour", "venteJour","prodArrayResume", "depot", "compassassion"));
     }
     public function mensuel($depot, $id){
         // dd($depot, $id, "mensuel");
@@ -138,8 +154,17 @@ class RapportController extends Controller
             array_push($prodArrayResume,$singleProdResume);
         }
         //tirer le tableau selon ordre decroissant de categorie
+        // usort($prodArrayResume, function ($a, $b) {
+        //     return strcmp($b['cat'], $a['cat']);
+        // });
         usort($prodArrayResume, function ($a, $b) {
-            return strcmp($b['cat'], $a['cat']);
+            // Tri par 'rest' (numérique croissant)
+            $restCompare = $a['rest'] <=> $b['rest'];
+            // Si 'rest' est égal, on trie par 'cat' (alphabétique croissant)
+            if ($restCompare === 0) {
+                return strcmp($a['cat'], $b['cat']);
+            }
+            return $restCompare;
         });
         // dd($prodArrayResume);
         
@@ -197,31 +222,19 @@ class RapportController extends Controller
             array_push($prodArrayResume,$singleProdResume);
         }
         //tirer le tableau selon ordre decroissant de categorie
+        // usort($prodArrayResume, function ($a, $b) {
+        //     return strcmp($b['cat'], $a['cat']);
+        // });
         usort($prodArrayResume, function ($a, $b) {
-            return strcmp($b['cat'], $a['cat']);
+            // Tri par 'rest' (numérique croissant)
+            $restCompare = $a['rest'] <=> $b['rest'];
+            // Si 'rest' est égal, on trie par 'cat' (alphabétique croissant)
+            if ($restCompare === 0) {
+                return strcmp($a['cat'], $b['cat']);
+            }
+            return $restCompare;
         });
 
-        // dd($prodArrayResume);
-        // $envoiMail=$this->rapport_send_mail('mukendiluabeya034@gmail.com',$depot->libele,$depot->id);
-        // dd($envoiMail, $envoiMail->getData()->status, $envoiMail->original['status']);
-       
-        // $userRoles = UserRole::whereHas('role', function ($query) {
-        //     $query->whereIn('libele', ['Super admin', 'Administrateur']);
-        //     })
-        // ->with(['user.depot'])
-        // ->get();
-        // $compte = 0;
-        // foreach( $userRoles as $userRole ) {
-        //     // $to = $userRole->user->email;
-        //     $to = "a.tshiyanze@gmail.com";
-        //     foreach($userRole->user->depot as $depot ) {
-        //         // dd($depot->id);
-        //         $envoiMail=$this->rapport_send_mail($to,$depot->libele,$depot->id);
-        //     }
-
-        // }
-        // dd( $compte);
-        // die('vue sur les differents depot');
         return view('rapport.annuel', compact ( "approAn", "transAn", "venteAn","year","prodArrayResume", "depot"));
     }
 
@@ -358,6 +371,11 @@ class RapportController extends Controller
         $venteJour = Vente::orderBy('user_id')->where('depot_id', $depot->id)
                         ->where('created_at','like','%'.$today.'%')
                         ->get();
+        $compassassion = Vente::whereHas('compassassion', function ($query) use ($today) {
+                            $query->where('created_at', 'like', '%' . $today . '%');
+                        })
+                        ->with(['paiement','venteProduit','compassassion'])
+                        ->get();
         $vendeurs = Vente::selectRaw('user_id, COUNT(*) as count, depot_id')
                     ->groupBy('user_id', 'depot_id')
                     ->orderByDesc('count')
@@ -408,7 +426,7 @@ class RapportController extends Controller
             return $restCompare;
         });
         // dd($prodArrayResume);
-        $rapport = ['approvisionnement'=>$approJour, 'transfert'=>$transJour, 'vente'=>$venteJour, 'resumeProduit'=>$prodArrayResume, 'vendeurs'=>$vendeurs];
+        $rapport = ['approvisionnement'=>$approJour, 'transfert'=>$transJour, 'vente'=>$venteJour, 'resumeProduit'=>$prodArrayResume, 'vendeurs'=>$vendeurs, 'compassassion'=>$compassassion];
         // Générer le PDF à partir de la vue
         $pdf = Pdf::loadView('mail.rapport', ['rapport' => $rapport]);
 
