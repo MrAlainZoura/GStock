@@ -6,7 +6,7 @@
     @vite(['resources/css/app.css','resources/js/app.js'])
     <title>@yield('title')</title>
 
-    <link rel="stylesheet" href="{{asset('build/assets/app-DwyTTvhX.css')}}">
+    <link rel="stylesheet" href="{{asset('build/assets/app-LK1St38P.css')}}">
     <link rel="stylesheet" href="{{asset('build/assets/app-hg-u5LYb.js')}}">
     <link rel="stylesheet" href="{{asset('build/manifest.json')}}">
     <link rel="icon" type="image/x-icon" href="{{asset('img/icon.jpeg')}}">    
