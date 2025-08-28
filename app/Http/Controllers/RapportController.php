@@ -30,9 +30,10 @@ class RapportController extends Controller
             return back()->with("echec", "Erreur, impossible de trouver le depot");
         }
         $compassassion = Vente::whereHas('compassassion', function ($query) use ($today) {
-                $query->where('created_at', 'like', '%' . $today . '%');
+                $query->whereDate('created_at', $today );
             })
             ->with(['paiement','venteProduit','compassassion'])
+            ->where("depot_id", $depot->id)
             ->get();
         // dd($compassassion[0]->venteProduit, $compassassion[0]->compassassion, $compassassion[0]->paiement, $dernierPaiement = $compassassion[0]->paiement->sortByDesc('created_at')->first(), $compassassion);
 

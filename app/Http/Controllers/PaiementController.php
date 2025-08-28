@@ -130,6 +130,7 @@ class PaiementController extends Controller
             }
     
         }
+        $tabSyntese= array_reverse($tabSyntese, true);
         // dd($tabSyntese, 'ok');
         return view('vente.creance', compact('tabSyntese',"depot"));
     }
