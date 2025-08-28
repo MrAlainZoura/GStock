@@ -131,8 +131,6 @@
                       $recette +=(float) $vcomp->paiement->sortByDesc('created_at')->first()->avance;
                       $recetteFc +=(float) $vcomp->paiement->sortByDesc('created_at')->first()->avance * (float) $vcomp->updateTaux;
                     @endphp
-                  <!-- @formaMille($vP->prixT) {{ $vV->devise->libele }} -->
-                  <!-- {{$vV->updateTaux}}Fc -->
                 </td>
                 <td>
                   @if($vcomp->user != null)
