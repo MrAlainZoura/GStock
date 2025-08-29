@@ -37,7 +37,7 @@ if($findVenteDetail->user != null){
                             $netPaye+=(float)$val->prixT;
                         @endphp
                     @endforeach
-                     {{$quantite}} piece(s) au total et le prix net payé @formaMille($netPaye) {{  $findVenteDetail->devise }} au taux d'échange de {{  $findVenteDetail->taux }} pour la monnaie locale.
+                     {{$quantite}} piece(s) au total et le prix net payé @formaMille((float)$netPaye) {{  $findVenteDetail->devise }} au taux d'échange de {{  $findVenteDetail->taux }} pour la monnaie locale.
                 </p>
                 <div class="flex flex-col justify-between sm:flex gap-2 sm:flex-row sm:flex-1">
                                         
@@ -119,7 +119,7 @@ if($findVenteDetail->user != null){
                                     {{$item->quantite}} pc
                                     </td>
                                     <td class="px-3 py-2">
-                                    @formaMille($item->prixT)  {{$findVenteDetail->devise}}
+                                    @formaMille((float)$item->prixT)  {{$findVenteDetail->devise}}
                                     </td>
                                 </tr>
                             @endforeach
@@ -136,7 +136,7 @@ if($findVenteDetail->user != null){
                                         {{$item->quantite}} pc
                                         </td>
                                         <td class="px-3 py-2">
-                                        @formaMille($item->prixT)  {{$findVenteDetail->devise}}
+                                        @formaMille((float)$item->prixT)  {{$findVenteDetail->devise}}
                                         </td>
                                     </tr>
                                 @endforeach
@@ -149,8 +149,8 @@ if($findVenteDetail->user != null){
                                       {{$quantite}}
                                        pc
                                     </td>
-                                    <td class="px-3 py-3">({{$findVenteDetail->devise}}) @formaMille($netPaye) <br>
-                                        (cdf) @formaMille($netPaye *$findVenteDetail->taux)
+                                    <td class="px-3 py-3">({{$findVenteDetail->devise}}) @formaMille((float)$netPaye) <br>
+                                        (cdf) @formaMille((float)$netPaye *(float)$findVenteDetail->taux)
                                     </td>
                                 </tr>
                                 
@@ -224,7 +224,7 @@ if($findVenteDetail->user != null){
                             {{$item->quantite}} pc
                             </td>
                             <td class="px-3 py-2">
-                            @formaMille($item->prixT)  {{$findVenteDetail->devise}}
+                            @formaMille((float)$item->prixT)  {{$findVenteDetail->devise}}
                             </td>
                         </tr>
                     @endforeach
@@ -236,8 +236,8 @@ if($findVenteDetail->user != null){
                               {{$quantite}}
                                pc
                             </td>
-                            <td class="px-3 py-3">({{$findVenteDetail->devise}}) @formaMille($netPaye) <br>
-                                (cdf) @formaMille($netPaye *$findVenteDetail->taux)
+                            <td class="px-3 py-3">({{$findVenteDetail->devise}}) @formaMille((float)$netPaye) <br>
+                                (cdf) @formaMille((float)$netPaye *(float)$findVenteDetail->taux)
                             </td>
                         </tr>
                         
