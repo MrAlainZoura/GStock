@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use DateTime;
 use Carbon\Carbon;
 use Dompdf\Dompdf;
 use App\Models\Depot;
@@ -352,147 +353,195 @@ class RapportController extends Controller
     }
 
   /**
-     * Génère un PDF à partir d’un rapport par ID.
+     * Génère un PDF à partir d’un rapport par ID et une periode (aujourd'hui, mois ou annee).
      */
-    public function genererPDF($id)
+   
+    public static function genererPDF($id, $periode = 'today')
     {
-        
-        $today = Carbon::now()->format('Y-m-d');
-        $mois = Carbon::now()->format('m');
+        $depot = Depot::find($id);
+        // $periode = "annee";
+        $dateFilter = function ($table = null) use ($periode) {
+            return function ($query) use ($periode, $table) {
+                $column = $table ? "{$table}.created_at" : "created_at";
+                switch ($periode) {
+                    case 'mois':
+                        $query->whereMonth($column, Carbon::now()->month)
+                            ->whereYear($column, Carbon::now()->year);
+                        break;
+                    case 'annee':
+                        $query->whereYear($column, Carbon::now()->year);
+                        break;
+                    default:
+                        $query->whereDate($column, Carbon::today());
+                        break;
+                }
+            };
+        };
 
-        
-        $depot = Depot::where('id',$id)->first();
+        // Requêtes principales
+        $approJour = Approvisionnement::where('depot_id', $depot->id)
+            ->where($dateFilter())
+            ->orderBy('user_id')
+            ->get();
 
-        $approJour = Approvisionnement::orderBy('user_id')->where('depot_id', $depot->id)
-                    ->where('created_at','like','%'.$today.'%')
-                    ->get();
-        $transJour = Transfert::orderBy('user_id')->where('depot_id', $depot->id)
-                    ->where('created_at','like','%'.$today.'%')
-                    ->get();
-        $venteJour = Vente::orderBy('user_id')->where('depot_id', $depot->id)
-                        ->where('created_at','like','%'.$today.'%')
-                        ->get();
-        $compassassion = Vente::whereHas('compassassion', function ($query) use ($today) {
-                            $query->where('created_at', 'like', '%' . $today . '%');
-                        })
-                        ->with(['paiement','venteProduit','compassassion'])
-                        ->get();
+        $transJour = Transfert::where('depot_id', $depot->id)
+            ->where($dateFilter())
+            ->orderBy('user_id')
+            ->get();
+
+        $venteJour = Vente::where('depot_id', $depot->id)
+            ->where($dateFilter())
+            ->orderBy('user_id')
+            ->get();
+
+        $compassassion = Vente::whereHas('compassassion', $dateFilter())
+            ->with(['paiement', 'venteProduit', 'compassassion'])
+            ->where('depot_id',$depot->id)
+            ->get();
+
+        // Statistiques vendeurs (toujours sur le mois)
         $vendeurs = Vente::selectRaw('user_id, COUNT(*) as count, depot_id')
-                    ->groupBy('user_id', 'depot_id')
-                    ->orderByDesc('count')
-                    ->whereMonth('created_at', (int)$mois)
-                    ->where('depot_id', $depot->id)
-                    // ->take(2)
-                    ->get();
-                //resume stock chaque produit
-        $prodArrayResume = [];
-        $allProdDepot = ProduitDepot::where('depot_id', $depot->id)->with('produit','produit.marque', 'produit.marque.categorie')->get();
-        foreach($allProdDepot as $ke=>$val){
-            $singleProdApro = Approvisionnement::where('depot_id', $depot->id)
-                            ->where('produit_id',$val->produit_id)
-                            ->where('created_at','like','%'.$today.'%')
-                            ->sum('quantite');
+            ->whereMonth('created_at', Carbon::now()->month)
+            ->where('depot_id', $depot->id)
+            ->groupBy('user_id', 'depot_id')
+            ->orderByDesc('count')
+            ->get();
 
-            $singleProdVente =DB::table('ventes')
-                            ->join('vente_produits', 'ventes.id', '=', 'vente_produits.vente_id')
-                            ->where('ventes.created_at','like','%'.$today.'%')
-                            ->where('produit_id',$val->produit_id)
-                            ->where('depot_id', $depot->id)
-                            ->sum('vente_produits.quantite');
-            $singleProdTrans =DB::table('transferts')
-                            ->join('produit_transferts', 'transferts.id', '=', 'produit_transferts.transfert_id')
-                            ->where('transferts.created_at','like','%'.$today.'%')
-                            ->where('produit_id',$val->produit_id)
-                            ->where('depot_id', $depot->id)
-                            ->sum('produit_transferts.quantite');
+        // Produits du dépôt
+        $allProdDepot = ProduitDepot::where('depot_id', $depot->id)
+            ->with('produit.marque.categorie')
+            ->get();
 
-            $singleProdResume = [
-                'libele'=>$val->produit->libele,
-                "cat"=>$val->produit->marque->categorie->libele." ". $val->produit->marque->libele,
-                "enter"=>$singleProdApro,
-                "trans"=>$singleProdTrans,
-                "vente"=> $singleProdVente,
-                "rest"=>$val->quantite
+        // Résumés par produit
+        $appros = Approvisionnement::where('depot_id', $depot->id)
+            ->where($dateFilter())
+            ->select('produit_id', DB::raw('SUM(quantite) as total'))
+            ->groupBy('produit_id')
+            ->pluck('total', 'produit_id');
+
+        $ventes = DB::table('ventes')
+            ->join('vente_produits', 'ventes.id', '=', 'vente_produits.vente_id')
+            ->where($dateFilter('ventes')) 
+            ->where('ventes.depot_id', $depot->id)
+            ->select('vente_produits.produit_id', DB::raw('SUM(vente_produits.quantite) as total'))
+            ->groupBy('vente_produits.produit_id')
+            ->pluck('total', 'vente_produits.produit_id');
+
+        $transferts = DB::table('transferts')
+            ->join('produit_transferts', 'transferts.id', '=', 'produit_transferts.transfert_id')
+            ->where($dateFilter( 'transferts'))
+            ->where('depot_id', $depot->id)
+            ->select('produit_id', DB::raw('SUM(produit_transferts.quantite) as total'))
+            ->groupBy('produit_id')
+            ->pluck('total', 'produit_id');
+
+        $prodArrayResume = $allProdDepot->map(function ($val) use ($appros, $ventes, $transferts) {
+            return [
+                'libele' => $val->produit->libele,
+                'cat' => $val->produit->marque->categorie->libele . ' ' . $val->produit->marque->libele,
+                'enter' => $appros[$val->produit_id] ?? 0,
+                'trans' => $transferts[$val->produit_id] ?? 0,
+                'vente' => $ventes[$val->produit_id] ?? 0,
+                'rest' => $val->quantite,
             ];
-            array_push($prodArrayResume,$singleProdResume);
-        }
-        //tirer le tableau selon ordre decroissant de categorie
-        usort($prodArrayResume, function ($a, $b) {
-            // Tri par 'rest' (numérique croissant)
-            $restCompare = $a['rest'] <=> $b['rest'];
-            // Si 'rest' est égal, on trie par 'cat' (alphabétique croissant)
-            if ($restCompare === 0) {
-                return strcmp($a['cat'], $b['cat']);
-            }
-            return $restCompare;
-        });
-        // dd($prodArrayResume);
-        $rapport = ['approvisionnement'=>$approJour, 'transfert'=>$transJour, 'vente'=>$venteJour, 'resumeProduit'=>$prodArrayResume, 'vendeurs'=>$vendeurs, 'compassassion'=>$compassassion];
-        // Générer le PDF à partir de la vue
-        $pdf = Pdf::loadView('mail.rapport', ['rapport' => $rapport]);
+        })->sortBy('rest')->values()->all();
 
-        return $pdf;
+        $rapport = [
+            'approvisionnement' => $approJour,
+            'transfert' => $transJour,
+            'vente' => $venteJour,
+            'resumeProduit' => $prodArrayResume,
+            'vendeurs' => $vendeurs,
+            'compassassion' => $compassassion,
+            'periode' => $periode,
+        ];
+        // dd($rapport, $prodArrayResume);
+        return Pdf::loadView('mail.rapport', ['rapport' => $rapport]);
     }
-
-    public function rapport_send_mail($to, $depot, $depot_id){
+    public static function rapport_send_mail($to, $depot, $depot_id){
         
-    // $to = 'a.tshiyanze@gmail.com';
-    // mbunzucalvin@gmail
-    // $object = 'Rapport PDF';
-    // $contenu = 'Voici le contenu du rapport.';
-    $today = Carbon::now()->format('Y-m-d');
-    try {
-        $pdf = $this->genererPDF($depot_id);
+        // $to = 'a.tshiyanze@gmail.com';
+        // mbunzucalvin@gmail
+        // $object = 'Rapport PDF';
+        // $contenu = 'Voici le contenu du rapport.';
+        Carbon::setLocale('fr');
+        $today = Carbon::now()->format('Y-m-d');
+        $moisEtAnnee = Carbon::now()->translatedFormat('F Y'); // "août 2025"    $finsDuMois = [];
+        $annee = Carbon::now()->format('Y');
+        $today = Carbon::today()->format('Y-m-d');
         $user = Auth::user();
         $name = $user ? "{$user->name} {$user->postnom} {$user->prenom}" : "System automatique";
-        Mail::send([], [], function ($message) use ($pdf, $to,$today, $depot, $name) {
-            $message->to($to)
-                    ->subject('Rapport journalier '. $today ." $depot")
-                    // ->setBody('Le rapport journalier en pièce jointe.', 'text/html')
-                    ->html("<p>Le rapport journalier en pièce jointe, envoyé par $name </p>")
-                    ->attachData($pdf->output(), 'rapport_' . $today."_$depot" . '.pdf');
-        });
 
-        return response()->json([
-            'message' => 'Email envoyé avec succès.',
-            'status'=>true
-        ]);
-    } catch (\Exception $e) {
-        Log::error('Erreur envoi PDF : ' . $e->getMessage());
+        for ($mois = 1; $mois <= 12; $mois++) {
+            // Crée une date au premier jour du mois suivant
+            $date = new DateTime("$annee-" . str_pad($mois, 2, '0', STR_PAD_LEFT) . "-01");
+            $date->modify('last day of this month');
+            $finsDuMois[] = $date->format('Y-m-d');
+        }
 
-        return response()->json([
-            'error' => 'Échec de l’envoi du mail.',
-            'details' => $e->getMessage(),
-            'status'=>false
-        ], 500);
-    }
+
+        try {
+            
+            $sendRapport = function ($periode, $label, $filename) use ($depot_id, $to, $depot, $name) {
+                $pdf = self::genererPDF($depot_id, $periode);
+                Mail::send([], [], function ($message) use ($pdf, $to, $label, $depot, $name, $filename) {
+                    $message->to($to)
+                        ->subject("Rapport $label $depot")
+                        ->html("<p>Le rapport $label en pièce jointe, envoyé par $name</p>")
+                        ->attachData($pdf->output(), "rapport_{$filename}_{$depot}.pdf");
+                });
+            };
+            // Cas : fin d’année
+            $lastDayOfYear = end($finsDuMois);
+            if ($today === $lastDayOfYear) {
+                $sendRapport('annee', "Annuel $annee", $annee);
+                $sendRapport('mois', "Mensuel $moisEtAnnee", $moisEtAnnee);
+                $sendRapport('today', "journalier $today", $today);
+
+            // Cas : fin de mois
+            } elseif (in_array($today, $finsDuMois)) {
+                $sendRapport('mois', "Mensuel $moisEtAnnee", $moisEtAnnee);
+                $sendRapport('today', "journalier $today", $today);
+
+            // Cas : jour ordinaire
+            } else {
+                $sendRapport('today', "journalier $today", $today);
+            }
+
+            return response()->json([
+                'message' => 'Email envoyé avec succès.',
+                'status'=>true
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Erreur envoi PDF : ' . $e->getMessage());
+
+            return response()->json([
+                'error' => 'Échec de l’envoi du mail.',
+                'details' => $e->getMessage(),
+                'status'=>false
+            ], 500);
+        }
 
     }
     public function sendMailrapport($depot){
         $depot_id = $depot/123;
         $getDepot = Depot::find($depot_id);
-         $pdf = $this->genererPDF($depot_id);
+        if(!$getDepot){
+            return back()->with('echec', "Renseignement fourni est incorrect");
+        }
+        $pdf = self::genererPDF($depot_id, 'today');
         $today = Carbon::now()->format('Y-m-d');
         // dd($getDepot, $depot_id);
         if($getDepot != null){
             // dd($getDepot->user->email);
             $to = $getDepot->user->email;
-            $user = Auth::user()->email;
-            $sendMailRapport = $this->rapport_send_mail($to,$getDepot->libele,$getDepot->id);
+            $sendMailRapport = self::rapport_send_mail($to,$getDepot->libele,$getDepot->id);
             if($sendMailRapport->getData()->status == true){
                 $rapportDwl= 'rapport_' . $today."_$getDepot->libele" . '.pdf';
-                return $pdf->download($rapportDwl);
-
-                // if($to !== $user){
-                //     $sendMailRapportUser = $this->rapport_send_mail($user,$getDepot->libele,$getDepot->id);
-                //    return ($sendMailRapportUser->getData()->status==true) 
-                //         ?  back()->with('success',"Email envoyé avec succes à l'administrateur et à $user!")
-                //         :  back()->with('success',"Email envoyé avec succes à l'administrateur et  échec à $user!");
-                // }
-                // return back()->with('success',"Email envoyé avec succes à l'administrateur!");
+                return $pdf->download($rapportDwl); 
             }
             return back()->with('echec',"Email non envoyé, adresse mail invalide << $to >>!");
-            // dd($sendMailRapport->getData()->status);
+            // dd($sendMailRapport->getData()->details, 'echec');
         }
         return back()->with('echec',"Email non envoyé, renseignements fournient sont erronés !");
 

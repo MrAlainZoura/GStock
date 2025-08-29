@@ -33,8 +33,8 @@ if($findVenteDetail->user != null){
                     @endphp
                     @foreach ( $findVenteDetail->venteProduit as $val)
                         @php
-                            $quantite +=$val->quantite;
-                            $netPaye+=$val->prixT;
+                            $quantite +=(float)$val->quantite;
+                            $netPaye+=(float)$val->prixT;
                         @endphp
                     @endforeach
                      {{$quantite}} piece(s) au total et le prix net payé @formaMille($netPaye) {{  $findVenteDetail->devise }} au taux d'échange de {{  $findVenteDetail->taux }} pour la monnaie locale.
