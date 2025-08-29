@@ -73,12 +73,12 @@
               <td>
                 @php
                     $recette +=(float) $vP->prixT;
-                    $recetteFc +=(float)$vP->prixT * $vV->updateTaux;
+                    $recetteFc +=(float)$vP->prixT * (float)$vV->updateTaux;
                 @endphp
-              @formaMille($vV->updateTaux) Fc
+              @formaMille((float)$vV->updateTaux) Fc
               </td>
               <td>
-                @formaMille($vP->prixT) {{ $vV->devise->libele }}
+                @formaMille((float)$vP->prixT) {{ $vV->devise->libele }}
                 <!-- {{$vV->updateTaux}}Fc -->
               </td>
               <td>
@@ -122,7 +122,7 @@
                 </td>
                 
                 <td>
-                @formaMille($vcomp->updateTaux) Fc
+                @formaMille((float)$vcomp->updateTaux) Fc
                 </td>
                 <td>
                    {{ $vcomp->paiement->sortBy('created_at')->first()->net}} + {{ $vcomp->paiement->sortByDesc('created_at')->first()->avance }}<br>
@@ -149,12 +149,12 @@
         <tr class="footer-row">
             <td colspan="2"><strong>Total</strong></td>
             <td colspan="2">
-                @formaMille( $recetteFc) Fc
+                @formaMille( (float)$recetteFc) Fc
             </td>
               <td colspan="3">
                 @if (count($rapport['vente']) >0)
                     @foreach ($vV->depot->devise as $cle=>$dev )
-                        @formaMille( $recetteFc/$dev->taux ) {{ $dev->libele }} ({{ $dev->taux }}) <br>
+                        @formaMille( (float)$recetteFc/(float)$dev->taux ) {{ $dev->libele }} ({{ $dev->taux }}) <br>
                     @endforeach
                 @endif
               </td>

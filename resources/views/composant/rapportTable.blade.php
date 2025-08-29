@@ -50,7 +50,7 @@
                         $recette +=(float)$v->prixT;
                         $recetteFc += (float)$v->prixT * (float)$item->updateTaux;
                     @endphp
-                @formaMille($v->prixT) {{ $item->devise->libele }}
+                @formaMille((float)$v->prixT) {{ $item->devise->libele }}
                 </td>
                 <td class="px-6 py-4">
                     {{$item->updateTaux}}Fc
@@ -135,10 +135,10 @@
                 <td></td>
                 <td></td>
                 <th scope="row" class="px-6 py-4 text-xl uppercase text-gray-900 whitespace-nowrap dark:text-white">
-                     @formaMille( $recetteFc) Fc<br>
+                     @formaMille( (float)$recetteFc) Fc<br>
                     @if (count($data) >0)
                         @foreach ($item->depot->devise as $cle=>$dev )
-                            @formaMille( $recetteFc/$dev->taux ) {{ $dev->libele }} ({{ $dev->taux }}) <br>
+                            @formaMille((float) $recetteFc/ (float)$dev->taux ) {{ $dev->libele }} ({{ $dev->taux }}) <br>
                         @endforeach
                     @endif
                 </th>
