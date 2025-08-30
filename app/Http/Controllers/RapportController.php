@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\SendDailyReport;
 use DateTime;
 use Carbon\Carbon;
 use Dompdf\Dompdf;
@@ -39,7 +40,7 @@ class RapportController extends Controller
         // dd($compassassion[0]->venteProduit, $compassassion[0]->compassassion, $compassassion[0]->paiement, $dernierPaiement = $compassassion[0]->paiement->sortByDesc('created_at')->first(), $compassassion);
 
         $approJour = Approvisionnement::orderBy('user_id')->where('depot_id', $depot->id)
-                    ->where('created_at','like','%'.$today.'%')
+                    ->whereDate('created_at',$today)
                     ->get();
         $transJour = Transfert::orderBy('user_id')->where('depot_id', $depot->id)
                     ->where('created_at','like','%'.$today.'%')
@@ -118,6 +119,12 @@ class RapportController extends Controller
         $venteMois = Vente::orderBy('user_id')->where('depot_id', $depot->id)
                         ->whereMonth('created_at',$mois)
                         ->get();
+         $compassassion = Vente::whereHas('compassassion', function ($query) use ($mois) {
+                $query->whereMonth('created_at', $mois );
+            })
+            ->with(['paiement','venteProduit','compassassion'])
+            ->where("depot_id", $depot->id)
+            ->get();
 
                 //resume stock chaque produit
         $prodArrayResume = [];
@@ -172,7 +179,7 @@ class RapportController extends Controller
         
         $mois = Carbon::now()->isoFormat('MMMM YYYY');;
                         
-        return view('rapport.mensuel', compact ( "approMois", "transMois", "venteMois","mois","prodArrayResume", "depot"));
+        return view('rapport.mensuel', compact ( "approMois", "transMois", "venteMois","mois","prodArrayResume", "depot", "compassassion"));
     }
     public function annuel($depot, $id){
         // dd($depot, $id, "annuel");
@@ -190,6 +197,12 @@ class RapportController extends Controller
         $venteAn = Vente::orderBy('user_id')->where('depot_id', $depot->id)
                         ->whereYear('created_at',$year)
                         ->get();
+        $compassassion = Vente::whereHas('compassassion', function ($query) use ($year) {
+                        $query->whereYear('created_at', $year );
+                    })
+                    ->with(['paiement','venteProduit','compassassion'])
+                    ->where("depot_id", $depot->id)
+                    ->get();
         //resume stock chaque produit
         $prodArrayResume = [];
         $allProdDepot = ProduitDepot::where('depot_id', $depot->id)->with('produit','produit.marque', 'produit.marque.categorie')->get();
@@ -237,7 +250,7 @@ class RapportController extends Controller
             return $restCompare;
         });
 
-        return view('rapport.annuel', compact ( "approAn", "transAn", "venteAn","year","prodArrayResume", "depot"));
+        return view('rapport.annuel', compact ( "approAn", "transAn", "venteAn","year","prodArrayResume", "depot", "compassassion"));
     }
 
 
@@ -547,4 +560,15 @@ class RapportController extends Controller
 
 
     }
+    public function sendMailrapportJob($depot)
+    {
+        
+        SendDailyReport::dispatchSync($depot);
+        return back()->with('success', 'Rapport envoyé avec succès.');
+
+        // SendDailyReport::dispatch($depot);
+        // die('ok regarde log '.$depot);
+        // return back()->with('success', 'Le rapport est en cours d’envoi.');
+    }
+
 }

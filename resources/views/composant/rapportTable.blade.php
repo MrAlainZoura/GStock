@@ -37,7 +37,7 @@
         @foreach ($item->venteProduit as $k=>$v )
             <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600">
                 <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                {{$v->vente->code}}
+                  {{ $key+1 }}. {{$v->vente->code}}
                 </th>
                 <td class="px-6 py-4">
                 {{$v->produit->marque->categorie->libele }} {{$v->produit->marque->libele }} {{$v->produit->libele }} 
@@ -78,7 +78,7 @@
             @foreach ($compassassion as $k=>$v )
                 <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600">
                     <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                    {{$v->code}}
+                    {{ $k+1 }}. {{$v->code}}
                     </th>
                     <td class="py-2" colspan="2">
                         Echangé(s)
@@ -87,7 +87,7 @@
                                 <li>
                                     {{ $comp->produit->libele }} {{ $comp->quantite }} pc 
                                     <span class="text-xl text-gray-600">→</span>
-                                    {{ $comp->prixT }} {{ $item->devise->libele }}</li>
+                                    {{ $comp->prixT }} {{ $v->devise->libele }}</li>
                             @endforeach
                         </ol>
                            <br> 
@@ -97,14 +97,14 @@
                            <li>
                                 {{ $anV->produit->libele }} {{ $anV->quantite }}pc 
                                 <span class="text-xl text-gray-600">→</span>
-                                {{ $anV->prixT }} {{ $item->devise->libele }}
+                                {{ $anV->prixT }} {{ $v->devise->libele }}
                             </li>
                            @endforeach 
                         </ol>
                     </td>
                     <td class="px-5 py-4">
                         {{ $v->paiement->sortBy('created_at')->first()->net}} + {{ $v->paiement->sortByDesc('created_at')->first()->avance }}<br>
-                        {{ $v->paiement->sortByDesc('created_at')->first()->net }} {{ $item->devise->libele }}
+                        {{ $v->paiement->sortByDesc('created_at')->first()->net }} {{ $v->devise->libele }}
                          @php
                             $recette +=(float) $v->paiement->sortByDesc('created_at')->first()->avance;
                             $recetteFc += (float)$v->paiement->sortByDesc('created_at')->first()->avance* (float)$v->updateTaux;
@@ -137,7 +137,11 @@
                 <th scope="row" class="px-6 py-4 text-xl uppercase text-gray-900 whitespace-nowrap dark:text-white">
                      @formaMille( (float)$recetteFc) Fc<br>
                     @if (count($data) >0)
-                        @foreach ($item->depot->devise as $cle=>$dev )
+                        @foreach ($data[0]->depot->devise as $cle=>$dev )
+                            @formaMille((float) $recetteFc/ (float)$dev->taux ) {{ $dev->libele }} ({{ $dev->taux }}) <br>
+                        @endforeach
+                    @elseif(count($compassassion)>0)
+                     @foreach ($compassassion[0]->depot->devise as $cle=>$dev )
                             @formaMille((float) $recetteFc/ (float)$dev->taux ) {{ $dev->libele }} ({{ $dev->taux }}) <br>
                         @endforeach
                     @endif

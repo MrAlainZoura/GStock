@@ -65,6 +65,7 @@ Route::get('rapport/{depot}/annuel/{id}', [RapportController::class,'annuel'])->
 Route::get('rapport/{depot}/voir-plus/{action}', [RapportController::class,'seemore'])->name('rapport.more')->middleware( AuthentifyMiddleware::class);
 Route::get('rapport/{vente}/facture/{action}', [RapportController::class,'facture'])->name('facturePDF')->middleware( AuthentifyMiddleware::class);
 Route::get('rapport/{depot}/mail', [RapportController::class,'sendMailrapport'])->name('sendMailrapport')->middleware( AuthentifyMiddleware::class);
+Route::get('rapport/{depot}/mail-job', [RapportController::class,'sendMailrapportJob'])->name('sendMailrapportJob')->middleware( AuthentifyMiddleware::class);
 
 Route::get('{depot}/parametre', [DepotController::class, 'depotSetting'])->name("depotSetting")->middleware(AuthentifyMiddleware::class);
 Route::get('{depot}/produits', [DepotController::class, 'showProduit'])->name("showProduit")->middleware(AuthentifyMiddleware::class);
