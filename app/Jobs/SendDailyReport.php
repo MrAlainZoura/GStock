@@ -2,6 +2,8 @@
 
 namespace App\Jobs;
 
+use Carbon\Carbon;
+use App\Models\Depot;
 use App\Models\UserRole;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Queue\SerializesModels;
@@ -15,13 +17,13 @@ class SendDailyReport implements ShouldQueue
 {
      use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-
     /**
      * Create a new job instance.
      */
-    public function __construct()
+    protected $depot; 
+    public function __construct($depot)
     {
-        //
+        $this->depot = $depot;
     }
 
     /**
@@ -30,27 +32,27 @@ class SendDailyReport implements ShouldQueue
     public function handle(): void
     { 
         Log::info('Job started envoi de mail ');
-
+        
         try{
-            $userRoles = UserRole::whereHas('role', function ($query) {
-                $query->whereIn('libele', ['Super admin', 'Administrateur']);
-                })
-            ->with(['user.depot'])
-            ->get();
-            $rapport = new RapportController();
-            foreach( $userRoles as $userRole ) {
-                // $to = $userRole->user->email;
-                $to = "a.tshiyanze@gmail.com";
-                foreach($userRole->user->depot as $depot ) {
-                    // dd($depot->id);
-                    $sendMailRapport=$rapport->rapport_send_mail($to,$depot->libele,$depot->id);
-                }
-    
+            $depot_id = $this->depot;
+            $getDepot = Depot::find($depot_id);
+            $pdf = RapportController::genererPDF($depot_id, 'today');
+            $today = Carbon::now()->format('Y-m-d');
+            $to = $getDepot->user->email;
+            $sendMailRapport = RapportController::rapport_send_mail($to, $getDepot->libele, $getDepot->id);
+
+            if ($sendMailRapport->getData()->status === true) {
+                // Optionally store the PDF or notify user
+                Log::info('Job executer avec success envoi de mail ');
+            } else {
+                Log::info('Job executer avec success envoi de mail MAIS ECHEC D"ENVOI D EMAIL'.$sendMailRapport->getData()->details);
+                // Log or handle email failure
             }
-            
+
+
+            Log::info('Job executer avec success envoi de mail ');
         }catch(\Exception $e){
             Log::error('Job failed: ' . $e->getMessage());
-
         }
     }
 }
