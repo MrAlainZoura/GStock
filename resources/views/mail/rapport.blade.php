@@ -125,12 +125,13 @@
                 @formaMille((float)$vcomp->updateTaux) Fc
                 </td>
                 <td>
-                   {{ $vcomp->paiement->sortBy('created_at')->first()->net}} + {{ $vcomp->paiement->sortByDesc('created_at')->first()->avance }}<br>
-                   <br>{{ $vcomp->paiement->sortByDesc('created_at')->first()->net }} {{ $vcomp->devise->libele }}     
-                  @php
-                      $recette +=(float) $vcomp->paiement->sortByDesc('created_at')->first()->avance;
-                      $recetteFc +=(float) $vcomp->paiement->sortByDesc('created_at')->first()->avance * (float) $vcomp->updateTaux;
+                   @php
+                      $ajout = (float) $vcomp->paiement->sortByDesc('created_at')->first()->net - (float)$vcomp->paiement->sortBy('created_at')->first()->net;
+                      $recette +=(float) $ajout;
+                      $recetteFc +=(float) $ajout * (float) $vcomp->updateTaux;
                     @endphp
+                   {{ $vcomp->paiement->sortBy('created_at')->first()->net}} + {{ $ajout }}<br>
+                   <br>{{ $vcomp->paiement->sortByDesc('created_at')->first()->net }} {{ $vcomp->devise->libele }}     
                 </td>
                 <td>
                   @if($vcomp->user != null)

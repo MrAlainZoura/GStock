@@ -103,12 +103,13 @@
                         </ol>
                     </td>
                     <td class="px-5 py-4">
-                        {{ $v->paiement->sortBy('created_at')->first()->net}} + {{ $v->paiement->sortByDesc('created_at')->first()->avance }}<br>
-                        {{ $v->paiement->sortByDesc('created_at')->first()->net }} {{ $v->devise->libele }}
                          @php
-                            $recette +=(float) $v->paiement->sortByDesc('created_at')->first()->avance;
-                            $recetteFc += (float)$v->paiement->sortByDesc('created_at')->first()->avance* (float)$v->updateTaux;
+                            $ajout +=(float) $v->paiement->sortByDesc('created_at')->first()->net - (float) $v->paiement->sortBy('created_at')->first()->net;
+                            $recette +=(float) $ajout;
+                            $recetteFc += (float)$ajout* (float)$v->updateTaux;
                         @endphp
+                        {{ $v->paiement->sortBy('created_at')->first()->net}} + {{ $ajout}}<br>
+                        {{ $v->paiement->sortByDesc('created_at')->first()->net }} {{ $v->devise->libele }}
                     </td>
                     <td class="px-6 py-4">
                         {{$v->updateTaux}}Fc
