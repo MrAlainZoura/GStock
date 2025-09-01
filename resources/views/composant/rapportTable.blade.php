@@ -104,7 +104,7 @@
                     </td>
                     <td class="px-5 py-4">
                          @php
-                            $ajout +=(float) $v->paiement->sortByDesc('created_at')->first()->net - (float) $v->paiement->sortBy('created_at')->first()->net;
+                            $ajout =(float) $v->paiement->sortByDesc('created_at')->first()->net - (float) $v->paiement->sortBy('created_at')->first()->net;
                             $recette +=(float) $ajout;
                             $recetteFc += (float)$ajout* (float)$v->updateTaux;
                         @endphp
