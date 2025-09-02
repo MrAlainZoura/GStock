@@ -157,8 +157,8 @@
                 @if ($findVenteDetail->compassassion->count() > 0)
                     @foreach ($findVenteDetail->compassassion as $item)
                         @php
-                            $quantite +=$item->quantite;
-                            $netPaye+=$item->prixT;
+                            $quantite +=(float)$item->quantite;
+                            $netPaye+=(float) $item->prixT;
                         @endphp
                         <tr class="tdDashed">
                             <th class="left pad">
@@ -170,7 +170,7 @@
                                 {{$item->quantite}}
                             </td>
                             <td >
-                                @formaMille($item->prixT * $findVenteDetail->taux ) cdf
+                                @formaMille((float)$item->prixT * (float)$findVenteDetail->taux ) cdf
                             </td>
                         </tr>
                     @endforeach
@@ -186,15 +186,15 @@
                                 {{$item->quantite}}
                             </td>
                             <td >
-                                @formaMille($item->prixT * $findVenteDetail->taux ) cdf
+                                @formaMille((float)$item->prixT * (float)$findVenteDetail->taux ) cdf
                             </td>
                         </tr>
                     @endforeach
                 @else
                     @foreach ($findVenteDetail->venteProduit as $item)
                          @php
-                            $quantite +=$item->quantite;
-                            $netPaye+=$item->prixT;
+                            $quantite +=(float) $item->quantite;
+                            $netPaye+=(float) $item->prixT;
                         @endphp
                         <tr class="tdDashed">
                             <th class="left pad">
@@ -206,7 +206,7 @@
                                 {{$item->quantite}}
                             </td>
                             <td >
-                                @formaMille($item->prixT * $findVenteDetail->taux ) cdf
+                                @formaMille((float)$item->prixT *(float)$findVenteDetail->taux ) cdf
                             </td>
                         </tr>
                     @endforeach
@@ -226,22 +226,22 @@
                     @foreach($findVenteDetail->paiement as $cle=>$valeur)
                         <tr>
                             <td class="left">{{$valeur->created_at}}</td>
-                            <td colspan="2" class="center">@formaMille($valeur->avance *$findVenteDetail->taux ) cdf</td>
+                            <td colspan="2" class="center">@formaMille((float)$valeur->avance * (float)$findVenteDetail->taux ) cdf</td>
                         </tr>
                     @endforeach
 
                     @if($valeur->solde > 0)
                     <tr>
                         <th class="left">Reste</th>
-                        <th colspan="2" >@formaMille($valeur->solde *$findVenteDetail->taux) cdf</th>
+                        <th colspan="2" >@formaMille((float)$valeur->solde *(float)$findVenteDetail->taux) cdf</th>
                     </tr>
                     @endif
                 @endif
                 <tr class="footer-row trHead">
                     <th class="footer-cell" >Total</th>
                     <th class="footer-cell" colspan="2">
-                        (cdf) @formaMille($netPaye*$findVenteDetail->taux)<br>
-                        ({{ $findVenteDetail->devise }}) @formaMille($netPaye)
+                        (cdf) @formaMille((float)$netPaye * (float)$findVenteDetail->taux)<br>
+                        ({{ $findVenteDetail->devise }}) @formaMille((float)$netPaye)
                     </th>
                 </tr>
             </tfoot>
