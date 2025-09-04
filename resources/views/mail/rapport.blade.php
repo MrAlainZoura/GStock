@@ -37,6 +37,7 @@
     @php
         $recette =0;
         $recetteFc = 0;
+        $restePaiementTrancheFc=0;
         $depotLiebele ="";
         if (count( $rapport['vendeurs']) >0) {
           $depotLiebele = $rapport['vendeurs'][0]->depot->libele;
@@ -58,6 +59,9 @@
     </thead>
     <tbody>
         @foreach ($rapport['vente'] as $kV=>$vV)
+          @php
+            $restePaiementTrancheFc += (float)$vV->paiement->sortByDesc('created_at')->first()->solde * (float)$vV->updateTaux;
+          @endphp
             @foreach ($vV->venteProduit as $kP=>$vP )
             <tr>
               <td>
@@ -150,6 +154,9 @@
         <tr class="footer-row">
             <td colspan="2"><strong>Total</strong></td>
             <td colspan="2">
+              @php
+                $recetteFc -= (float)$restePaiementTrancheFc;
+              @endphp
                 @formaMille( (float)$recetteFc) Fc
             </td>
               <td colspan="3">
@@ -161,6 +168,22 @@
               </td>
             <!-- <td colspan="2">—</td> -->
         </tr>
+        @if ($restePaiementTrancheFc >0)
+          <tr class="footer-row">
+              <td colspan="2"><strong>Reste P-Tranche</strong></td>
+              <td colspan="2">
+                
+                  @formaMille( (float)$restePaiementTrancheFc) Fc
+              </td>
+                <td colspan="3">
+                  @if (count($rapport['vente']) >0)
+                      @foreach ($vV->depot->devise as $cle=>$dev )
+                          @formaMille( (float)$restePaiementTrancheFc/(float)$dev->taux ) {{ $dev->libele }} ({{ $dev->taux }}) <br>
+                      @endforeach
+                  @endif
+                </td>
+          </tr>
+        @endif
     </tfoot>
   </table>        
   <h2>Tableau Classement Vendeur du mois {{ $depotLiebele }}</h2>
