@@ -50,7 +50,7 @@ class VenteController extends Controller
         
         $validateDate = Validator::make($request->all(),
         [
-            'nom_client'=>'string|required',
+            'nom_client',
             'lieu_de_vente'=>'string|required',
             'contact_client'=>'max:255',
             'produits'=>'array|required'
@@ -85,19 +85,32 @@ class VenteController extends Controller
         $client_id ="";
         $tel=$request->contact_client;
         $findClient =null;
-        if($tel !=null){
             (strlen($tel)<=10)?$lonTel="+243".substr($tel, 1):$lonTel=$tel;
-            $findClient = Client::where('tel',$tel)->orWhere('tel',$lonTel)->first();
+            // $findClient = Client::where('tel',$tel)->orWhere('tel',$lonTel)->first();
+           if($tel != null){
+               $findClient = Client::where('tel', $tel)
+                   ->orWhere('tel', $lonTel)
+                   ->Where('tel', "!=", null)
+                   ->first();
+            }elseif($request->nom_client==null || strtolower(trim($request->nom_client)) == "passant" ){
+                $findClient = Client::WhereRaw('LOWER(name) = ?', ['passant'])
+                   ->first();
+            }
             if($findClient != null){
                 $client_id =$findClient->id;
             }else{
+                
                 $createClient = Client::create($filterDataClient);
                 $client_id = $createClient->id;
             }
-        }else{
-            $createClient = Client::create($filterDataClient);
-            $client_id = $createClient->id;
-        }
+            // dd($findClient, $client_id);
+            // $findClient = Client::where('tel', $tel)
+            //     ->orWhere('tel', $lonTel)
+            //     ->orWhereRaw('LOWER(name) = ?', ['passant'])
+            //     ->first();
+            // $createClient = Client::create($filterDataClient);
+            // $client_id = $createClient->id;
+        
         $tabDataVenteProduit = [];
 
         foreach($request->produits as $key=>$val){

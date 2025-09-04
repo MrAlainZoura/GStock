@@ -18,7 +18,7 @@ class UserController extends Controller
      */
     public function index()
     {
-        return 'ok';
+        // return 'ok';
         $user = User::latest()->get();
         return response()->json(['success'=>true, 'data'=>$user]);
     }
