@@ -412,6 +412,21 @@ class RapportController extends Controller
             ->where('depot_id',$depot->id)
             ->get();
 
+        $restePaiementTranche = Vente::with(['paiement' => function ($query) use ($dateFilter) {
+            $query->where($dateFilter());
+        }])->whereHas('paiement', function ($query) use ($dateFilter) {
+            $query->where($dateFilter());
+        })->wherenot($dateFilter())
+        ->whereDoesntHave('compassassion')
+        ->get();
+        // dd($restePaiementTranche);
+        // Somme des avances dans les paiements filtrés
+        $avanceTotal = $restePaiementTranche->sum(function ($vente) {
+            return $vente->paiement->sum(function ($paiement) use ($vente) {
+                return $paiement->avance * $vente->updateTaux;
+            });
+        });
+
         // Statistiques vendeurs (toujours sur le mois)
         $vendeurs = Vente::selectRaw('user_id, COUNT(*) as count, depot_id')
             ->whereMonth('created_at', Carbon::now()->month)
@@ -467,6 +482,8 @@ class RapportController extends Controller
             'vendeurs' => $vendeurs,
             'compassassion' => $compassassion,
             'periode' => $periode,
+            'avanceTotal'=>$avanceTotal,
+            'depot'=>$depot
         ];
         // dd($rapport, $prodArrayResume);
         return Pdf::loadView('mail.rapport', ['rapport' => $rapport]);
