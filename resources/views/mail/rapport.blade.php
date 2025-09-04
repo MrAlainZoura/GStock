@@ -156,31 +156,40 @@
             <td colspan="2">
               @php
                 $recetteFc -= (float)$restePaiementTrancheFc;
+                $recetteFc += (float)$rapport['avanceTotal'];
               @endphp
                 @formaMille( (float)$recetteFc) Fc
             </td>
               <td colspan="3">
-                @if (count($rapport['vente']) >0)
-                    @foreach ($vV->depot->devise as $cle=>$dev )
-                        @formaMille( (float)$recetteFc/(float)$dev->taux ) {{ $dev->libele }} ({{ $dev->taux }}) <br>
-                    @endforeach
-                @endif
+                @foreach ($rapport['depot']->devise as $cle=>$dev )
+                   @formaMille( (float)$recetteFc/(float)$dev->taux ) {{ $dev->libele }} ({{ $dev->taux }}) <br>
+                @endforeach
               </td>
             <!-- <td colspan="2">—</td> -->
         </tr>
+        @if($rapport ['avanceTotal']>0)
+            <tr class="footer-row">
+                <td colspan="2"><strong>Reçu P-Tranche Vente Antérieur</strong></td>
+                <td colspan="2">
+                    @formaMille( (float)$rapport ['avanceTotal']) Fc
+                </td>
+                  <td colspan="3">
+                      @foreach ($rapport['depot']->devise as $cle=>$dev )
+                          @formaMille( (float)$rapport ['avanceTotal']/(float)$dev->taux ) {{ $dev->libele }} ({{ $dev->taux }}) <br>
+                      @endforeach
+                  </td>
+            </tr>
+          @endif
         @if ($restePaiementTrancheFc >0)
           <tr class="footer-row">
               <td colspan="2"><strong>Reste P-Tranche</strong></td>
               <td colspan="2">
-                
                   @formaMille( (float)$restePaiementTrancheFc) Fc
               </td>
                 <td colspan="3">
-                  @if (count($rapport['vente']) >0)
-                      @foreach ($vV->depot->devise as $cle=>$dev )
-                          @formaMille( (float)$restePaiementTrancheFc/(float)$dev->taux ) {{ $dev->libele }} ({{ $dev->taux }}) <br>
-                      @endforeach
-                  @endif
+                    @foreach ($rapport['depot']->devise as $cle=>$dev )
+                        @formaMille( (float)$restePaiementTrancheFc/(float)$dev->taux ) {{ $dev->libele }} ({{ $dev->taux }}) <br>
+                    @endforeach
                 </td>
           </tr>
         @endif
