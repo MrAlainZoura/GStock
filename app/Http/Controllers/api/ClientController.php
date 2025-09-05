@@ -28,7 +28,7 @@ class ClientController extends Controller
                     ->update(['client_id' => $clientPrincipal->id]);
 
                 // Suppression des clients
-                $deleteClient = Client::whereIn('id', $autresClients)->delete();
+                // $deleteClient = Client::whereIn('id', $autresClients)->delete();
             }
         }
 
