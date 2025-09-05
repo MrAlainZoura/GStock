@@ -16,18 +16,24 @@ class ClientController extends Controller
             ->orderBy('id')
             ->first();
 
-        $autresClients = Client::whereRaw('LOWER(name) = ?', ['passant'])
-            ->where('id', '!=', $clientPrincipal->id)
-            ->pluck('id'); // On récupère juste les IDs
-
-        $updateVent = Vente::whereIn('client_id', $autresClients)
+        if ($clientPrincipal) {
+            $autresClients = Client::whereRaw('LOWER(name) = ?', ['passant'])
+                ->where('id', '!=', $clientPrincipal->id)
+                ->pluck('id');
+            $updateVente = false;
+            $deleteClient = false;
+            if ($autresClients->isNotEmpty()) {
+                // Mise à jour des ventes
+                $updateVente = Vente::whereIn('client_id', $autresClients)
                     ->update(['client_id' => $clientPrincipal->id]);
-        $deleteCleint = Client::whereIn('id', $autresClients)->delete();
-        return response()->json(["Premier"=>$clientPrincipal, "Autres"=>$autresClients, "Update"=>$updateVent, "StatutDelete"=>$deleteCleint, "AllDelete"=>$autresClients->count()]);
+
+                // Suppression des clients
+                $deleteClient = Client::whereIn('id', $autresClients)->delete();
+            }
+        }
+
+        return response()->json(["Premier"=>$clientPrincipal, "Autres"=>$autresClients, "Update"=>$updateVente, "StatutDelete"=>$deleteClient, "AllDelete"=>$autresClients->count()]);
         } catch (Exception $e) {
-                // error_log("Exception capturée : " . $e->getMessage());
-                // http_response_code(500);
-                // echo json_encode(["error" => "Erreur interne"]);
              return response()->json(["erreur"=>$e->getMessage(), "status"=>false]);
         }
     }
