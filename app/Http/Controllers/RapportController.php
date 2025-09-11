@@ -372,7 +372,7 @@ class RapportController extends Controller
     public static function genererPDF($id, $periode = 'today')
     {
         $depot = Depot::find($id);
-        $limite = Carbon::today()->setHour(17)->setMinute(45);
+        $limite = Carbon::today()->setHour(17)->setMinute(30);
         // $periode = "annee";
         $dateFilter = function ($table = null) use ($periode) {
             return function ($query) use ($periode, $table) {

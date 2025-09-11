@@ -55,7 +55,7 @@
     </thead>
     <tbody>
 
-        @foreach ($data as $key=>$item )
+        @foreach ($data->reverse() as $key=>$item )
         <tr>
             <td class="font-medium text-gray-900  dark:text-white">
                 <div class="flex gap-2 sm:bloc">
