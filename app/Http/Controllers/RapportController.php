@@ -372,6 +372,7 @@ class RapportController extends Controller
     public static function genererPDF($id, $periode = 'today')
     {
         $depot = Depot::find($id);
+        $limite = Carbon::today()->setHour(17)->setMinute(45);
         // $periode = "annee";
         $dateFilter = function ($table = null) use ($periode) {
             return function ($query) use ($periode, $table) {
@@ -401,32 +402,108 @@ class RapportController extends Controller
             ->where($dateFilter())
             ->orderBy('user_id')
             ->get();
-
-        $venteJour = Vente::where('depot_id', $depot->id)
-            ->where($dateFilter())
-            ->orderBy('user_id')
+        if($periode == "today"){
+            
+            $venteJourPremierTour = Vente::where('depot_id', $depot->id)
+                ->where($dateFilter())
+                ->where('created_at', '<', $limite)
+                ->orderBy('user_id')
+                ->get();
+            $venteJourDeuxiemeTour = Vente::where('depot_id', $depot->id)
+                ->where($dateFilter())
+                ->where('created_at', '>=', $limite)
+                ->orderBy('user_id')
+                ->get();
+            $venteJour=[
+                'avant'=>$venteJourPremierTour,
+                'apres'=>$venteJourDeuxiemeTour,
+            ];
+    
+            $compassassionPremierTour = Vente::whereHas('compassassion', function ($query) use ($limite, $dateFilter) {
+                    $query->where('created_at', '<', $limite)
+                            ->where($dateFilter());
+                })
+                ->with(['paiement', 'venteProduit', 'compassassion'])
+                ->where('depot_id', $depot->id)
+                ->get();
+            $compassassionDeuxiemeTour = Vente::whereHas('compassassion', function ($query) use ($limite, $dateFilter) {
+                    $query->where('created_at', '>=', $limite)
+                            ->where($dateFilter());
+                })
+                ->with(['paiement', 'venteProduit', 'compassassion'])
+                ->where('depot_id', $depot->id)
+                ->get();
+           
+            $compassassion = [
+                'avant'=>$compassassionPremierTour,
+                'apres'=>$compassassionDeuxiemeTour
+            ];
+            // dd($compassassion);
+            $restePaiementTranche = Vente::with(['paiement' => function ($query) use ($dateFilter) {
+                $query->where($dateFilter());
+            }])->whereHas('paiement', function ($query) use ($dateFilter) {
+                $query->where($dateFilter());
+            })->wherenot($dateFilter())
+            ->whereDoesntHave('compassassion')
             ->get();
-
-        $compassassion = Vente::whereHas('compassassion', $dateFilter())
-            ->with(['paiement', 'venteProduit', 'compassassion'])
-            ->where('depot_id',$depot->id)
-            ->get();
-
-        $restePaiementTranche = Vente::with(['paiement' => function ($query) use ($dateFilter) {
-            $query->where($dateFilter());
-        }])->whereHas('paiement', function ($query) use ($dateFilter) {
-            $query->where($dateFilter());
-        })->wherenot($dateFilter())
-        ->whereDoesntHave('compassassion')
-        ->get();
-        // dd($restePaiementTranche);
-        // Somme des avances dans les paiements filtrés
-        $avanceTotal = $restePaiementTranche->sum(function ($vente) {
-            return $vente->paiement->sum(function ($paiement) use ($vente) {
-                return $paiement->avance * $vente->updateTaux;
+            
+            // dd($restePaiementTranche);
+            // Somme des avances dans les paiements filtrés
+            $avanceTotal = $restePaiementTranche->sum(function ($vente) {
+                return $vente->paiement->sum(function ($paiement) use ($vente) {
+                    return $paiement->avance * $vente->updateTaux;
+                });
             });
-        });
-
+        }else{
+            $venteJour = Vente::where('depot_id', $depot->id)
+                ->where($dateFilter())
+                ->orderBy('user_id')
+                ->get();
+    
+            $compassassion = Vente::whereHas('compassassion', $dateFilter())
+                ->with(['paiement', 'venteProduit', 'compassassion'])
+                ->where('depot_id',$depot->id)
+                ->get();
+    
+            $restePaiementTranche = Vente::with(['paiement' => function ($query) use ($dateFilter) {
+                $query->where($dateFilter());
+            }])->whereHas('paiement', function ($query) use ($dateFilter) {
+                $query->where($dateFilter());
+            })->wherenot($dateFilter())
+            ->whereDoesntHave('compassassion')
+            ->get();
+            // dd($restePaiementTranche);
+            // Somme des avances dans les paiements filtrés
+            $avanceTotal = $restePaiementTranche->sum(function ($vente) {
+                return $vente->paiement->sum(function ($paiement) use ($vente) {
+                    return $paiement->avance * $vente->updateTaux;
+                });
+            });
+            $venteJour = Vente::where('depot_id', $depot->id)
+                ->where($dateFilter())
+                ->orderBy('user_id')
+                ->get();
+    
+            $compassassion = Vente::whereHas('compassassion', $dateFilter())
+                ->with(['paiement', 'venteProduit', 'compassassion'])
+                ->where('depot_id',$depot->id)
+                ->get();
+    
+            $restePaiementTranche = Vente::with(['paiement' => function ($query) use ($dateFilter) {
+                $query->where($dateFilter());
+            }])->whereHas('paiement', function ($query) use ($dateFilter) {
+                $query->where($dateFilter());
+            })->wherenot($dateFilter())
+            ->whereDoesntHave('compassassion')
+            ->get();
+            // dd($restePaiementTranche);
+            // Somme des avances dans les paiements filtrés
+            $avanceTotal = $restePaiementTranche->sum(function ($vente) {
+                return $vente->paiement->sum(function ($paiement) use ($vente) {
+                    return $paiement->avance * $vente->updateTaux;
+                });
+            });
+        }
         // Statistiques vendeurs (toujours sur le mois)
         $vendeurs = Vente::selectRaw('user_id, COUNT(*) as count, depot_id')
             ->whereMonth('created_at', Carbon::now()->month)
@@ -485,7 +562,7 @@ class RapportController extends Controller
             'avanceTotal'=>$avanceTotal,
             'depot'=>$depot
         ];
-        // dd($rapport, $prodArrayResume);
+        // dd($rapport, $prodArrayResume, $restePaiementTranche[0]->paiement);
         return Pdf::loadView('mail.rapport', ['rapport' => $rapport]);
     }
     public static function rapport_send_mail($to, $depot, $depot_id){

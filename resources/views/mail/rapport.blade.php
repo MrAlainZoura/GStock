@@ -37,7 +37,11 @@
     @php
         $recette =0;
         $recetteFc = 0;
+        $recettePT = 0;
+        $recetteDT = 0;
         $restePaiementTrancheFc=0;
+        $restePaiementTrancheFcPT=0;
+        $restePaiementTrancheFcDT=0;
         $depotLiebele ="";
         if (count( $rapport['vendeurs']) >0) {
           $depotLiebele = $rapport['vendeurs'][0]->depot->libele;
@@ -58,6 +62,227 @@
       </tr>
     </thead>
     <tbody>
+      @if (is_array($rapport['vente']) && array_key_exists('avant', $rapport['vente']))
+          @foreach ($rapport['vente']['avant'] as $kV=>$vV)
+          @php
+            $restePaiementTrancheFcPT += (float)$vV->paiement->sortByDesc('created_at')->first()->solde * (float)$vV->updateTaux;
+          @endphp
+            @foreach ($vV->venteProduit as $kP=>$vP )
+              <tr>
+                <td>
+                  {{$vP->vente->code}} <br>
+                  {{$vP->vente->created_at}}
+                </td>
+                <td>
+                  {{$vP->produit->marque->categorie->libele }} {{$vP->produit->marque->libele }} {{$vP->produit->libele }} 
+                </td>
+                <td>
+                  {{ $vP->quantite }} 
+                </td>
+                <td>
+                  @php
+                      $recettePT +=(float)$vP->prixT * (float)$vV->updateTaux;
+                  @endphp
+                @formaMille((float)$vV->updateTaux) Fc
+                </td>
+                <td>
+                  @formaMille((float)$vP->prixT) {{ $vV->devise->libele }}
+                  <!-- {{$vV->updateTaux}}Fc -->
+                </td>
+                <td>
+                  @if($vV->user != null)
+                      {{$vV->user->name ." ".$vV->user->prenom}}
+                  @else
+                      Utilisateur Suspendu
+                  @endif
+                  <br>
+                  # {{ $vV->type }}
+                </td>
+              </tr>
+            @endforeach
+        @endforeach 
+        <!-- debut -->
+          @if ($rapport ['compassassion']['avant']->count() > 0)
+            <tr>
+              <td colspan="6" style="font-weight: bold; font-size: 18px;">Compassassion avant / Contre valeur</td>
+            </tr>
+            @foreach ($rapport ['compassassion']['avant'] as $vcomp)
+              <tr>
+                    <td>
+                      {{$vcomp->code}} <br>
+                      {{$vcomp->created_at}}
+                    </td>
+                    <td colspan="2">
+                      <ol>
+                        @foreach ($vcomp->compassassion as $kc=>$vc)
+                        <li>
+                          {{ $vc->produit->libele }} {{ $vc->quantite }}pc <span>→</span> {{ $vc->prixT }} {{ $vcomp->devise->libele }}
+                        </li> 
+                        @endforeach
+
+                      </ol> 
+                      <p style="font-weight: bold;">Contre (ancien article)</p>
+                      <ol>
+                        @foreach ($vcomp->venteProduit as $cvp)
+                        <li>
+                          {{ $cvp->produit->libele}} {{ $cvp->quantite}}pc <span>→</span> {{ $cvp->prixT }} {{ $vcomp->devise->libele }}
+                        </li> 
+                        @endforeach
+                    </td>
+                    
+                    <td>
+                    @formaMille((float)$vcomp->updateTaux) Fc
+                    </td>
+                    <td>
+                      @php
+                          $ajout = (float) $vcomp->paiement->sortByDesc('created_at')->first()->net - (float)$vcomp->paiement->sortBy('created_at')->first()->net;
+                          $recette +=(float) $ajout;
+                          $recetteFc +=(float) $ajout * (float) $vcomp->updateTaux;
+                        @endphp
+                      {{ $vcomp->paiement->sortBy('created_at')->first()->net}} + {{ $ajout }}<br>
+                      <br>{{ $vcomp->paiement->sortByDesc('created_at')->first()->net }} {{ $vcomp->devise->libele }}     
+                    </td>
+                    <td>
+                      @if($vcomp->user != null)
+                          {{$vcomp->user->name ." ".$vcomp->user->prenom}}
+                      @else
+                          Utilisateur Suspendu
+                      @endif
+                      <br>
+                      # shop
+                    </td>
+              </tr>
+            @endforeach
+          @endif
+         <!-- fin -->
+        <tr>
+          <td colspan="2">Sous total à 17h45</td>
+          <td colspan="2">
+            @php
+                $recettePT = (float) $recettePT - (float)$restePaiementTrancheFcPT;
+                $restePaiementTrancheFc +=(float)$restePaiementTrancheFcPT;
+            @endphp
+             @formaMille((float) $recettePT ) Fc
+          </td>
+          <td colspan="2">
+              @foreach ($rapport['depot']->devise as $cle=>$dev )
+                   @formaMille( (float)$recettePT/(float)$dev->taux ) {{ $dev->libele }} ({{ $dev->taux }}) <br>
+                @endforeach
+          </td>
+        </tr>
+        @foreach ($rapport['vente']['apres'] as $kV=>$vV)
+        
+          @php
+            $restePaiementTrancheFcDT += (float)$vV->paiement->sortByDesc('created_at')->first()->solde * (float)$vV->updateTaux;
+          @endphp
+            @foreach ($vV->venteProduit as $kP=>$vP )
+              <tr>
+                <td>
+                  {{$vP->vente->code}} <br>
+                  {{$vP->vente->created_at}}
+                </td>
+                <td>
+                  {{$vP->produit->marque->categorie->libele }} {{$vP->produit->marque->libele }} {{$vP->produit->libele }} 
+                </td>
+                <td>
+                  {{ $vP->quantite }} 
+                </td>
+                <td>
+                  @php
+                      $recette +=(float) $vP->prixT;
+                      $recetteDT +=(float)$vP->prixT * (float)$vV->updateTaux;
+                  @endphp
+                @formaMille((float)$vV->updateTaux) Fc
+                </td>
+                <td>
+                  @formaMille((float)$vP->prixT) {{ $vV->devise->libele }}
+                  <!-- {{$vV->updateTaux}}Fc -->
+                </td>
+                <td>
+                  @if($vV->user != null)
+                      {{$vV->user->name ." ".$vV->user->prenom}}
+                  @else
+                      Utilisateur Suspendu
+                  @endif
+                  <br>
+                  # {{ $vV->type }}
+                </td>
+              </tr>
+            @endforeach
+        @endforeach 
+        <!-- debut -->
+          @if ($rapport ['compassassion']['apres']->count() > 0)
+            <tr>
+              <td colspan="6" style="font-weight: bold; font-size: 18px;">Compassassion / Contre valeur</td>
+            </tr>
+            @foreach ($rapport ['compassassion']['apres'] as $vcomp)
+              <tr>
+                    <td>
+                      {{$vcomp->code}} <br>
+                      {{$vcomp->created_at}}
+                    </td>
+                    <td colspan="2">
+                      <ol>
+                        @foreach ($vcomp->compassassion as $kc=>$vc)
+                        <li>
+                          {{ $vc->produit->libele }} {{ $vc->quantite }}pc <span>→</span> {{ $vc->prixT }} {{ $vcomp->devise->libele }}
+                        </li> 
+                        @endforeach
+
+                      </ol> 
+                      <p style="font-weight: bold;">Contre (ancien article)</p>
+                      <ol>
+                        @foreach ($vcomp->venteProduit as $cvp)
+                        <li>
+                          {{ $cvp->produit->libele}} {{ $cvp->quantite}}pc <span>→</span> {{ $cvp->prixT }} {{ $vcomp->devise->libele }}
+                        </li> 
+                        @endforeach
+                    </td>
+                    
+                    <td>
+                    @formaMille((float)$vcomp->updateTaux) Fc
+                    </td>
+                    <td>
+                      @php
+                          $ajout = (float) $vcomp->paiement->sortByDesc('created_at')->first()->net - (float)$vcomp->paiement->sortBy('created_at')->first()->net;
+                          $recette +=(float) $ajout;
+                          $recettePT +=(float) $ajout * (float) $vcomp->updateTaux;
+                        @endphp
+                      {{ $vcomp->paiement->sortBy('created_at')->first()->net}} + {{ $ajout }}<br>
+                      <br>{{ $vcomp->paiement->sortByDesc('created_at')->first()->net }} {{ $vcomp->devise->libele }}     
+                    </td>
+                    <td>
+                      @if($vcomp->user != null)
+                          {{$vcomp->user->name ." ".$vcomp->user->prenom}}
+                      @else
+                          Utilisateur Suspendu
+                      @endif
+                      <br>
+                      # shop
+                    </td>
+              </tr>
+            @endforeach
+          @endif
+         <!-- fin -->
+        <tr>
+          <td colspan="2">Sous total après 17h45</td>
+          <td colspan="2">
+            @php
+                $recetteDT = (float) $recetteDT - (float)$restePaiementTrancheFcDT;
+                $restePaiementTrancheFc +=(float)$restePaiementTrancheFcDT;
+            @endphp
+            @formaMille((float) $recetteDT) Fc
+            </td>
+          <td colspan="2">
+            @foreach ($rapport['depot']->devise as $cle=>$dev )
+                   @formaMille( (float)$recetteDT/(float)$dev->taux ) {{ $dev->libele }} ({{ $dev->taux }}) <br>
+                @endforeach
+          </td>
+        </tr>
+        @php
+          $recetteFc += (float)$recettePT+ (float)$recetteDT;
+        @endphp
+      @else
         @foreach ($rapport['vente'] as $kV=>$vV)
           @php
             $restePaiementTrancheFc += (float)$vV->paiement->sortByDesc('created_at')->first()->solde * (float)$vV->updateTaux;
@@ -96,66 +321,73 @@
               </td>
             </tr>
             @endforeach
-        @endforeach 
-        @if ($rapport ['compassassion']->count() > 0)
-        <tr>
-          <td colspan="6" style="font-weight: bold; font-size: 18px;">Compassassion / Contre valeur</td>
-        </tr>
-        @foreach ($rapport ['compassassion'] as $vcomp)
-        <tr>
-                <td>
-                  {{$vcomp->code}} <br>
-                  {{$vcomp->created_at}}
-                </td>
-                <td colspan="2">
-                  <ol>
-                    @foreach ($vcomp->compassassion as $kc=>$vc)
-                     <li>
-                      {{ $vc->produit->libele }} {{ $vc->quantite }}pc <span>→</span> {{ $vc->prixT }} {{ $vcomp->devise->libele }}
-                    </li> 
-                    @endforeach
-
-                  </ol> 
-                  <p style="font-weight: bold;">Contre (ancien article)</p>
-                  <ol>
-                    @foreach ($vcomp->venteProduit as $cvp)
-                     <li>
-                      {{ $cvp->produit->libele}} {{ $cvp->quantite}}pc <span>→</span> {{ $cvp->prixT }} {{ $vcomp->devise->libele }}
-                     </li> 
-                    @endforeach
-                </td>
-                
-                <td>
-                @formaMille((float)$vcomp->updateTaux) Fc
-                </td>
-                <td>
-                   @php
-                      $ajout = (float) $vcomp->paiement->sortByDesc('created_at')->first()->net - (float)$vcomp->paiement->sortBy('created_at')->first()->net;
-                      $recette +=(float) $ajout;
-                      $recetteFc +=(float) $ajout * (float) $vcomp->updateTaux;
-                    @endphp
-                   {{ $vcomp->paiement->sortBy('created_at')->first()->net}} + {{ $ajout }}<br>
-                   <br>{{ $vcomp->paiement->sortByDesc('created_at')->first()->net }} {{ $vcomp->devise->libele }}     
-                </td>
-                <td>
-                  @if($vcomp->user != null)
-                      {{$vcomp->user->name ." ".$vcomp->user->prenom}}
-                  @else
-                      Utilisateur Suspendu
-                  @endif
-                  <br>
-                  # shop
-                </td>
-              </tr>
         @endforeach
-        @endif       
+         @php
+          $recetteFc -= (float)$restePaiementTrancheFc;
+         @endphp
+      @endif
+      <!-- compassassion mois ou annee-->
+      @if (!is_array($rapport ['compassassion']))
+            @if ($rapport ['compassassion']->count() > 0)
+              <tr>
+                <td colspan="6" style="font-weight: bold; font-size: 18px;">Compassassion / Contre valeur</td>
+              </tr>
+              @foreach ($rapport ['compassassion'] as $vcomp)
+                <tr>
+                      <td>
+                        {{$vcomp->code}} <br>
+                        {{$vcomp->created_at}}
+                      </td>
+                      <td colspan="2">
+                        <ol>
+                          @foreach ($vcomp->compassassion as $kc=>$vc)
+                          <li>
+                            {{ $vc->produit->libele }} {{ $vc->quantite }}pc <span>→</span> {{ $vc->prixT }} {{ $vcomp->devise->libele }}
+                          </li> 
+                          @endforeach
+    
+                        </ol> 
+                        <p style="font-weight: bold;">Contre (ancien article)</p>
+                        <ol>
+                          @foreach ($vcomp->venteProduit as $cvp)
+                          <li>
+                            {{ $cvp->produit->libele}} {{ $cvp->quantite}}pc <span>→</span> {{ $cvp->prixT }} {{ $vcomp->devise->libele }}
+                          </li> 
+                          @endforeach
+                      </td>
+                      
+                      <td>
+                      @formaMille((float)$vcomp->updateTaux) Fc
+                      </td>
+                      <td>
+                        @php
+                            $ajout = (float) $vcomp->paiement->sortByDesc('created_at')->first()->net - (float)$vcomp->paiement->sortBy('created_at')->first()->net;
+                            $recette +=(float) $ajout;
+                            $recetteFc +=(float) $ajout * (float) $vcomp->updateTaux;
+                          @endphp
+                        {{ $vcomp->paiement->sortBy('created_at')->first()->net}} + {{ $ajout }}<br>
+                        <br>{{ $vcomp->paiement->sortByDesc('created_at')->first()->net }} {{ $vcomp->devise->libele }}     
+                      </td>
+                      <td>
+                        @if($vcomp->user != null)
+                            {{$vcomp->user->name ." ".$vcomp->user->prenom}}
+                        @else
+                            Utilisateur Suspendu
+                        @endif
+                        <br>
+                        # shop
+                      </td>
+                </tr>
+              @endforeach
+            @endif
+
+      @endif
     </tbody>
     <tfoot>
         <tr class="footer-row">
-            <td colspan="2"><strong>Total</strong></td>
+            <td colspan="2"><strong>Total Général</strong></td>
             <td colspan="2">
               @php
-                $recetteFc -= (float)$restePaiementTrancheFc;
                 $recetteFc += (float)$rapport['avanceTotal'];
               @endphp
                 @formaMille( (float)$recetteFc) Fc
