@@ -444,6 +444,7 @@ class RapportController extends Controller
             }])->whereHas('paiement', function ($query) use ($dateFilter) {
                 $query->where($dateFilter());
             })->wherenot($dateFilter())
+            ->where('depot_id',$depot->id)
             ->whereDoesntHave('compassassion')
             ->get();
             
@@ -470,6 +471,7 @@ class RapportController extends Controller
             }])->whereHas('paiement', function ($query) use ($dateFilter) {
                 $query->where($dateFilter());
             })->wherenot($dateFilter())
+            ->where('depot_id',$depot->id)
             ->whereDoesntHave('compassassion')
             ->get();
             // dd($restePaiementTranche);
