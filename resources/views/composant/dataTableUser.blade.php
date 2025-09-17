@@ -99,23 +99,10 @@ if (document.getElementById("search-table") && typeof simpleDatatables.DataTable
     const dataTable = new simpleDatatables.DataTable("#search-table", {
         searchable: true,
         paging: true,
-        perPage: 5,
+        perPage: 15,
         perPageSelect: [5, 10, 15, 20, 25, 50,100, 200, 300, 400, 500],
         sortable: true
     });
 }
-   //modal suppression item
-    const deleteLink = document.querySelectorAll('#linkDelete');
 
-    deleteLink.forEach(link => {
-    link.addEventListener('click', (event) => {
-    event.preventDefault();
-    const hrefClicked = event.currentTarget.getAttribute('href');
-    const formDelete =document.getElementById('deleteForm');
-    const textDeleteItem =document.getElementById('textDeleteItem');
-    const itemName = event.currentTarget.getAttribute('itemName') ;
-    textDeleteItem.textContent= `Confirmer la suppression de (d') ${itemName}`;
-    formDelete.setAttribute('action',hrefClicked);
-  });
-});
 </script>

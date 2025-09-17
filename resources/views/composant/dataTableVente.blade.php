@@ -106,7 +106,13 @@
                             $paiment += (float) $prix;
                         }
                     @endphp
-                        <label for="" class="block"> {{$comp->produit->libele}} : {{$comp->quantite}} pc</label>
+                        <label class="block"> 
+                            @if($comp->produit)
+                            {{$comp->produit->libele}} : {{$comp->quantite}} pc
+                            @else 
+                                Produit retiré : {{$comp->quantite}} pc
+                            @endif   
+                        </label>
                     @endforeach
                 @else 
                     @php
@@ -134,7 +140,7 @@
             </td>
 
             <td>
-                @include('composant.actionLink', ['itemName'=>$item->code,'seeRoute'=>'venteShow','seeParam'=>["vente"=>56745264509*$item->id, "depot"=>$item->depot_id*12], 'deleteRoute'=>"venteDelete",'deleteParam'=>56745264509*$item->id, 'editeRoute'=>"compCreate",'editParam'=>['depot'=>$item->depot->libele, 'vente_id'=>$item->id]])
+                @include('composant.actionLink', ['itemName'=>$item->code." ".$item->created_at." ".$prix ." ".$item->devise->libele,'seeRoute'=>'venteShow','seeParam'=>["vente"=>56745264509*$item->id, "depot"=>$item->depot_id*12], 'deleteRoute'=>"venteDelete",'deleteParam'=>56745264509*$item->id, 'editeRoute'=>"compCreate",'editParam'=>['depot'=>$item->depot->libele, 'vente_id'=>$item->id]])
             </td>
         </tr>
         @php
@@ -173,35 +179,57 @@ if (document.getElementById("search-table") && typeof simpleDatatables.DataTable
     const dataTable = new simpleDatatables.DataTable("#search-table", {
         searchable: true,
         paging: true,
-        perPage: 5,
+        perPage: 15,
         perPageSelect: [5, 10, 15, 20, 25, 50,100, 200, 300, 400, 500],
         sortable: true
     });
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    // const data = @json($data);
-    // // console.log(data);
-    // if (typeof renderRecette === 'function') {
-    //     renderRecette(data);
-    //     console.log('fonction');
-    // }  
-    //modal suppression item
-    const deleteLink = document.querySelectorAll('#linkDelete');
+// document.addEventListener('DOMContentLoaded', () => {
+//     // const data = @json($data);
+//     // // console.log(data);
+//     // if (typeof renderRecette === 'function') {
+//     //     renderRecette(data);
+//     //     console.log('fonction');
+//     // }  
+//     //modal suppression item
+//     const deleteLink = document.querySelectorAll('#linkDelete');
     
-     deleteLink.forEach(link => {
-         link.addEventListener('click', (event) => {
-             event.preventDefault();
-             const hrefClicked = event.currentTarget.getAttribute('href');
-             const formDelete =document.getElementById('deleteForm');
-             const textDeleteItem =document.getElementById('textDeleteItem');
-             const itemName = event.currentTarget.getAttribute('itemName') ;
-             textDeleteItem.textContent= `Confirmer la suppression de la vente ${itemName}`;
-             formDelete.setAttribute('action',hrefClicked);
-         });
-     });
-});
+//      deleteLink.forEach(link => {
+//          link.addEventListener('click', (event) => {
+//              event.preventDefault();
+//              const hrefClicked = event.currentTarget.getAttribute('href');
+//              const formDelete =document.getElementById('deleteForm');
+//              const textDeleteItem =document.getElementById('textDeleteItem');
+//              const itemName = event.currentTarget.getAttribute('itemName') ;
+//              textDeleteItem.textContent= `Confirmer la suppression de la vente ${itemName}`;
+//              formDelete.setAttribute('action',hrefClicked);
+//          });
+//      });
+// });
 
+
+
+// document.addEventListener("DOMContentLoaded", () => {
+//     document.querySelectorAll(".delete-button").forEach(button => {
+//         button.addEventListener("click", () => {
+//             const itemName = button.dataset.itemName;
+//             const deleteRoute = button.dataset.deleteRoute;
+
+//             const formDelete = document.getElementById("deleteForm");
+//             const message = document.getElementById("textDeleteItem");
+
+//             if (formDelete) {
+//                 formDelete.setAttribute("action", deleteRoute);
+//             }
+
+//             if (message) {
+//                 message.textContent = `Etes-vous sûr de vouloir supprimer "${itemName}" ?`;
+//             }
+
+//         });
+//     });
+// });
 
 
     
