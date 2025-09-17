@@ -161,8 +161,8 @@ if (document.getElementById("search-table") && typeof simpleDatatables.DataTable
     const dataTable = new simpleDatatables.DataTable("#search-table", {
         searchable: true,
         paging: true,
-        perPage: 10,
-        perPageSelect: [10, 15, 20, 25, 50,100, 200, 300, 400, 500],
+        perPage: 15,
+        perPageSelect: [15, 15, 20, 25, 50,100, 200, 300, 400, 500],
         sortable: true
     });
 }
