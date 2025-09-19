@@ -59,6 +59,7 @@
         }
     
     @endphp
+  <h2>Rapport {{ $rapport['periode'] }}  {{ $depotLiebele }} </h2>
   <h2>Tableau de vente {{ $depotLiebele }} </h2>
   <table class="table-style">
     <thead>
