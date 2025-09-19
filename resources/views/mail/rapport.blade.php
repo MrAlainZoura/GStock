@@ -30,7 +30,18 @@
         background-color: #f1f1f1;
         font-weight: bold;
         }
-
+        .tc{
+          text-align: center;
+        }
+        .df{
+          display: flex;
+        }
+        .jc{
+          justify-content: center;
+        }
+        .tb{
+          font-weight: 700;
+        }
     </style>
 </head>
 <body>
@@ -156,15 +167,15 @@
           @endif
          <!-- fin -->
         <tr>
-          <td colspan="2">Sous total à 17h45</td>
-          <td colspan="2">
+          <td colspan="2" class="tb">Sous total à 17h30</td>
+          <td colspan="2" class="tb">
             @php
                 $recettePT = (float) $recettePT - (float)$restePaiementTrancheFcPT;
                 $restePaiementTrancheFc +=(float)$restePaiementTrancheFcPT;
             @endphp
              @formaMille((float) $recettePT ) Fc
           </td>
-          <td colspan="2">
+          <td colspan="2" class="tb">
               @foreach ($rapport['depot']->devise as $cle=>$dev )
                    @formaMille( (float)$recettePT/(float)$dev->taux ) {{ $dev->libele }} ({{ $dev->taux }}) <br>
                 @endforeach
@@ -265,15 +276,15 @@
           @endif
          <!-- fin -->
         <tr>
-          <td colspan="2">Sous total après 17h45</td>
-          <td colspan="2">
+          <td colspan="2" class="tb">Sous total après 17h30</td>
+          <td colspan="2" class="tb">
             @php
                 $recetteDT = (float) $recetteDT - (float)$restePaiementTrancheFcDT;
                 $restePaiementTrancheFc +=(float)$restePaiementTrancheFcDT;
             @endphp
             @formaMille((float) $recetteDT) Fc
             </td>
-          <td colspan="2">
+          <td colspan="2" class="tb">
             @foreach ($rapport['depot']->devise as $cle=>$dev )
                    @formaMille( (float)$recetteDT/(float)$dev->taux ) {{ $dev->libele }} ({{ $dev->taux }}) <br>
                 @endforeach
@@ -448,6 +459,45 @@
     </tbody>
    
   </table> 
+  @if ((int)$rapport['showVente'] > 0)
+    <h2>Tableau de resumé de produit vendu {{ $depotLiebele }}</h2>
+    <table class="table-style">
+      <thead>
+        <tr class="header-row">
+          <th>Categorie</th>
+          <th>Marque</th>
+          <th>Pièce Vendue</th>
+        </tr>
+      </thead>
+      <tbody>
+          @foreach ($rapport['venteTri'] as $cat=>$allMarque)
+              <tr>
+                <td colspan="3" class="tb">{{ $cat}}</td>
+              </tr>
+              @php
+                $index = 1;
+                $total = 0;
+              @endphp
+              @foreach ($allMarque as $marque=>$qte )
+              <tr>
+                <td>{{ $index++ }}.</td>
+                <td>{{ $marque }}</td>
+                <td>{{ $qte }}</td>
+              </tr>
+                @php
+                  $total+=(int)$qte;
+                @endphp
+              @endforeach
+              <tr class="tb">
+                <td colspan="2" >Total vente {{$cat}}</td>
+                <td>{{$total}}</td>
+              </tr>
+          @endforeach        
+      </tbody>
+    </table>        
+  @else 
+    <h4>Aucune vente enregistrée dans cette intervalle</h4>
+  @endif
   <h2>Tableau de resumé de stock produit {{ $depotLiebele }}</h2>
   <table class="table-style">
     <thead>

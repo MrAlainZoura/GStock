@@ -373,7 +373,7 @@ class RapportController extends Controller
     {
         $depot = Depot::find($id);
         $limite = Carbon::today()->setHour(17)->setMinute(30);
-        // $periode = "annee";
+        // $periode = "mois";
         $dateFilter = function ($table = null) use ($periode) {
             return function ($query) use ($periode, $table) {
                 $column = $table ? "{$table}.created_at" : "created_at";
@@ -552,7 +552,33 @@ class RapportController extends Controller
                 'rest' => $val->quantite,
             ];
         })->sortBy('rest')->values()->all();
+        // debut new tri
+        $ventesParCategorie = $allProdDepot
+            ->map(function ($val) use ($ventes) {
+                $produit = $val->produit;
+                $categorie = $produit->marque->categorie->libele;
+                $marque = $produit->marque->libele;
+                $quantiteVendue = $ventes[$val->produit_id] ?? 0;
 
+                return [
+                    'categorie' => $categorie,
+                    'marque' => $marque,
+                    'quantite' => $quantiteVendue,
+                ];
+            })
+            ->filter(function ($item) {
+                return $item['quantite'] >= 1;
+            })
+            ->groupBy('categorie')
+            ->map(function ($group) {
+                return $group
+                    ->groupBy('marque')
+                    ->map(function ($items) {
+                        return $items->sum('quantite');
+                    })
+                    ->sortDesc(); // Tri des marques par quantité vendue
+        });
+        // fin new tri
         $rapport = [
             'approvisionnement' => $approJour,
             'transfert' => $transJour,
@@ -562,7 +588,9 @@ class RapportController extends Controller
             'compassassion' => $compassassion,
             'periode' => $periode,
             'avanceTotal'=>$avanceTotal,
-            'depot'=>$depot
+            'depot'=>$depot,
+            'venteTri'=>$ventesParCategorie,
+            'showVente'=>$ventesParCategorie->count()
         ];
         // dd($rapport, $prodArrayResume, $restePaiementTranche[0]->paiement);
         return Pdf::loadView('mail.rapport', ['rapport' => $rapport]);
@@ -655,6 +683,32 @@ class RapportController extends Controller
         return back()->with('echec',"Email non envoyé, renseignements fournient sont erronés !");
 
 
+    }
+
+    public static function rapportDownload ($depot, $periode){
+        $depot_id = $depot/12;
+        $getDepot = Depot::find($depot_id);
+        if(!$getDepot){
+            return back()->with('echec', "Erreur, Depot introvable");
+        }
+
+        if(in_array($periode, ['today','mois', 'annee'])){
+            switch ($periode) {
+                    case 'mois':
+                        $getDate = Carbon::now()->translatedFormat('F Y');
+                       break;
+                    case 'annee':
+                        $getDate = Carbon::now()->format('Y');
+                        break;
+                    default:
+                        $getDate = Carbon::today()->format('Y-m-d');
+                        break;
+                }
+            $pdf = self::genererPDF($depot_id, $periode);
+            $rapportDwl= 'rapport_'.$getDate."_$getDepot->libele" . '.pdf';
+            return $pdf->download($rapportDwl);
+        }
+        return back()->with('echec', "Erreur, Intervalle invalide");
     }
     public function sendMailrapportJob($depot)
     {
