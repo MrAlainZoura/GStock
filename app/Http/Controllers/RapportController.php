@@ -579,6 +579,17 @@ class RapportController extends Controller
                     ->sortDesc(); // Tri des marques par quantité vendue
         });
         // fin new tri
+        switch ($periode) {
+            case 'mois':
+                $getDate ='Mensuel '. Carbon::now()->translatedFormat('F Y');
+               break;
+            case 'annee':
+                $getDate ="Annuel ". Carbon::now()->format('Y');
+                break;
+            default:
+                $getDate ="Journalier ". Carbon::today()->format('Y-m-d');
+                break;
+        }
         $rapport = [
             'approvisionnement' => $approJour,
             'transfert' => $transJour,
@@ -586,7 +597,7 @@ class RapportController extends Controller
             'resumeProduit' => $prodArrayResume,
             'vendeurs' => $vendeurs,
             'compassassion' => $compassassion,
-            'periode' => $periode,
+            'periode' => $getDate,
             'avanceTotal'=>$avanceTotal,
             'depot'=>$depot,
             'venteTri'=>$ventesParCategorie,
