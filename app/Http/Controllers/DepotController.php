@@ -260,6 +260,8 @@ class DepotController extends Controller
      */
     public function destroy(string $id)
     {
+        return back()->with('success','Bientôt disponible');
+
         $delete = Depot::where('id',$id)->delete();
         if(!$delete){
             return response()->json(['success'=>true, 'data'=>'echec de suppression']);
