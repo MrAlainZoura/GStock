@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    @vite(['resources/css/app.css','resources/js/app.js'])
+    @vite(['resources/css/app.css','resources/js/app.js', 'resources/js/actionLink.js'])
     <title>@yield('title')</title>
 
     <link rel="stylesheet" href="{{asset('build/assets/app-LK1St38P.css')}}">

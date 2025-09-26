@@ -113,27 +113,27 @@ if (document.getElementById("search-table") && typeof simpleDatatables.DataTable
     @endif
  
     const deleteLink = document.querySelectorAll('#linkDelete');
-    deleteLink.forEach(link => {
-        link.addEventListener('click', (event) => {
-            event.preventDefault();
-            const hrefClicked = event.currentTarget.getAttribute('href');
-            const formDelete =document.getElementById('deleteForm');
-            const textDeleteItem =document.getElementById('textDeleteItem');
-            const itemName = event.currentTarget.getAttribute('itemName');
-            textDeleteItem.textContent= `Confirmer la suppression du produit ${itemName}`;
+    // deleteLink.forEach(link => {
+    //     link.addEventListener('click', (event) => {
+    //         event.preventDefault();
+    //         const hrefClicked = event.currentTarget.getAttribute('href');
+    //         const formDelete =document.getElementById('deleteForm');
+    //         const textDeleteItem =document.getElementById('textDeleteItem');
+    //         const itemName = event.currentTarget.getAttribute('itemName');
+    //         textDeleteItem.textContent= `Confirmer la suppression du produit ${itemName}`;
 
-            const inputDepotId = document.createElement('input');
-                    inputDepotId.type = "text";
-                    inputDepotId.name = "depot_id"; // important si tu veux que ce champ soit envoyé avec le formulaire
-                    inputDepotId.value = depot_id;  // tu peux assigner la valeur ici si elle existe
-                    inputDepotId.hidden = true;
-                    inputDepotId.id="depot_id";
+    //         const inputDepotId = document.createElement('input');
+    //                 inputDepotId.type = "text";
+    //                 inputDepotId.name = "depot_id"; // important si tu veux que ce champ soit envoyé avec le formulaire
+    //                 inputDepotId.value = depot_id;  // tu peux assigner la valeur ici si elle existe
+    //                 inputDepotId.hidden = true;
+    //                 inputDepotId.id="depot_id";
 
-            if(!document.getElementById('depot_id')){
-                formDelete.appendChild(inputDepotId);
-            }
-            formDelete.setAttribute('action',hrefClicked);
+    //         if(!document.getElementById('depot_id')){
+    //             formDelete.appendChild(inputDepotId);
+    //         }
+    //         formDelete.setAttribute('action',hrefClicked);
 
-        });
-    });
+    //     });
+    // });
 </script>
