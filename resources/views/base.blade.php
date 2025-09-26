@@ -6,8 +6,9 @@
     @vite(['resources/css/app.css','resources/js/app.js', 'resources/js/actionLink.js'])
     <title>@yield('title')</title>
 
-    <link rel="stylesheet" href="{{asset('build/assets/app-LK1St38P.css')}}">
+    <link rel="stylesheet" href="{{asset('build/assets/app-T0NEsHWA.css')}}">
     <link rel="stylesheet" href="{{asset('build/assets/app-hg-u5LYb.js')}}">
+    <link rel="stylesheet" href="{{asset('build/assets/actionLink-CO_D2RG2.js')}}">
     <link rel="stylesheet" href="{{asset('build/manifest.json')}}">
     <link rel="icon" type="image/x-icon" href="{{asset('img/icon.jpeg')}}">    
     <script src="https://cdn.jsdelivr.net/npm/simple-datatables@9.0.3"></script>
