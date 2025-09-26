@@ -1,12 +1,18 @@
 {
   "resources/css/app.css": {
-    "file": "assets/app-LK1St38P.css",
+    "file": "assets/app-T0NEsHWA.css",
     "src": "resources/css/app.css",
     "isEntry": true
   },
   "resources/css/login.css": {
     "file": "assets/login-DU19I3f8.css",
     "src": "resources/css/login.css",
+    "isEntry": true
+  },
+  "resources/js/actionLink.js": {
+    "file": "assets/actionLink-CO_D2RG2.js",
+    "name": "actionLink",
+    "src": "resources/js/actionLink.js",
     "isEntry": true
   },
   "resources/js/app.js": {

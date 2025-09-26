@@ -3,17 +3,18 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\DepotController;
 use App\Http\Controllers\VenteController;
+use App\Http\Controllers\DeviseController;
 use App\Http\Controllers\ProduitController;
+use App\Http\Controllers\RapportController;
+use App\Http\Controllers\PaiementController;
 use App\Http\Controllers\CategorieController;
 use App\Http\Controllers\TransfertController;
 use App\Http\Middleware\AuthentifyMiddleware;
-use App\Http\Controllers\ApprovisionnementController;
 use App\Http\Controllers\CompassassionController;
-use App\Http\Controllers\DeviseController;
-use App\Http\Controllers\PaiementController;
-use App\Http\Controllers\RapportController;
+use App\Http\Controllers\ApprovisionnementController;
 
 // Route::get('/', function () {
 //     return view('home');
@@ -21,6 +22,10 @@ use App\Http\Controllers\RapportController;
 // Route::get('/',[HomeController::class, 'home'])->name('home');
 Route::get('/',[UserController::class, 'loginCreate'])->name('home');
 Route::get('dashbord',[HomeController::class, 'dashboard'])->name('dashboard')->middleware(AuthentifyMiddleware::class);
+
+Route::get('administration',[AdminController::class,"index"])->name("admin.index")->middleware(AuthentifyMiddleware::class);
+Route::get('administration/create',[AdminController::class,"create"])->name("admin.create")->middleware(AuthentifyMiddleware::class);
+Route::post('administration/store',[AdminController::class,"store"])->name("admin.store")->middleware(AuthentifyMiddleware::class);
 
 Route::get('sing_in',[UserController::class, 'loginCreate'])->name('loginCreate');
 Route::post('nous_rejoindre',[UserController::class, 'createCompte'])->name('nousRejoindre');

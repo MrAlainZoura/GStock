@@ -448,6 +448,7 @@ class UserController extends Controller
         ];
 
         // dd($data);
+        return back()->with('succes', 'Veuillez vous connectez à présent votre boite mail pour la suite de création de votre compte');
         $createAdmin = User::create($data);
         if($createAdmin){ 
             $getAdminRoleId = Role::where('libele', 'Administrateur')->first();
