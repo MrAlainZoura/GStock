@@ -104,6 +104,7 @@
         const depot_id = null;
     @endif
  
+
     //const deleteLink = document.querySelectorAll('#linkDelete');
     // deleteLink.forEach(link => {
     //     link.addEventListener('click', (event) => {
