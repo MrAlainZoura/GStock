@@ -24,6 +24,6 @@ class AppServiceProvider extends ServiceProvider
         Blade::directive('formaMille', function ($expression) {
             return "<?php echo number_format($expression, 0, ',', ' '); ?>";
         });
-        Schema::defaultStringLength(255);
+        Schema::defaultStringLength(191);
     }
 }

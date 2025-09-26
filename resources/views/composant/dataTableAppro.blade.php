@@ -115,20 +115,3 @@
 
     </tbody>
 </table>
-
-
-
-<script>
-    
-if (document.getElementById("search-table") && typeof simpleDatatables.DataTable !== 'undefined') {
-    const dataTable = new simpleDatatables.DataTable("#search-table", {
-        searchable: true,
-        paging: true,
-        perPage: 15,
-        perPageSelect: [15, 10, 15, 20, 25, 50,100, 200, 300, 400, 500],
-        sortable: true
-    });
-}
-
-
-</script>
