@@ -53,6 +53,8 @@ class AdminController extends Controller
         $data = [
             'name'=>$request->name,
             'email'=>$request->email,
+            'prenom'=>$request->prenom,
+            'tel'=>$request->tel,
             'password'=>Hash::make('0000')
         ];
         $user = User::create($data);
