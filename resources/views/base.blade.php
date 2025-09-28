@@ -1,3 +1,6 @@
+@php
+    use Illuminate\Support\Facades\Crypt;
+@endphp
 <!DOCTYPE html>
 <html lang="en">
 <head>

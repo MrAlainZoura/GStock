@@ -330,6 +330,9 @@ class ProduitController extends Controller
      */
     public function destroy(Request $request, string $getId)
     {
+        if(session('depot') === null){
+            return to_route('dashboard');
+        }
         $id = $getId/450;
         $prod = Produit::find($id);
         if($prod){
@@ -350,12 +353,13 @@ class ProduitController extends Controller
                     $prod->produitTransfert()->delete();
                     $prod->approvisionnement()->delete();
                     $prod->delete();
-                    return back()->with("success","Produit supprimé avec succès !");
+
+                    return to_route('showProduit',["depot"=>session('depot'), "id"=>session('depot_id')*12])->with("success","Produit supprimé avec succès !");
                 }
 
-            return back()->with("echec", "Echec de suppression, ce produit est lié à une transaction en cours! vente : $prodVente, transfert : $prodTrans");
+            return to_route('showProduit',["depot"=>session('depot'), "id"=>session('depot_id')*12])->with("echec", "Echec de suppression, ce produit est lié à une transaction en cours! vente : $prodVente, transfert : $prodTrans");
         }else{
-            return back()->with("echec", "Echec de suppression, ce produit introuvable!");
+            return to_route('showProduit',["depot"=>session('depot'), "id"=>session('depot_id')*12])->with("echec", "Echec de suppression, ce produit introuvable!");
         }
     }
 }

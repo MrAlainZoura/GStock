@@ -29,14 +29,4 @@
                 });
             });
         };
-
-        // Exécuter la configuration des boutons de suppression au chargement
-        setupDeleteButtons();
-
-        // Événement resize avec debounce
-        window.addEventListener("resize", () => {
-            clearTimeout(resizeTimeout);
-                // Ici, vous pouvez ajouter d'autres logiques de redimensionnement si nécessaire
-            }, 200);
-        });
     });

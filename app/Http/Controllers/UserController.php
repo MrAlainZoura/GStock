@@ -165,11 +165,6 @@ class UserController extends Controller
      */
     public function edit(string $userEdit)
     {
-        // dd($userEdit);
-        // [$name, $id] = [
-        //     preg_replace('/[0-9]+/', '', $userEdit),
-        //     preg_replace('/[^0-9]/', '', $userEdit)
-        // ];
         if(session('depot') === null){
             return to_route('dashboard');
         }
@@ -333,12 +328,7 @@ class UserController extends Controller
         $string = $userDelete;
         $dossier="users";
         $id = (int) $userDelete/6789012345;
-        // $name="";
-        // $parts = explode(" ", $string);
-        // if (count($parts) == 2) {
-        //     $name = $parts[0];
-        //     $id = $parts[1]/6789012345;
-        // }
+        
         $user= User::where("id", $id)->first();
         if($user != null && !in_array($user->user_role->role->libele, ['Administrateur', 'Super admin'])){
             $image=$user->image;
@@ -347,11 +337,11 @@ class UserController extends Controller
                 if (Storage::exists("public/uploads/$dossier/$image")) {
                     Storage::delete("public/uploads/$dossier/$image");
                 }
-                return back()->with('success',"Utilisateur supprimé avec succès !");
+                return to_route('user.index')->with('success',"Utilisateur supprimé avec succès !");
             }
-            return back()->with('echec',"Erreur inattendue, utilisateur est lié à un processus encours!");
+            return to_route('user.index')->with('echec',"Erreur inattendue, utilisateur est lié à un processus encours!");
         }
-        return back()->with('echec',"Erreur inattendue, suppression échouée!");
+        return to_route('user.index')->with('echec',"Erreur inattendue, suppression échouée!");
     }
 
     public function login(Request $request){
@@ -394,7 +384,7 @@ class UserController extends Controller
             } 
         }
 
-        // $password = $request->password;
+    // $password = $request->password;
     //    if ($user && Auth::attempt(['email' => $user->email, 'password' => $password])) {
     //         $request->session()->regenerate();
     //         return redirect()->intended('dashbord');

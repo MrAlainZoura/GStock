@@ -115,22 +115,3 @@
 
     </tbody>
 </table>
-
-
-
-<script>
-
- //modal suppression item
-    // const deleteLink = document.querySelectorAll('#linkDelete');
-    // deleteLink.forEach(link => {
-    //     link.addEventListener('click', (event) => {
-    //         event.preventDefault();
-    //         const hrefClicked = event.currentTarget.getAttribute('href');
-    //         const formDelete =document.getElementById('deleteForm');
-    //         const textDeleteItem =document.getElementById('textDeleteItem');
-    //         const itemName = event.currentTarget.getAttribute('itemName') ;
-    //         textDeleteItem.textContent= `Confirmer la suppression du transfert ${itemName}`;
-    //         formDelete.setAttribute('action',hrefClicked);
-    //     });
-    // });
-</script>

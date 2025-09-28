@@ -27,13 +27,11 @@ class TransfertController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create($var_depot)
+    public function create($var_depot, $id)
     {
-       if(session('depot') === null){
-            return to_route('dashboard');
-        }
+        $id = $id/12;
         // dd(Transfert::all(), Approvisionnement::latest()->first(), ProduitDepot::latest()->first(), $var_depot);
-        $depot = Depot::where("libele",$var_depot)->where('id',session('depot_id'))->with('produitDepot')->first();
+        $depot = Depot::where("libele",$var_depot)->where('id',$id)->with('produitDepot')->first();
         if($depot){
             $produit = ProduitDepot::where("depot_id",$depot->id)->with("produit.marque","produit.marque.categorie")->get();
             $depotList=Depot::where("libele",'!=',$var_depot)->where('user_id',$depot->user_id)->get();
@@ -128,13 +126,14 @@ class TransfertController extends Controller
     /**
      * Display the specified resource.
      */
-    public function showDepotTrans($depot){
-        if(session('depot') === null){
-            return to_route('dashboard');
-        }
-        $findDepotId = Depot::where('libele',$depot)->where('id', session('depot_id'))->first();
+    public function showDepotTrans($depot, $id){
+        $id = $id/12;
+        $findDepotId = Depot::where('libele',$depot)->where('id', $id)->first();
         $findTransDepot = Transfert::where('depot_id',$findDepotId->id)->with('produitTransfert')->get();
-        return view('transfert.index',compact('findTransDepot'));
+        if($findTransDepot){
+            return view('transfert.index',compact('findTransDepot'));
+        }
+        return back()->with('echec',"Aucune donnée ne correspond à votre demande"); 
 
     }
     public function show($transfert)
@@ -146,7 +145,10 @@ class TransfertController extends Controller
         $code = $parts[0];
         $id = $parts[1]/6789012345;
         $findTransDetails = Transfert::where("id",$id)->where('code', $code)->first();
-        return view('transfert.show',compact('findTransDetails'));
+        if($findTransDetails){
+            return view('transfert.show',compact('findTransDetails'));
+        }
+        return back()->with('echec',"Aucune donnée ne correspend à votre demande"); 
     }
 
     /**

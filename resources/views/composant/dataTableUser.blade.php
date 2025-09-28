@@ -81,7 +81,7 @@
                 @endif
             </td>
             <td> 
-                @include('composant.actionLink', ['itemName'=>$item->name,'seeRoute'=>'user.show','seeParam'=>$item->id*6789012345, 'deleteRoute'=>"user.destroy",'deleteParam'=>$item->id*6789012345, 'editeRoute'=>"user.edit",'editParam'=>$item->id*6789012345])
+                @include('composant.actionLink', ['itemName'=>"Utilisateur_".$item->name,'seeRoute'=>'user.show','seeParam'=>$item->id*6789012345, 'deleteRoute'=>"user.destroy",'deleteParam'=>$item->id*6789012345, 'editeRoute'=>"user.edit",'editParam'=>$item->id*6789012345])
             </td>
            
         </tr>
@@ -89,5 +89,3 @@
 
     </tbody>
 </table>
-
-@include('composant.modalDelete')

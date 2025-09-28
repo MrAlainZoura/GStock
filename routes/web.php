@@ -23,6 +23,8 @@ use App\Http\Controllers\ApprovisionnementController;
 Route::get('/',[UserController::class, 'loginCreate'])->name('home');
 Route::get('dashbord',[HomeController::class, 'dashboard'])->name('dashboard')->middleware(AuthentifyMiddleware::class);
 
+Route::get('confirmation/{message}/{id}/{route}',[AdminController::class,"confirmDeleteItem"])->name("admin.confirmDeleteItem")->middleware(AuthentifyMiddleware::class);
+
 Route::get('administration',[AdminController::class,"index"])->name("admin.index")->middleware(AuthentifyMiddleware::class);
 Route::get('administration/create',[AdminController::class,"create"])->name("admin.create")->middleware(AuthentifyMiddleware::class);
 Route::post('administration/store',[AdminController::class,"store"])->name("admin.store")->middleware(AuthentifyMiddleware::class);
@@ -42,8 +44,8 @@ Route::post('approvisionnement/{appro}/confirmation/{action}', [Approvisionnemen
 Route::get('approvisionnement/{appro}/show', [ApprovisionnementController::class,'show'])->name('approShow')->middleware( AuthentifyMiddleware::class);
 Route::get('approvisionnement/{appro}/edit', [ApprovisionnementController::class,'edit'])->name('approEdit')->middleware( AuthentifyMiddleware::class);
 
-Route::get('transfert/{depot}', [TransfertController::class,'showDepotTrans'])->name('transDepot')->middleware( AuthentifyMiddleware::class);
-Route::get('transfert/{depot}/create', [TransfertController::class,'create'])->name('transCreate')->middleware( AuthentifyMiddleware::class);
+Route::get('transfert/{depot}/{id}', [TransfertController::class,'showDepotTrans'])->name('transDepot')->middleware( AuthentifyMiddleware::class);
+Route::get('transfert/{depot}/create/{id}', [TransfertController::class,'create'])->name('transCreate')->middleware( AuthentifyMiddleware::class);
 Route::post('transfert/{depot}/store', [TransfertController::class,'store'])->name('transStore')->middleware( AuthentifyMiddleware::class);
 Route::post('transfert/{transfert}/confirmation', [TransfertController::class,'confirm'])->name('transConfirm')->middleware( AuthentifyMiddleware::class);
 Route::get('transfert/{transfert}/show', [TransfertController::class,'show'])->name('transShow')->middleware( AuthentifyMiddleware::class);
@@ -74,7 +76,7 @@ Route::get('rapport/{depot}/mail-job', [RapportController::class,'sendMailrappor
 Route::get('rapport/{depot}/{periode}/download', [RapportController::class,'rapportDownload'])->name('rapportDownload')->middleware( AuthentifyMiddleware::class);
 
 Route::get('{depot}/parametre', [DepotController::class, 'depotSetting'])->name("depotSetting")->middleware(AuthentifyMiddleware::class);
-Route::get('{depot}/produits', [DepotController::class, 'showProduit'])->name("showProduit")->middleware(AuthentifyMiddleware::class);
+Route::get('{depot}/produits/{id}', [DepotController::class, 'showProduit'])->name("showProduit")->middleware(AuthentifyMiddleware::class);
 
 Route::put('{depot}/{devise}/update', [DeviseController::class, 'update'])->name("devise.update")->middleware(AuthentifyMiddleware::class);
 
