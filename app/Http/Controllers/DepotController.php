@@ -144,9 +144,13 @@ class DepotController extends Controller
         $prodDepot = ProduitDepot::where("depot_id",$depot->id)->with('produit')->get();
         return view('depot.show',compact('prodDepot','depot','user','vendeurs','tabProdVendu'));
     }
-    public function showProduit(string $depot)
+    public function showProduit(string $depot, $id)
     {
-        $depotData = Depot::where("libele",$depot)->first();
+        $id = $id/12;
+        $depotData = Depot::where("libele",$depot)->where('id', $id)->first();
+        if(!$depotData){
+            return redirect()->back()->with('echec','Renseignement incorrect, recommencer');
+        }
         $user = Auth::user();
         $cat = Categorie::orderBy('libele')->with('marque')->get();        
         $prodDepot = ProduitDepot::where("depot_id",$depotData->id)->with('produit.marque')->latest()->get();

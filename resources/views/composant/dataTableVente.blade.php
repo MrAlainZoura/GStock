@@ -140,7 +140,7 @@
             </td>
 
             <td>
-                @include('composant.actionLink', ['itemName'=>$item->code." ".$item->created_at." ".$prix ." ".$item->devise->libele,'seeRoute'=>'venteShow','seeParam'=>["vente"=>56745264509*$item->id, "depot"=>$item->depot_id*12], 'deleteRoute'=>"venteDelete",'deleteParam'=>56745264509*$item->id, 'editeRoute'=>"compCreate",'editParam'=>['depot'=>$item->depot->libele, 'vente_id'=>$item->id]])
+                @include('composant.actionLink', ['itemName'=>"Vente_".$item->user->name."_".$item->created_at."_".$prix . $item->devise->libele,'seeRoute'=>'venteShow','seeParam'=>["vente"=>56745264509*$item->id, "depot"=>$item->depot_id*12], 'deleteRoute'=>"venteDelete",'deleteParam'=>56745264509*$item->id, 'editeRoute'=>"compCreate",'editParam'=>['depot'=>$item->depot->libele, 'vente_id'=>$item->id]])
             </td>
         </tr>
         @php

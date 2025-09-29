@@ -267,7 +267,9 @@ class VenteController extends Controller
 
         $idVente = $vente/56745264509;
         $deleteVente = Vente::where('id', $idVente)->first();
-       
+        if( $deleteVente === null ){
+            return back()->with("echec","Une erreur s'est produite, cet élément a déjà été supprimé !");
+        }
         foreach($deleteVente->venteProduit as $c=>$v){
             $verifQTe = ProduitDepot::where('depot_id',$deleteVente->depot_id)
                 ->where('produit_id',$v->produit_id)
@@ -275,11 +277,11 @@ class VenteController extends Controller
             $newQt =$verifQTe->quantite + $v->quantite;
             $verifQTe->update(['quantite'=>(int)$newQt]);
         }
-
+        $depot = $deleteVente->depot;
         if( $deleteVente->delete())  {
-            return back()->with("success","Vente effacée avec succès");
+            return to_route('venteDepot', ['depot'=>$depot->libele, "depot_id"=>$depot->id])->with("success","Vente effacée avec succès");
         }
-        return back()->with("echec","Une erreur s'est produite, veuillez réessayer plus tard !");
+        return to_route('venteDepot', ['depot'=>$depot->libele, "depot_id"=>$depot->id])->with("echec","Une erreur s'est produite, veuillez réessayer plus tard !");
     }
      public function restore($venteId){
 

@@ -83,50 +83,9 @@
                 </div> 
             </td>
            <td>
-               @include('composant.actionLink', ['itemName'=>$item->produit->libele,'seeRoute'=>'prod.show','seeParam'=>450*$item->produit->id, 'deleteRoute'=>"prod.destroy",'deleteParam'=>450*$item->produit->id, 'editeRoute'=>"prod.edit",'editParam'=>$item->produit->id*450])
+               @include('composant.actionLink', ['itemName'=>"Produit_".$item->produit->marque->categorie->libele."_".$item->produit->marque->libele."_".$item->produit->libele,'seeRoute'=>'prod.show','seeParam'=>450*$item->produit->id, 'deleteRoute'=>"prod.destroy",'deleteParam'=>450*$item->produit->id, 'editeRoute'=>"prod.edit",'editParam'=>$item->produit->id*450])
             </td>
         </tr>
         @endforeach
     </tbody>
 </table>
-  @include('composant.modalDelete')
-<script>
-    
-
-
- //modal suppression item
-
-    @if(isset($item))
-        const depot = @json($item);
-        const depot_id = depot.depot_id;
-    @else
-        const depot = null;
-        const depot_id = null;
-    @endif
- 
-
-    //const deleteLink = document.querySelectorAll('#linkDelete');
-    // deleteLink.forEach(link => {
-    //     link.addEventListener('click', (event) => {
-    //         event.preventDefault();
-    //         const hrefClicked = event.currentTarget.getAttribute('href');
-    //         const formDelete =document.getElementById('deleteForm');
-    //         const textDeleteItem =document.getElementById('textDeleteItem');
-    //         const itemName = event.currentTarget.getAttribute('itemName');
-    //         textDeleteItem.textContent= `Confirmer la suppression du produit ${itemName}`;
-
-    //         const inputDepotId = document.createElement('input');
-    //                 inputDepotId.type = "text";
-    //                 inputDepotId.name = "depot_id"; // important si tu veux que ce champ soit envoyé avec le formulaire
-    //                 inputDepotId.value = depot_id;  // tu peux assigner la valeur ici si elle existe
-    //                 inputDepotId.hidden = true;
-    //                 inputDepotId.id="depot_id";
-
-    //         if(!document.getElementById('depot_id')){
-    //             formDelete.appendChild(inputDepotId);
-    //         }
-    //         formDelete.setAttribute('action',hrefClicked);
-
-    //     });
-    // });
-</script>
