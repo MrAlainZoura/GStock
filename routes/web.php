@@ -27,6 +27,8 @@ Route::get('confirmation/{message}/{id}/{route}',[AdminController::class,"confir
 
 Route::get('administration',[AdminController::class,"index"])->name("admin.index")->middleware(AuthentifyMiddleware::class);
 Route::get('administration/create',[AdminController::class,"create"])->name("admin.create")->middleware(AuthentifyMiddleware::class);
+Route::get('administration/edit/{id}',[AdminController::class,"edit"])->name("admin.edit")->middleware(AuthentifyMiddleware::class);
+Route::put('administration/update/{id}',[AdminController::class,"update"])->name("admin.update")->middleware(AuthentifyMiddleware::class);
 Route::post('administration/store',[AdminController::class,"store"])->name("admin.store")->middleware(AuthentifyMiddleware::class);
 
 Route::get('sing_in',[UserController::class, 'loginCreate'])->name('loginCreate');

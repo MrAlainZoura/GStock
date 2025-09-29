@@ -61,7 +61,10 @@
                         </div>
                     </td>
                     <td class="text-md">
-                        {{ $admin->name }} {{ $admin->postnom }} {{ $admin->prenom }} <br>
+                        <a href="{{ route('admin.edit', $admin->id*12) }}" class="flex items-center gap-2 w-full p-2 text-blue-600 text-md transition duration-75 rounded-lg group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
+                        <img src="{{asset('svg/man.svg')}}" class="flex-shrink-0 w-7 h-7 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" aria-hidden="true" alt="">
+                            {{ $admin->name }} {{ $admin->postnom }} {{ $admin->prenom }}
+                        </a>
                         {{ $admin->email }} <br>
                         {{ $admin->tel }}
                     </td>
