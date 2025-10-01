@@ -258,7 +258,7 @@
                       @php
                           $ajout = (float) $vcomp->paiement->sortByDesc('created_at')->first()->net - (float)$vcomp->paiement->sortBy('created_at')->first()->net;
                           $recette +=(float) $ajout;
-                          $recettePT +=(float) $ajout * (float) $vcomp->updateTaux;
+                          $recetteDT +=(float) $ajout * (float) $vcomp->updateTaux;
                         @endphp
                       {{ $vcomp->paiement->sortBy('created_at')->first()->net}} + {{ $ajout }}<br>
                       <br>{{ $vcomp->paiement->sortByDesc('created_at')->first()->net }} {{ $vcomp->devise->libele }}     
