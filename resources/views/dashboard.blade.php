@@ -31,10 +31,15 @@
         </div>
     </div>
 </section>
-@if(session('echec'))
-    <div class="alert-echec">
-        @include('composant.alert_echec', ['message'=>session('echec')])
-    </div>
+    @if(session('echec'))
+        <div class="alert-echec">
+            @include('composant.alert_echec', ['message'=>session('echec')])
+        </div>
+    @endif
+    @if(session('success'))
+        <div class="alert-success">
+            @include('composant.alert_suc', ['message'=>session('success')])
+        </div>
     @endif
 <section class="mt-10 p-20 gap-5 w-full grid grid-cols-1 sm:grid-cols-2 " id="sectionDepot">
 
