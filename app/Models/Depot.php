@@ -36,6 +36,9 @@ class Depot extends Model
     public function vente(){
         return $this->hasMany(Vente::class);
     }
+    public function transfert(){
+        return $this->hasMany(Transfert::class);
+    }
     public function depotUser(){
         return $this->hasMany(DepotUser::class);
     }
@@ -43,5 +46,16 @@ class Depot extends Model
         return $this->hasMany(Devise::class);
     }
 
+        protected static function booted()
+    {
+        static::deleting(function ($depot) {
+            $depot->devise()->delete();
+            $depot->depotUser()->delete();
+            $depot->transfert()->delete();
+            $depot->vente()->delete();
+            $depot->produitDepot()->delete();
+            $depot->approvisionnement()->delete();
+        });
 
+    }
 }

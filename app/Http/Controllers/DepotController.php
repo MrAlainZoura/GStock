@@ -82,7 +82,7 @@ class DepotController extends Controller
         }
 
         if(!$depot){
-            return to_route('dashboard')->with('echec',"Choisissez unn dépôt pour effectuer vos opérations!"); 
+            return to_route('dashboard')->with('echec',"Choisissez un dépôt pour effectuer vos opérations!"); 
         }
         session(['depot' => $depot->libele]);
         session(['depot_id' => $depot->id]);
@@ -262,15 +262,17 @@ class DepotController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(string $id, Request $request)
     {
-        return back()->with('success','Bientôt disponible');
-
-        $delete = Depot::where('id',$id)->delete();
-        if(!$delete){
-            return response()->json(['success'=>true, 'data'=>'echec de suppression']);
+        $libele = $request->libele;
+        $id = $id/13;
+        $delete = Depot::where('id',$id)->where('libele', $libele)->first();
+        if($delete){
+            $delete->delete();
+            return to_route('dashboard')->with('success','Depot supprimé avec succès');
         }
-        return response()->json(['success'=>true, 'data'=>'Suppression reussie!']);
+        return back()->with('echec','Echec depot introuvable');
+
     }
 
     public function depotSetting(string $depot){
