@@ -48,7 +48,11 @@
             </a>
         @endif
         @if (Route::current()->getName()=="venteTrashed" )
-            <a title="Restorer cette vente" itemName ="{{$itemName}}" id="linkRestore" href="{{route($editeRoute, $editParam)}}" data-modal-target="popup-modal1" data-modal-toggle="popup-modal1">
+            <a title="Restorer cette vente" itemName ="{{$itemName}}" 
+            href="{{route("admin.confirmDeleteItem", 
+            ["id"=>$editParam,
+             "message"=>$itemName,
+             "route"=>Crypt::encrypt($editeRoute)])}}">
                 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
                 <svg width="26px" height="26px" viewBox="-20 -20 1040.00 1040.00" data-name="Layer 2" id="Layer_2" xmlns="http://www.w3.org/2000/svg" fill="#000000">
                     <g id="SVGRepo_bgCarrier" stroke-width="0"/>
@@ -96,59 +100,7 @@
                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m15 9-6 6m0-6 6 6m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
                 </svg>
             </a>
-            <!-- <button title="Supprimer"
-                    role="button"
-                    type="button"
-                    data-item-name="{{$itemName}}"
-                    data-delete-route="{{route($deleteRoute, $deleteParam)}}"
-                    data-modal-target="popup-modal"
-                    data-modal-toggle="popup-modal"
-                    class="delete-button flex items-center justify-center">
-                <svg class="w-[26px] h-[26px] text-gray-800 dark:text-white"
-                    aria-hidden="true"
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    fill="none"
-                    viewBox="0 0 24 24">
-                    <path stroke="currentColor"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="m15 9-6 6m0-6 6 6m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
-                </svg>
-            </button> -->
+            
         @endif
     @endif      
 </div>
-<!-- <script>
-    
-    document.addEventListener("DOMContentLoaded", () => {
-        let resizeTimeout;
-        window.addEventListener("resize", () => {
-            clearTimeout(resizeTimeout);
-            resizeTimeout = setTimeout(() => {
-                // Ton code ici, exécuté après un délai
-                document.querySelectorAll(".delete-button").forEach(button => {
-                    button.addEventListener("click", () => {
-                        const itemName = button.dataset.itemName;
-                        const deleteRoute = button.dataset.deleteRoute;
-        
-                        const formDelete = document.getElementById("deleteForm");
-                        const message = document.getElementById("textDeleteItem");
-        
-                        if (formDelete) {
-                            formDelete.setAttribute("action", deleteRoute);
-                        }
-        
-                        if (message) {
-                            message.textContent = `Etes-vous sûr de vouloir supprimer "${itemName}" ?`;
-                        }
-        
-                    });
-                });
-            }, 200);
-        });
-    });
-</script> -->
-

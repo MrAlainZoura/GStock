@@ -129,7 +129,7 @@
             </td>
 
             <td>
-                @include('composant.actionLink', ['itemName'=>$item->code,'seeRoute'=>'venteShow','seeParam'=>56745264509*$item->id, 'deleteRoute'=>"forcedelete",'deleteParam'=>12*$item->id, 'editeRoute'=>"restore",'editParam'=>$item->id*12])
+                @include('composant.actionLink', ['itemName'=>"Déjà_supprimé_".$item->created_at."_".$paiment.$item->devise->libele,'seeRoute'=>'venteShow','seeParam'=>56745264509*$item->id, 'deleteRoute'=>"forcedelete",'deleteParam'=>12*$item->id, 'editeRoute'=>"restore",'editParam'=>$item->id*12])
             </td>
         </tr>
         @php
@@ -165,7 +165,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
    //modal suppression item
-   const deleteLink = document.querySelectorAll('#linkDelete');
+   const deleteLink = document.querySelectorAll('#linkDeleteFE');
 
     deleteLink.forEach(link => {
         link.addEventListener('click', (event) => {
