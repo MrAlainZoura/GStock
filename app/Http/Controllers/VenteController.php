@@ -291,6 +291,7 @@ class VenteController extends Controller
         $id = $venteId/12;
         $vente = Vente::with(['venteProduit', 'paiement'])->onlyTrashed()->find($id);
         if($vente){
+            $depot = $vente->depot;
             $vente->restore();
             //UPDATE QTE
             foreach($vente->venteProduit as $c=>$v){
@@ -300,7 +301,7 @@ class VenteController extends Controller
                 $newQt = $verifQTe->quantite - $v->quantite;
                 $verifQTe->update(['quantite'=>(int)$newQt]);
             }
-            return back()->with('success', "Vente restorée avec succès !");
+            return to_route('venteTrashed', ['depot'=>$depot->libele, "depot_id"=>$depot->id*12])->with("success","Vente restaurée avec succès !");
         }
         return back()->with('success', "Erreur, renseignement fourni incorrect !");
      }
@@ -339,10 +340,12 @@ class VenteController extends Controller
         }
         $id = $vente/12;
         $vente = Vente::onlyTrashed()->find($id);
+        $depot= $vente->depot;
         // dd($vente);
         if($vente){
             $vente->forceDelete();
-            return back()->with('success', "Vente supprimée définitivement avec succès !");
+            return to_route('venteTrashed', ['depot'=>$depot->libele, "depot_id"=>$depot->id])->with("success","Vente supprimée définitivement avec succès !");
+            // return back()->with('success', "Vente supprimée définitivement avec succès !");
         }
         return back()->with('echec', "Suppression échouée, erreur inattendue s'est produite!");
      }

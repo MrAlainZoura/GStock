@@ -157,9 +157,13 @@ class AdminController extends Controller
     public function confirmDeleteItem($message, $id, $route)
     {
         $action =Crypt::decrypt($route);
+        $restore = false;
+        if($action=="restore"){
+            $restore = true;
+        }
         $item = $message;
         $parametre = $id; 
-        return view('comfirmDelete',compact('action','parametre','item'));
+        return view('comfirmDelete',compact('action','parametre','item', 'restore'));
     }
 
 }
