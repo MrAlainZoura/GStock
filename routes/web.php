@@ -83,6 +83,7 @@ Route::get('{depot}/produits/{id}', [DepotController::class, 'showProduit'])->na
 Route::put('{depot}/{devise}/update', [DeviseController::class, 'update'])->name("devise.update")->middleware(AuthentifyMiddleware::class);
 
 Route::post('import_produit',[ ProduitController::class, 'importProduitExcel'])->name('import_prod_excel')->middleware(AuthentifyMiddleware::class);
+Route::get('export_produit/{depot}',[ ProduitController::class, 'exportProduitExcel'])->name('export_prod_excel')->middleware(AuthentifyMiddleware::class);
 Route::get('vente/creances/{depot}/{depot_id}', [PaiementController::class,'creance'])->name('creanceDepot')->middleware( AuthentifyMiddleware::class);
 Route::post('vente/creances/{vente}', [PaiementController::class,'store'])->name('creanceStore')->middleware( AuthentifyMiddleware::class);
 Route::resource('paiement',PaiementController::class)->middleware(AuthentifyMiddleware::class);
