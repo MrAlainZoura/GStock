@@ -23,21 +23,24 @@ class ProduitExport implements FromCollection, WithHeadings
     public function collection()
     {
         return ProduitDepot::with('produit.marque.categorie')
-            ->where('depot_id', $this->depotId)
-            ->get()
-            ->map(function ($affectation) {
-                $produit = $affectation->produit;
+        ->where('depot_id', $this->depotId)
+        ->get()
+        ->sortBy(function ($affectation) {
+            return $affectation->produit->marque->categorie->libele ?? '';
+        })
+        ->map(function ($affectation) {
+            $produit = $affectation->produit;
 
-                return [
-                    'libele' => $produit->libele,
-                    'marque' => $produit->marque->libele ?? '',
-                    'categorie' => $produit->marque->categorie->libele ?? '',
-                    'quantite' => $affectation->quantite,
-                    'prix' => $produit->prix,
-                    'etat' => $produit->etat,
-                    'description' => $produit->description,
-                ];
-            });
+            return [
+                'libele' => $produit->libele,
+                'marque' => $produit->marque->libele ?? '',
+                'categorie' => $produit->marque->categorie->libele ?? '',
+                'quantite' => $affectation->quantite,
+                'prix' => $produit->prix,
+                'etat' => $produit->etat,
+                'description' => $produit->description,
+            ];
+        });
     }
 
 
