@@ -81,7 +81,13 @@
         }
         .imprime{
             text-align: center;
+            font-size: 10.5px;
+        }
+        .politique{
+            text-align: center;
             font-size: 10px;
+            padding: 0;
+            display: flex;
         }
         .pad{
             padding-bottom: 5px;
@@ -107,6 +113,9 @@
                 @endif
             </div>
         <h3>Détails de la Vente</h3>
+        @if ($findVenteDetail->compassassion->count() > 0)
+            <h3>Compassaion</h3>
+        @endif
         <h3>{{ $findVenteDetail->depot->cpostal }}</h3>
         <!-- <h3>Ets. Ujisha</h3> -->
         <div class="idnat">
@@ -115,7 +124,10 @@
 
             ***
                Adresse: {{ $findVenteDetail->depot->avenue}}
-            *** <br>
+            ***
+            @if ($findVenteDetail->depot->remboursement_delay != null)
+                <label class="politique">{{ $findVenteDetail->depot->remboursement_delay }} </label>
+            @endif
             Phone : {{ $findVenteDetail->depot->contact }} {{ $findVenteDetail->depot->contact1 }}
             <!-- RCCM:KNG/RCCM/22-A-01256 ID.NAT : <br> 01-G4701-N998728, N.Impot: A23119069 <br>
             ***
@@ -254,7 +266,7 @@
             <!-- Les marchandises vendue sont ni reprises ni échangées!<br> -->
             <!-- 1 mois de garentie et celle-ci n'inclut pas le display et chargeur! -->
         </p>
-        <p class="imprime"> imprimer par {{Auth::user()->name ." ".Auth::user()->postnom ." ".Auth::user()->prenom}}</p>
+        <p class="imprime"> Imprimer par {{Auth::user()->name ." ".Auth::user()->postnom ." ".Auth::user()->prenom}}</p>
     </div>
 </div>
 </body>
