@@ -206,9 +206,10 @@ class DepotController extends Controller
             'avenue'=>$request->avenue,
             'idNational'=>$request->idNat,
             'numImpot'=>$request->impot,
-            'autres'=>$request->autres
+            'autres'=>$request->autres,
+            'remboursement_delay'=>$request->remboursement_delay
         ];
-        $data = array_filter($data, function($val){return !is_null($val);});
+        // $data = array_filter($data, function($val){return !is_null($val);});
 
         // $depotUpdate = Depot::where('id',session('depot_id'))->update($data);
 

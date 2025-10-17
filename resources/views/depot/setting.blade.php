@@ -43,7 +43,7 @@
         <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">{{$collaborateur}} @if ($collaborateur>1) collaborateurs @else collaborateur @endif </dd>
       </div>
       <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-        <dt class="text-sm/6 font-medium text-gray-900">Autre rensiegnement</dt>
+        <dt class="text-sm/6 font-medium text-gray-900">Autre rensiegnement : durée et condition de la garantie</dt>
         <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">{{ $depotData->autres }}</dd>
       </div>
       <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
