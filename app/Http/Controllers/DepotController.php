@@ -209,7 +209,7 @@ class DepotController extends Controller
             'autres'=>$request->autres,
             'remboursement_delay'=>$request->remboursement_delay
         ];
-        // $data = array_filter($data, function($val){return !is_null($val);});
+        $data = array_filter($data, function($val){return !is_null($val);});
 
         // $depotUpdate = Depot::where('id',session('depot_id'))->update($data);
 
