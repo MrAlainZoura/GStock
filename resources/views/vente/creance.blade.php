@@ -109,7 +109,6 @@
                     </td>
                     <td >
                        {{$item['net'] ."   ".$item['devise']}} 
-                       
                     </td>
                    
         

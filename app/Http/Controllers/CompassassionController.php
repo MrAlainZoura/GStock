@@ -10,6 +10,7 @@ use App\Models\Categorie;
 use App\Models\ProduitDepot;
 use Illuminate\Http\Request;
 use App\Models\Compassassion;
+use Illuminate\Support\Carbon;
 
 class CompassassionController extends Controller
 {
@@ -17,16 +18,31 @@ class CompassassionController extends Controller
     {
         return Compassassion::all();
     }
+    public function show($libel,$id){
+        $depot = Depot::find($id);
+      
+        if(!$depot){
+            return to_route('dashboard');
+        }
+        $compassassionS = Vente::whereHas('compassassion')
+            ->with(['paiement', 'venteProduit', 'compassassion'])
+            ->where('depot_id', $depot->id)
+            ->latest()
+            ->get();
+
+        // Tri par date de création de la relation compassassion
+        $compassassion = $compassassionS->sortByDesc(function ($vente) {
+            return optional($vente->compassassion->max('created_at'));
+        });
+        return view('compassassion.index', compact('compassassion','depot'));
+    }
     public function create($depot ,$vente_id){
-        // return back()->with('success', "Bientot disponible");
         $vente= Vente::find($vente_id);
-        // dd($vente, $vente_id);
         if($vente){
-            $cat = Categorie::all();
-            $client =Client::all();
             $depot = $vente->depot;
-            $paiement = collect($vente->paiement)->sum('net');            $produit = ProduitDepot::where("depot_id",$depot->id)->with("produit.marque","produit.marque.categorie")->get();
-            return view("compassassion.create", compact("depot","paiement","cat","client","produit", 'vente'));
+            $paiement = collect($vente->paiement)->sum('net');            ;
+            $produit = ProduitDepot::where("depot_id",$depot->id)->with("produit.marque","produit.marque.categorie")->get();
+            return view("compassassion.create", compact("depot","paiement","produit", 'vente'));
         }
         return back()->with('echec', "Demande mal formulée, veuillez réessayez !");
     }
@@ -196,5 +212,85 @@ class CompassassionController extends Controller
             // dd(vars: 'ok',$dataCompassassion, Compassassion::all());
         }
         return back()->with('echec',"Echec, impossible de trouver cette vente !");
+    }
+
+    public function destroy($id){
+        $ref = Compassassion::find($id);
+        if(!$ref){
+           return back()->with('echec', 'Aucune donnée trouvée pour suppression.');
+        }
+        $date = Carbon::parse($ref->created_at)->toDateString(); // '2025-09-11'
+
+        $delete = Compassassion::where('vente_id', $ref->vente_id)
+            ->whereDate('created_at', $date);
+        $firstDelete = $delete->first();
+        if (!$firstDelete) {
+            return back()->with('echec', 'Aucune donnée trouvée pour suppression.');
+        }
+
+        $netInit = $firstDelete->vente->paiement->first();
+        $netFinal = $firstDelete->vente->paiement->last();
+        $ajout = ($netFinal->net == $netInit->net) ? true : false;
+
+        $depot = $delete->first()->vente->depot;
+        $dateSearch = $firstDelete->created_at;
+        if($ajout){
+            $delete->delete();
+            return to_route('compList', [
+                'depot' => $depot->libele,
+                'id'    => $depot->id,
+            ])->with('success', 'Annulation de compassassion effectuée avec succès !');
+        };
+        $paiement = $firstDelete->vente->paiement
+                ->sortBy('net')
+                ->groupBy('net');
+        
+        if ($paiement->count() === 2) {
+            $lastPaiement = $paiement->last();
+            if ($lastPaiement) {
+                foreach($lastPaiement as $cle=>$val){
+                    $val->delete();
+                }
+            }
+        }
+       
+
+        if ($paiement->count() > 2) {
+            $listPaiementSup = $paiement->map(function ($group) use ($dateSearch) {
+                    return $group->filter(function ($item) use ($dateSearch) {
+                        return $item->created_at > $dateSearch;
+                    });
+                })->filter(function ($group) {
+                    return $group->isNotEmpty();
+                });
+            $avance = 0;
+            if ($listPaiementSup) {
+                foreach($listPaiementSup as $m=> $paie){
+                    $avance =  $paie[0]->avance;
+                    break;
+                }
+                // on update net les compassassions apres cette date
+                $listPaiementUpdate = $paiement
+                    ->map(fn($group) => $group->filter(fn($item) => $item->created_at == $dateSearch))
+                    ->filter(fn($group) => $group->isNotEmpty());
+
+                $listPaiementUpdate->each(function ($group) use ($avance) {
+                    $group->each(function ($item) use ($avance) {
+                        $item->net -= $avance;
+                        $item->save();
+                    });
+                });
+
+                $listPaiementSup->each(function ($group) {
+                    $group->each->delete();
+                });
+            }
+        }
+       
+        $delete->delete();
+        return to_route('compList', [
+            'depot' => $depot->libele,
+            'id'    => $depot->id,
+        ])->with('success', 'Annulation de compassassion effectuée avec succès !');
     }
 }

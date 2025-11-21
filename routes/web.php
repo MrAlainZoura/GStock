@@ -65,7 +65,9 @@ Route::delete('vente/{vente}/delete-force', [VenteController::class,'forcedelete
 Route::put('vente/{vente}/restore', [VenteController::class,'restore'])->name('restore')->middleware( AuthentifyMiddleware::class);
 
 Route::get('compassassion/{depot}/{vente_id}/create', [CompassassionController::class,'create'])->name('compCreate')->middleware( AuthentifyMiddleware::class);
+Route::get('compassassion/{depot}/list/{id}', [CompassassionController::class,'show'])->name('compList')->middleware( AuthentifyMiddleware::class);
 Route::post('compassassion/{depot}/store', [CompassassionController::class,'store'])->name('compStore')->middleware( AuthentifyMiddleware::class);
+Route::delete('compassassion/delete/{id}', [CompassassionController::class,'destroy'])->name('compDelete')->middleware( AuthentifyMiddleware::class);
 
 
 Route::get('rapport/{depot}/journalier/{id}', [RapportController::class,'journalier'])->name('rapport.jour')->middleware( AuthentifyMiddleware::class);
