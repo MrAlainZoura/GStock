@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AbonnementController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\UserController;
@@ -15,6 +16,7 @@ use App\Http\Controllers\TransfertController;
 use App\Http\Middleware\AuthentifyMiddleware;
 use App\Http\Controllers\CompassassionController;
 use App\Http\Controllers\ApprovisionnementController;
+use App\Http\Controllers\SouscriptionController;
 
 // Route::get('/', function () {
 //     return view('home');
@@ -76,6 +78,16 @@ Route::get('rapport/{vente}/facture/{action}', [RapportController::class,'factur
 Route::get('rapport/{depot}/mail', [RapportController::class,'sendMailrapport'])->name('sendMailrapport')->middleware( AuthentifyMiddleware::class);
 Route::get('rapport/{depot}/mail-job', [RapportController::class,'sendMailrapportJob'])->name('sendMailrapportJob')->middleware( AuthentifyMiddleware::class);
 Route::get('rapport/{depot}/{periode}/download', [RapportController::class,'rapportDownload'])->name('rapportDownload')->middleware( AuthentifyMiddleware::class);
+
+Route::get('abonnements/list/{admin}', [AbonnementController::class,'index'])->name('abonnement.list')->middleware(AuthentifyMiddleware::class);
+Route::get('abonnement/{admin}/create', [AbonnementController::class,'create'])->name('abonnement.create')->middleware(AuthentifyMiddleware::class);
+Route::post('abonnements/store', [AbonnementController::class,'store'])->name('abonnement.store')->middleware(AuthentifyMiddleware::class);
+Route::put('abonnement/{id}', [AbonnementController::class,'show'])->name('abonnement.update')->middleware(AuthentifyMiddleware::class);
+
+// Route::get('abonnements/list/{admin}', [AbonnementController::class,'index'])->name('abonnement.list')->middleware(AuthentifyMiddleware::class);
+// Route::get('abonnement/{admin}/create', [AbonnementController::class,'create'])->name('abonnement.create')->middleware(AuthentifyMiddleware::class);
+Route::post('souscription/store', [SouscriptionController::class,'store'])->name('souscr.store')->middleware(AuthentifyMiddleware::class);
+Route::put('souscription/{id}', [SouscriptionController::class,'show'])->name('souscr.update')->middleware(AuthentifyMiddleware::class);
 
 Route::get('{depot}/parametre', [DepotController::class, 'depotSetting'])->name("depotSetting")->middleware(AuthentifyMiddleware::class);
 Route::get('{depot}/produits/{id}', [DepotController::class, 'showProduit'])->name("showProduit")->middleware(AuthentifyMiddleware::class);
