@@ -1,0 +1,1 @@
+document.addEventListener("DOMContentLoaded",()=>{document.getElementById("search-table")&&typeof simpleDatatables.DataTable<"u"&&new simpleDatatables.DataTable("#search-table",{searchable:!0,paging:!0,perPage:15,perPageSelect:[15,15,20,25,50,100,200,300,400,500],sortable:!0})});
