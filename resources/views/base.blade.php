@@ -21,8 +21,9 @@
     <header>
          @yield('header')
     </header>
-
+    
     <main class="w-full bg-gray-100 ">
+        @include('composant.loader')
         @yield('main')
     </main>
 
