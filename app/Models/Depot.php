@@ -21,7 +21,9 @@ class Depot extends Model
         'idNational',
         'numImpot',
         'autres',
-        'remboursement_delay'
+        'remboursement_delay',
+        'lon',
+        'lat'
     ];
 
     public function user(){

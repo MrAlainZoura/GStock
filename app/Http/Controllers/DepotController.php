@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Exception;
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Depot;
@@ -14,6 +15,7 @@ use App\Models\ProduitDepot;
 use Illuminate\Http\Request;
 use App\Models\Approvisionnement;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
@@ -296,5 +298,63 @@ class DepotController extends Controller
             }
          }
         return view('depot.setting',compact('depotData', 'collaborateur','tabCatMark','countMark'));
+    }
+
+    public function geolocalisation(Request $request, $depot, $action){
+        $getDepot = Depot::find($depot);
+       if(!$getDepot){
+            return back()->with('echec',"Renseignement invalide");
+       }
+        if($action == 'auto'){
+            $positionAuto = self::getPosition();
+            if(!$positionAuto['ok']){
+              return back()->with('echec',$positionAuto['error'] );
+            }
+            $getDepot->update(['lat'=>$positionAuto['lat'], 'lon'=>$positionAuto['lon']]);
+            return back()->with('success', "Position mise à jour par détection automatique");
+        }
+        if($action == 'insert'){
+            if (!is_null($request->lon) && is_numeric($request->lon) &&
+            !is_null($request->lat) && is_numeric($request->lat)) {
+                
+                $lon = (float) $request->lon;
+                $lat = (float) $request->lat;
+                
+                $getDepot->update(['lat'=>$lat, 'lon'=>$lon]);
+                return back()->with('success', "Position mise à jour");
+            }
+            return back()->with('echec', 'Coordonnées invalides');
+        }
+        return back()->with('echec', 'Action invalide');
+    }
+    static public function getPosition():array{
+        try{
+             $ipResponse = Http::timeout(10)->get('https://api.ipify.org');
+            $ip = $ipResponse->body();
+
+            // Géolocalisation
+            $url = "http://ip-api.com/json/{$ip}";
+            $positionResponse = Http::timeout(10)->get($url);
+
+            if ($positionResponse->failed()) {
+                return [
+                    "ok"=>false,
+                   "error"=> "Position automatique a échoué"
+                ];
+            }
+            $localisation = $positionResponse->json();
+           return [
+                    'lon'=>$localisation['lon'],
+                    'lat'=>$localisation['lat'],
+                    'ip'=>$localisation['query'],
+                    'city'=>$localisation['city'],
+                    'ok'=>true
+                ];
+        }catch(Exception $e){
+            return [
+                    "ok"=>false,
+                    "error"=> "!Position automatique a échoué"
+                ];
+        }
     }
 }
