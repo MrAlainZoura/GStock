@@ -48,6 +48,9 @@ class User extends Authenticatable
     public function depotUser(){
         return $this->hasMany(DepotUser::class);
     }
+    public function presence(){
+        return $this->hasMany(Presence::class);
+    }
     public function user_role()
     {
         return $this->hasOne(UserRole::class);
