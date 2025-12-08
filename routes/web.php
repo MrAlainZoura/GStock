@@ -81,6 +81,7 @@ Route::get('rapport/{depot}/{periode}/download', [RapportController::class,'rapp
 
 Route::get('{depot}/parametre', [DepotController::class, 'depotSetting'])->name("depotSetting")->middleware(AuthentifyMiddleware::class);
 Route::get('{depot}/produits/{id}', [DepotController::class, 'showProduit'])->name("showProduit")->middleware(AuthentifyMiddleware::class);
+Route::put('update/{depot}/geolocalisation/{action}', [DepotController::class, 'geolocalisation'])->name("depotGeo")->middleware(AuthentifyMiddleware::class);
 
 Route::put('{depot}/{devise}/update', [DeviseController::class, 'update'])->name("devise.update")->middleware(AuthentifyMiddleware::class);
 
