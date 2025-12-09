@@ -51,8 +51,8 @@ class PresenceController extends Controller
     public function store(Request $request)
     {
         $validattion = Validator::make($request->all(), [
-            'user_id'=>'required|long',
-            'depot_id'=>'required|long',
+            'user_id'=>'required|int',
+            'depot_id'=>'required|int',
         ]);
         if($validattion->fails()){
             $message = $validattion->errors();
@@ -113,76 +113,20 @@ class PresenceController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($date)
+    public function show($depot_id)
     {
-        $presence = Presence::whereYear('h_arrive',$date)->latest()->get();
+        $service  = Depot::find($depot_id);
+        if(!$service){
+           return back()->with('echec',"Erreur renseignemenet invalide");   
+        }
+        $today = Carbon::now();
 
-        $tab= [];
-        for($i=1; $i <= 12; $i++){
-            $presence = Presence::whereYear('h_arrive',$date)->whereMonth('h_arrive',$i)->get();
-            if(count($presence) > 0){
-                switch ($i) {
-                    case 1:
-                        $mois = 'Janvier';
-                        break;
-                    
-                    case 2:
-                        $mois="Février";
-                        break;
-                    
-                    case 3:
-                        $mois="Mars";
-                        break;
-                    
-                    case 4:
-                        $mois="Avril";
-                        break;
-                    
-                    case 5:
-                        $mois="Mai";
-                        break;
-                    
-                    case 6:
-                        $mois="Juin";
-                        break;
-                    
-                    case 7:
-                        $mois="Juillet";
-                        break;
-                    
-                    case 8:
-                        $mois="Aout";
-                        break;
-                    
-                    case 9:
-                        $mois="Septembre";
-                        break;
-                    
-                    case 10:
-                        $mois="Octobre";
-                        break;
-                    
-                    case 11:
-                        $mois="Novembre";
-                        break;
-                    
-                    case 12:
-                        $mois="Décembre";
-                        break;
-                    
-                    default:
-                        # code...
-                        break;
-                }
-                $presence->an=$date;
-                $presence->mois=$i;
-                $presence->jour=false;
-                $tab[$mois] = $presence;
-            }
-        } 
-        // dd($tab);
-        $groupe=$tab;
-        return view('presences.index', compact('groupe'));
+        $presence = Presence::where('depot_id', $depot_id)
+            ->whereDate('created_at', $today->format('Y-m-d'))
+            ->get();
+        return back()->with('success',"Bientot disponible");
+
+        return view('presence.index', compact('presence'));
     }
 
     public function showPresence($an, $mois){
@@ -239,7 +183,7 @@ class PresenceController extends Controller
         //
     }
 
-    public function updateSortier(int $id){
+    public function updateSortie(int $id){
         $getTimeNow = Carbon::now();
         $now = $getTimeNow->format('Y-m-d H:i:s');
 
@@ -248,14 +192,12 @@ class PresenceController extends Controller
             return back()->with('echec',"Priere de signer d'abord la présence d'arrivée avant la sortie");
         }
        
-        if($presence->created_at != $presence->update_at){
-            return back()->with('echec',"Revenez le prochain jour de travail pour signer la présence, vous avez déjà signé la sortie pour aujourd'hui");
+        if($presence->created_at->equalTo($presence->updated_at)){
+            $presence->updated_at = $now;
+            $presence->save();
+            return back()->with('success',"Vous êtes sorti à {$now} {$presence->user->name}");
         }
-       
-        if($presence->update(['update_at'=>$now])){
-            return back()->with('success',"Vous êtes sorti à {$now} {$presence->user->nom}");
-        }
-
+        return back()->with('echec',"Revenez le prochain jour de travail pour signer la présence, vous avez déjà signé la sortie pour aujourd'hui à {$presence->updated_at}");
      }
     /**
      * Update the specified resource in storage.
