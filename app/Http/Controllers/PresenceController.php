@@ -115,8 +115,8 @@ class PresenceController extends Controller
      */
     public function show($depot_id)
     {
-        $service  = Depot::find($depot_id);
-        if(!$service){
+        $depot  = Depot::find($depot_id);
+        if(!$depot){
            return back()->with('echec',"Erreur renseignemenet invalide");   
         }
         $today = Carbon::now();
@@ -124,9 +124,7 @@ class PresenceController extends Controller
         $presence = Presence::where('depot_id', $depot_id)
             ->whereDate('created_at', $today->format('Y-m-d'))
             ->get();
-        return back()->with('success',"Bientot disponible");
-
-        return view('presence.index', compact('presence'));
+        return view('presence.journalier', compact('presence','depot'));
     }
 
     public function showPresence($an, $mois){

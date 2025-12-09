@@ -23,6 +23,7 @@ return new class extends Migration
                 ->cascadeOnUpdate();
             $table->float('distance')->nullable();
             $table->boolean('confirm')->default(false);
+            $table->string('confirm_raison')->nullable();
             $table->string('ip')->nullable();
             $table->string('lat')->nullable();
             $table->string('lon')->nullable();
