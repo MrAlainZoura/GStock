@@ -15,6 +15,7 @@ use App\Http\Controllers\TransfertController;
 use App\Http\Middleware\AuthentifyMiddleware;
 use App\Http\Controllers\CompassassionController;
 use App\Http\Controllers\ApprovisionnementController;
+use App\Http\Controllers\PresenceController;
 
 // Route::get('/', function () {
 //     return view('home');
@@ -69,6 +70,12 @@ Route::get('compassassion/{depot}/list/{id}', [CompassassionController::class,'s
 Route::post('compassassion/{depot}/store', [CompassassionController::class,'store'])->name('compStore')->middleware( AuthentifyMiddleware::class);
 Route::delete('compassassion/delete/{id}', [CompassassionController::class,'destroy'])->name('compDelete')->middleware( AuthentifyMiddleware::class);
 
+Route::prefix('presence')->middleware(AuthentifyMiddleware::class)->group(function () {
+    Route::post('/', [PresenceController::class,'store'])->name('presence.store');
+    Route::get('{depot}/list', [PresenceController::class,'show'])->name('presence.show');
+    Route::put('{presence}/sortie', [PresenceController::class,'updateSortie'])->name('presence.out');
+    Route::put('{presence}/confirmation', [PresenceController::class,'update'])->name('presence.confirm');
+});
 
 Route::get('rapport/{depot}/journalier/{id}', [RapportController::class,'journalier'])->name('rapport.jour')->middleware( AuthentifyMiddleware::class);
 Route::get('rapport/{depot}/mensuel/{id}', [RapportController::class,'mensuel'])->name('rapport.mois')->middleware( AuthentifyMiddleware::class);
