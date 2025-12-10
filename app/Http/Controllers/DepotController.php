@@ -306,7 +306,7 @@ class DepotController extends Controller
             return back()->with('echec',"Renseignement invalide");
        }
         if($action == 'auto'){
-            $positionAuto = self::getPosition();
+            $positionAuto = self::getPosition($request->ip());
             if(!$positionAuto['ok']){
               return back()->with('echec',$positionAuto['error'] );
             }
@@ -327,10 +327,10 @@ class DepotController extends Controller
         }
         return back()->with('echec', 'Action invalide');
     }
-    static public function getPosition():array{
+    static public function getPosition(string $requestIp=''):array{
         try{
              $ipResponse = Http::timeout(10)->get('https://api.ipify.org');
-            $ip = $ipResponse->body();
+            $ip = ($requestIp == null)? $ipResponse->body() : $requestIp;
 
             // Géolocalisation
             $url = "http://ip-api.com/json/{$ip}";
