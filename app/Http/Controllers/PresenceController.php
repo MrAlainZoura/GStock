@@ -9,6 +9,7 @@ use App\Models\Presence;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Barryvdh\DomPDF\Facade\PDF;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Validator;
 
@@ -84,14 +85,13 @@ class PresenceController extends Controller
         
         $position = self::getPerimetre((float)$service->lon, (float)$service->lat,15,$request->ip());
        //verif ip deja existe
-       if($position['ok']){
-            $verif_ip = Presence::where('ip', $request->ip())
-                ->whereDate('created_at', $today)
-                ->exists();
-            if($verif_ip ){
-                return back()->with('success', "Quelqu'un a déjà signé la présence aujourd'hui avec cet appareil");
-            }
-       }
+        $verif_ip = Presence::where('ip', $request->ip())
+            ->whereDate('created_at', $today)
+            ->exists();
+        if($verif_ip ){
+            return back()->with('success', "Quelqu'un a déjà signé la présence aujourd'hui avec cet appareil");
+        }
+
         $insert = [
             'user_id'=>$user->id,
             'depot_id'=>$service->id,
@@ -215,7 +215,7 @@ class PresenceController extends Controller
             if($now >= $today){
                 return back()->with('echec','Tentative de corruption, dépasser 12h00 la présence ne peut être modifiée');
             }
-            if($presence->update(['confirm' => true])){
+            if(in_array(Auth::user()->user_role->role->libele,['Administrateur','Super admin']) && $presence->update(['confirm' => true])){
                 return back()->with('success',"La présence de {$presence->user->name} a été confirmée avec succès");
             }
         }
@@ -225,11 +225,16 @@ class PresenceController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Presence $presence)
+    public function destroy(int $id)
     {
-        //
+        $presence = Presence::find($id);
+        if(in_array(Auth::user()->user_role->role->libele,['Administrateur','Super admin']) && $presence){
+            $presence->delete();
+            return back()->with('success', 'Suppression reussie avec succes');
+        }
+        return back()->with('echec', 'Erreur demande introuvable');
     }
-
+    
     public function globalPresence(){
  
         $lancement = 2020;
