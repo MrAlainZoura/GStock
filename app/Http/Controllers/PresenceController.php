@@ -82,10 +82,10 @@ class PresenceController extends Controller
             return back()->with('success', "Signer la sortie et revenez le prochain jour de travail");
         }
         
-        $position = $this->getPerimetre((float)$service->lon, (float)$service->lat);
+        $position = self::getPerimetre((float)$service->lon, (float)$service->lat,15,$request->ip());
        //verif ip deja existe
        if($position['ok']){
-            $verif_ip = Presence::where('ip', $position['ip'])
+            $verif_ip = Presence::where('ip', $request->ip())
                 ->whereDate('created_at', $today)
                 ->exists();
             if($verif_ip ){
@@ -96,7 +96,7 @@ class PresenceController extends Controller
             'user_id'=>$user->id,
             'depot_id'=>$service->id,
             'confirm'=>$position['confirmation'],
-            'ip'=>$position['ip'],
+            'ip'=>$request->ip(),
             'distance'=>$position['distance'],
             'lon'=>$position['long'],
             'lat'=>$position['lat'],
@@ -298,7 +298,7 @@ class PresenceController extends Controller
         ];
     }
 
-     private function calculDistance ( ?float $xCenter, ?float $yCenter, ?float $xUser, ?float $yUser){
+    static private function calculDistance ( ?float $xCenter, ?float $yCenter, ?float $xUser, ?float $yUser){
         if ($xCenter === null || $yCenter === null || $xUser === null || $yUser === null) {
             return null;
         }
@@ -326,7 +326,7 @@ class PresenceController extends Controller
      * @param float $lat Latitude
      * @param float $rayon Rayon en m (par défaut 10)
      */
-     public function getPerimetre(float $long,float $lat, $rayon = 10){
+     static public function getPerimetre(float $long,float $lat, $rayon = 10, string $requestIp = ''){
 
         $coord_bureau = ["long"=>$long, "lat"=>$lat];
         $data = [
@@ -336,13 +336,14 @@ class PresenceController extends Controller
                 'distance'=>null,
                 'ip'=>null,
                 'city'=>null,
-                'confirmation'=>null
+                'confirmation'=>false
             ];
 
         try {
             // IP publique
             $ipResponse = Http::timeout(10)->get('https://api.ipify.org');
-            $ip = $ipResponse->body();
+            // $ip = $ipResponse->body();
+            $ip = ($requestIp == null)? $ipResponse->body() : $requestIp;
 
             // Géolocalisation
             $url = "http://ip-api.com/json/{$ip}";
@@ -357,7 +358,7 @@ class PresenceController extends Controller
             $localisation = $positionResponse->json();
 
            //Rayon de 10m par defaut autour du bureau
-            $distance = $this->calculDistance($coord_bureau['lat'],$coord_bureau['long'],$localisation['lat'],$localisation['lon']);
+            $distance = self::calculDistance($coord_bureau['lat'],$coord_bureau['long'],$localisation['lat'],$localisation['lon']);
         
                return [
                     'ok'=>true,
