@@ -75,6 +75,7 @@ Route::prefix('presence')->middleware(AuthentifyMiddleware::class)->group(functi
     Route::get('{depot}/list', [PresenceController::class,'show'])->name('presence.show');
     Route::put('{presence}/sortie', [PresenceController::class,'updateSortie'])->name('presence.out');
     Route::put('{presence}/confirmation', [PresenceController::class,'update'])->name('presence.confirm');
+    Route::delete('{presence}/delete', [PresenceController::class,'destroy'])->name('presence.destroy');
 });
 
 Route::get('rapport/{depot}/journalier/{id}', [RapportController::class,'journalier'])->name('rapport.jour')->middleware( AuthentifyMiddleware::class);
