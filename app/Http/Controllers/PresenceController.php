@@ -127,47 +127,27 @@ class PresenceController extends Controller
         return view('presence.journalier', compact('presence','depot'));
     }
 
-    public function showPresence($an, $mois){
-        $presence = Presence::whereYear('h_arrive',$an)->whereMonth('h_arrive',$mois)->get();
-        // dd($presence);
-        $groupe=[];
-        foreach($presence as $key=>$val){
-            $element = Carbon::parse($val->h_arrive)->format('Y-m-d');
-            // echo $element."<br>";
-            if($key==0){
-
-                $groupecle = Presence::where('created_at','like',"%$element%")->get();
-                $groupecle->an=null;
-                $groupecle->mois=null;
-                $groupecle->jour=true;
-                $groupe [$element]= $groupecle;
-            }
-            if($key > 0){
-                
-                $cle= $key-1;
-                $element2 = Carbon::parse($presence[$cle]->h_arrive)->format('Y-m-d');
-
-                if($element != $element2){
-                    $groupecle2 = Presence::where('created_at','like',"%$element2%")->get();
-                    $groupecle2->an=null;
-                    $groupecle2->mois=null;
-                    $groupecle2->jour=true;
-                    $groupe [$element2]= $groupecle2;
-
-                }
-            }
-            $dernier = count($presence)-1;
-            if($key == $dernier){
-                $groupecle = Presence::where('created_at','like',"%$element2%")->get();
-                $groupecle->an=null;
-                $groupecle->mois=null;
-                $groupecle->jour=true;
-                $groupe[$element]= $groupecle;
-            }
+    public function presenceMensuel($depot_id){
+        $depot  = Depot::find($depot_id);
+        if(!$depot){
+           return back()->with('echec',"Erreur renseignemenet invalide");   
         }
+        
+        $now = Carbon::now();
+        $an = $now->year; 
+        $mois = $now->month;
+        Carbon::setLocale('fr');
 
-        return view('presences.index', compact('groupe'));
-
+        $presence = Presence::with(['user','depot'])
+            ->whereYear('created_at', $an)
+            ->whereMonth('created_at', $mois)
+            ->where('depot_id', $depot->id)
+            ->get()
+            ->groupBy(function($item) {
+                return $item->created_at->translatedFormat('l j F Y');
+            });
+            // return $presence;
+        return view('presence.mensuel', compact('presence', 'depot'));
     }
     public function showPresenceJour($date){
         $presence = Presence::where('created_at','like',"%$date%")->get();

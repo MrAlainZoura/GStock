@@ -73,6 +73,9 @@ Route::delete('compassassion/delete/{id}', [CompassassionController::class,'dest
 Route::prefix('presence')->middleware(AuthentifyMiddleware::class)->group(function () {
     Route::post('/', [PresenceController::class,'store'])->name('presence.store');
     Route::get('{depot}/list', [PresenceController::class,'show'])->name('presence.show');
+    Route::get('mensuel/{depot}/list', [PresenceController::class,'presenceMensuel'])->name('presence.mois');
+    Route::get('annuel/{depot}/list', [PresenceController::class,'presenceAnnuel'])->name('presence.annee');
+
     Route::put('{presence}/sortie', [PresenceController::class,'updateSortie'])->name('presence.out');
     Route::put('{presence}/confirmation', [PresenceController::class,'update'])->name('presence.confirm');
     Route::delete('{presence}/delete', [PresenceController::class,'destroy'])->name('presence.destroy');
