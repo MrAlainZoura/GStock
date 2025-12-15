@@ -344,7 +344,7 @@ class PresenceController extends Controller
 
            //Rayon de 10m par defaut autour du bureau
             $distance = self::calculDistance($coord_bureau['lat'],$coord_bureau['long'],$localisation['lat'],$localisation['lon']);
-        
+            $distance = ($distance ==null)?100:$distance;
                return [
                     'ok'=>true,
                     'long'=>$localisation['lon'],
