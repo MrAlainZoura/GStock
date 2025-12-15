@@ -9,6 +9,7 @@ use App\Models\Produit;
 use App\Models\Categorie;
 use App\Models\ProduitDepot;
 use Illuminate\Http\Request;
+use App\Exports\ProduitExport;
 use App\Imports\ProduitImport;
 use App\Models\Approvisionnement;
 use Illuminate\Support\Facades\DB;
@@ -262,6 +263,20 @@ class ProduitController extends Controller
         return back()->with('echec','Importation échouée, votre fichier excel est vide');   
     }
 
+    public function exportProduitExcel($depot){
+        if (is_numeric($depot) && intval($depot) == $depot) {
+            $intValue = (int)$depot;
+            $depotId = $depot/12;
+            $getDepot = Depot::find($depotId);
+            if(!$getDepot){
+                return back()->with("echec", "Erreur depot introuvable");
+            }
+            return Excel::download(new ProduitExport($depotId), 'produits_depot_' . $getDepot->libele . '.xlsx');
+        } else {
+            return back()->with("echec", "Erreur depot introuvable");
+        }
+
+    }
     /**
      * Display the specified resource.
      */

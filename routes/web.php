@@ -17,6 +17,7 @@ use App\Http\Middleware\AuthentifyMiddleware;
 use App\Http\Controllers\CompassassionController;
 use App\Http\Controllers\ApprovisionnementController;
 use App\Http\Controllers\SouscriptionController;
+use App\Http\Controllers\PresenceController;
 
 // Route::get('/', function () {
 //     return view('home');
@@ -67,8 +68,20 @@ Route::delete('vente/{vente}/delete-force', [VenteController::class,'forcedelete
 Route::put('vente/{vente}/restore', [VenteController::class,'restore'])->name('restore')->middleware( AuthentifyMiddleware::class);
 
 Route::get('compassassion/{depot}/{vente_id}/create', [CompassassionController::class,'create'])->name('compCreate')->middleware( AuthentifyMiddleware::class);
+Route::get('compassassion/{depot}/list/{id}', [CompassassionController::class,'show'])->name('compList')->middleware( AuthentifyMiddleware::class);
 Route::post('compassassion/{depot}/store', [CompassassionController::class,'store'])->name('compStore')->middleware( AuthentifyMiddleware::class);
+Route::delete('compassassion/delete/{id}', [CompassassionController::class,'destroy'])->name('compDelete')->middleware( AuthentifyMiddleware::class);
 
+Route::prefix('presence')->middleware(AuthentifyMiddleware::class)->group(function () {
+    Route::post('/', [PresenceController::class,'store'])->name('presence.store');
+    Route::get('{depot}/list', [PresenceController::class,'show'])->name('presence.show');
+    Route::get('mensuel/{depot}/list', [PresenceController::class,'presenceMensuel'])->name('presence.mois');
+    Route::get('annuel/{depot}/list', [PresenceController::class,'presenceAnnuel'])->name('presence.annee');
+
+    Route::put('{presence}/sortie', [PresenceController::class,'updateSortie'])->name('presence.out');
+    Route::put('{presence}/confirmation', [PresenceController::class,'update'])->name('presence.confirm');
+    Route::delete('{presence}/delete', [PresenceController::class,'destroy'])->name('presence.destroy');
+});
 
 Route::get('rapport/{depot}/journalier/{id}', [RapportController::class,'journalier'])->name('rapport.jour')->middleware( AuthentifyMiddleware::class);
 Route::get('rapport/{depot}/mensuel/{id}', [RapportController::class,'mensuel'])->name('rapport.mois')->middleware( AuthentifyMiddleware::class);
@@ -91,10 +104,12 @@ Route::put('souscription/{id}', [SouscriptionController::class,'show'])->name('s
 
 Route::get('{depot}/parametre', [DepotController::class, 'depotSetting'])->name("depotSetting")->middleware(AuthentifyMiddleware::class);
 Route::get('{depot}/produits/{id}', [DepotController::class, 'showProduit'])->name("showProduit")->middleware(AuthentifyMiddleware::class);
+Route::put('update/{depot}/geolocalisation/{action}', [DepotController::class, 'geolocalisation'])->name("depotGeo")->middleware(AuthentifyMiddleware::class);
 
 Route::put('{depot}/{devise}/update', [DeviseController::class, 'update'])->name("devise.update")->middleware(AuthentifyMiddleware::class);
 
 Route::post('import_produit',[ ProduitController::class, 'importProduitExcel'])->name('import_prod_excel')->middleware(AuthentifyMiddleware::class);
+Route::get('export_produit/{depot}',[ ProduitController::class, 'exportProduitExcel'])->name('export_prod_excel')->middleware(AuthentifyMiddleware::class);
 Route::get('vente/creances/{depot}/{depot_id}', [PaiementController::class,'creance'])->name('creanceDepot')->middleware( AuthentifyMiddleware::class);
 Route::post('vente/creances/{vente}', [PaiementController::class,'store'])->name('creanceStore')->middleware( AuthentifyMiddleware::class);
 Route::resource('paiement',PaiementController::class)->middleware(AuthentifyMiddleware::class);
