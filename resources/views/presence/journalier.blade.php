@@ -129,8 +129,10 @@
                     </td>
                     <td > 
                         <div class="max-w-sm">
-                            {{$item->city}}
-                        </div> 
+                            {{$item->city}} <br>
+                            long : {{$item->lon}} <br>
+                            lat : {{$item->lat}}
+                        </div> <br>
                     </td>
                 <td>
                         @if ($item->confirm)
