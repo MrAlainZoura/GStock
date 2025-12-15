@@ -299,7 +299,7 @@ class PresenceController extends Controller
             $km = $distance * 60 * 1.1515;
             $mettres = $km *1609.39;
 
-            return $mettres;
+            return (int)$mettres;
         }catch(Exception $e){
             return null;
         }
@@ -343,8 +343,7 @@ class PresenceController extends Controller
             $localisation = $positionResponse->json();
             //Rayon de 10m par defaut autour du bureau
             $distance = self::calculDistance($coord_bureau['lat'],$coord_bureau['lon'],$localisation['lat'],$localisation['lon']);
-            dd($localisation, $distance);
-            $distance = ($distance ==null)?100:$distance;
+            $distance = ($distance == null)?100:$distance;
                return [
                     'ok'=>true,
                     'long'=>$localisation['lon'],
