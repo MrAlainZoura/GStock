@@ -83,7 +83,7 @@ class PresenceController extends Controller
             return back()->with('success', "Signer la sortie et revenez le prochain jour de travail");
         }
         
-        $position = self::getPerimetre((float)$service->lon, (float)$service->lat,15,$request->ip());
+        $position = self::getPerimetre((float)$service->lon, (float)$service->lat,10,$request->ip());
        //verif ip deja existe
         $verif_ip = Presence::where('ip', $request->ip())
             ->whereDate('created_at', $today)
@@ -328,7 +328,7 @@ class PresenceController extends Controller
             // IP publique
             $ipResponse = Http::timeout(10)->get('https://api.ipify.org');
             // $ip = $ipResponse->body();
-            $ip = ($requestIp == null)? $ipResponse->body() : $requestIp;
+            $ip = ($requestIp == '')? $ipResponse->body() : $requestIp;
 
             // Géolocalisation
             $url = "http://ip-api.com/json/{$ip}";
@@ -344,7 +344,7 @@ class PresenceController extends Controller
 
            //Rayon de 10m par defaut autour du bureau
             $distance = self::calculDistance($coord_bureau['lat'],$coord_bureau['long'],$localisation['lat'],$localisation['lon']);
-        
+            $distance = ($distance ==null)?100:$distance;
                return [
                     'ok'=>true,
                     'long'=>$localisation['lon'],
