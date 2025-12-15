@@ -18,9 +18,9 @@ use App\Http\Controllers\CompassassionController;
 use App\Http\Controllers\ApprovisionnementController;
 use App\Http\Controllers\SouscriptionController;
 
-// Route::get('/', function () {
-//     return view('home');
-// });
+Route::get('/loader', function () {
+    return view('composant.loader');
+});
 // Route::get('/',[HomeController::class, 'home'])->name('home');
 Route::get('/',[UserController::class, 'loginCreate'])->name('home');
 Route::get('dashbord',[HomeController::class, 'dashboard'])->name('dashboard')->middleware(AuthentifyMiddleware::class);
@@ -85,8 +85,9 @@ Route::post('abonnements/store', [AbonnementController::class,'store'])->name('a
 Route::put('abonnement/{id}', [AbonnementController::class,'show'])->name('abonnement.update')->middleware(AuthentifyMiddleware::class);
 
 // Route::get('abonnements/list/{admin}', [AbonnementController::class,'index'])->name('abonnement.list')->middleware(AuthentifyMiddleware::class);
-// Route::get('abonnement/{admin}/create', [AbonnementController::class,'create'])->name('abonnement.create')->middleware(AuthentifyMiddleware::class);
+Route::get('souscription/paiement/{admin}', [SouscriptionController::class,'paiement'])->name('souscr.paie')->middleware(AuthentifyMiddleware::class);
 Route::post('souscription/store', [SouscriptionController::class,'store'])->name('souscr.store')->middleware(AuthentifyMiddleware::class);
+Route::put('souscription/{id}/confirm', [SouscriptionController::class,'confirmePaie'])->name('souscr.confirm')->middleware(AuthentifyMiddleware::class);
 Route::put('souscription/{id}', [SouscriptionController::class,'show'])->name('souscr.update')->middleware(AuthentifyMiddleware::class);
 
 Route::get('{depot}/parametre', [DepotController::class, 'depotSetting'])->name("depotSetting")->middleware(AuthentifyMiddleware::class);

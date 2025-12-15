@@ -17,16 +17,6 @@
         @include('composant.alert_echec', ['message'=>session('echec')])
     </div>
     @endif
-    <div id="alert-box" 
-     class="hidden fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 
-            bg-blue-100 text-blue-900 px-2 py-2 rounded shadow-lg text-center">
-</div>
-
-    <div class="flex justify-start py-3">
-        <a href="{{ route('abonnement.create', auth::user()->id*13) }}" class="inline-flex justify-center bg-blue-700 hover:text-gray-900 items-center py-3 px-5 sm:ms-4 text-base font-medium text-center text-white rounded-lg border border-gray-700 focus:ring-4 focus:ring-gray-400">
-            Souscire un abonnement
-        </a>
-    </div>
     <div class="py-3 px-5">
         <table id="search-table" class="w-70">
             <thead>
@@ -34,14 +24,6 @@
                     <th>
                         <span class="flex items-center max-w-sm">
                             #
-                            <svg class="w-3 h-3 ms-1.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M8.574 11.024h6.852a2.075 2.075 0 0 0 1.847-1.086 1.9 1.9 0 0 0-.11-1.986L13.736 2.9a2.122 2.122 0 0 0-3.472 0L6.837 7.952a1.9 1.9 0 0 0-.11 1.986 2.074 2.074 0 0 0 1.847 1.086Zm6.852 1.952H8.574a2.072 2.072 0 0 0-1.847 1.087 1.9 1.9 0 0 0 .11 1.985l3.426 5.05a2.123 2.123 0 0 0 3.472 0l3.427-5.05a1.9 1.9 0 0 0 .11-1.985 2.074 2.074 0 0 0-1.846-1.087Z"/>
-                            </svg>
-                        </span>
-                    </th>
-                    <th>
-                        <span class="flex items-center max-w-sm">
-                            Administrateur
                             <svg class="w-3 h-3 ms-1.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
                                 <path d="M8.574 11.024h6.852a2.075 2.075 0 0 0 1.847-1.086 1.9 1.9 0 0 0-.11-1.986L13.736 2.9a2.122 2.122 0 0 0-3.472 0L6.837 7.952a1.9 1.9 0 0 0-.11 1.986 2.074 2.074 0 0 0 1.847 1.086Zm6.852 1.952H8.574a2.072 2.072 0 0 0-1.847 1.087 1.9 1.9 0 0 0 .11 1.985l3.426 5.05a2.123 2.123 0 0 0 3.472 0l3.427-5.05a1.9 1.9 0 0 0 .11-1.985 2.074 2.074 0 0 0-1.846-1.087Z"/>
                             </svg>
@@ -57,7 +39,7 @@
                     </th>
                     <th>
                         <span class="flex items-center max-w-sm">
-                            Depot
+                            Debut
                             <svg class="w-3 h-3 ms-1.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
                                 <path d="M8.574 11.024h6.852a2.075 2.075 0 0 0 1.847-1.086 1.9 1.9 0 0 0-.11-1.986L13.736 2.9a2.122 2.122 0 0 0-3.472 0L6.837 7.952a1.9 1.9 0 0 0-.11 1.986 2.074 2.074 0 0 0 1.847 1.086Zm6.852 1.952H8.574a2.072 2.072 0 0 0-1.847 1.087 1.9 1.9 0 0 0 .11 1.985l3.426 5.05a2.123 2.123 0 0 0 3.472 0l3.427-5.05a1.9 1.9 0 0 0 .11-1.985 2.074 2.074 0 0 0-1.846-1.087Z"/>
                             </svg>
@@ -65,7 +47,15 @@
                     </th>
                     <th>
                         <span class="flex items-center max-w-sm">
-                            Expriration
+                            Expiration
+                            <svg class="w-3 h-3 ms-1.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M8.574 11.024h6.852a2.075 2.075 0 0 0 1.847-1.086 1.9 1.9 0 0 0-.11-1.986L13.736 2.9a2.122 2.122 0 0 0-3.472 0L6.837 7.952a1.9 1.9 0 0 0-.11 1.986 2.074 2.074 0 0 0 1.847 1.086Zm6.852 1.952H8.574a2.072 2.072 0 0 0-1.847 1.087 1.9 1.9 0 0 0 .11 1.985l3.426 5.05a2.123 2.123 0 0 0 3.472 0l3.427-5.05a1.9 1.9 0 0 0 .11-1.985 2.074 2.074 0 0 0-1.846-1.087Z"/>
+                            </svg>
+                        </span>
+                    </th>
+                    <th>
+                        <span class="flex items-center max-w-sm">
+                            Depot
                             <svg class="w-3 h-3 ms-1.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
                                 <path d="M8.574 11.024h6.852a2.075 2.075 0 0 0 1.847-1.086 1.9 1.9 0 0 0-.11-1.986L13.736 2.9a2.122 2.122 0 0 0-3.472 0L6.837 7.952a1.9 1.9 0 0 0-.11 1.986 2.074 2.074 0 0 0 1.847 1.086Zm6.852 1.952H8.574a2.072 2.072 0 0 0-1.847 1.087 1.9 1.9 0 0 0 .11 1.985l3.426 5.05a2.123 2.123 0 0 0 3.472 0l3.427-5.05a1.9 1.9 0 0 0 .11-1.985 2.074 2.074 0 0 0-1.846-1.087Z"/>
                             </svg>
@@ -90,19 +80,19 @@
                         </div>
                     </td>
                     <td class="text-md">
-                        <a href="{{ route('admin.edit', 12) }}" class="flex items-center gap-2 w-full p-2 text-blue-600 text-md transition duration-75 rounded-lg group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
-                        <img src="{{asset('svg/man.svg')}}" class="flex-shrink-0 w-7 h-7 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" aria-hidden="true" alt="">
-                            {{ $abonnement->user->name }}
-                        </a>
+                        {{ $abonnement->abonnement->name }}
+                         code : <label class="cursor-pointer flex items-center gap-2 w-full p-2 text-blue-600 text-md transition duration-75 rounded-lg group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
+                        {{ $abonnement->code }}
+                        </label> 
                         
                     </td>
                     <td>
-                        {{ $abonnement->abonnement->name }}
-                         code : <label onclick="copyCode('{{ $abonnement->code }}')" title="clic pour copier" class="cursor-pointer flex items-center gap-2 w-full p-2 text-blue-600 text-md transition duration-75 rounded-lg group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
-                        {{ $abonnement->code }}
-                        </label> 
+                        {{ $abonnement->debut  }}
                     </td>
                     <td>
+                        {{ $abonnement->expired }}
+                    </td>
+                    <td> 
                         <ul class="max-w-md space-y-1 text-body list-inside">                            
                             @foreach ($abonnement->depotSouscription as $depotS)
                                 <li class="flex items-center">
@@ -112,10 +102,21 @@
                                 </li>
                             @endforeach
                         </ul>
-                   
                     </td>
-                    <td>{{ $abonnement->expired }}</td>
-                    <td>action</td>
+                    <td>
+                        <div class="flex justify-start">
+                            <a href="{{ route('abonnement.create', auth::user()->id*13) }}" class="inline-flex justify-center text-blue-600 hover:text-gray-900 items-center sm:ms-4 text-base font-medium text-center rounded-lg focus:ring-4 focus:ring-gray-400">
+                                Active
+                            </a>
+                        </div>
+                        <form method="post" action="{{route('souscr.confirm',$abonnement->id ) }}" class="flex justify-start">
+                            @csrf
+                            @method('put')
+                            <button type="submit" class="inline-flex justify-center text-blue-600 hover:text-gray-900 items-center sm:ms-4 text-base font-medium text-center rounded-lg focus:ring-4 focus:ring-gray-400">
+                                Confirme
+                            <button>
+                        </form>
+                    </td>
                 </tr>
                 @endforeach
             </tbody>
@@ -128,27 +129,3 @@
     @include('composant.footer')
 @endsection
 
-<script>
-    document.addEventListener('DOMContentLoaded', ()=>{
-
-        window.copyCode = (code)=>{
-            const success = `${code} copié !`;
-            const error = "Echec de la copie !";
-            navigator.clipboard.writeText(code)
-                    .then(() => showAlert(success))
-                    .catch(() => showAlert(error));
-        }
-        
-        const alertBox = document.getElementById('alert-box');
-
-        const showAlert = (message) => {
-            alertBox.textContent = message;
-            alertBox.classList.remove('hidden');
-
-            setTimeout(() => {
-            alertBox.classList.add('hidden');
-            }, 3000);
-        };
-    });
-    
-</script>

@@ -72,6 +72,7 @@
    
     @endsection
 
+@include('composant.sidebarAdmin',["user_id"=>auth::user()->id])
 
 @section('footer')
     @include('composant.footer')

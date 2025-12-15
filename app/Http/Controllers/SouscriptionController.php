@@ -10,6 +10,7 @@ use App\Models\Souscription;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use App\Models\User;
 
 class SouscriptionController extends Controller
 {
@@ -116,7 +117,30 @@ class SouscriptionController extends Controller
     {
         //
     }
-
+    public function paiement($admin){
+        $user = User::find((int)$admin/13);
+        if (!$user) {
+            return back()->with('echec', 'erreur utilisateur non trouvé');
+        }
+        $roleAutorises = ['Super admin'];
+        if (in_array(Auth::user()->user_role->role->libele, $roleAutorises)) {
+            $abonnements = Souscription::where('validate', false)->latest()->get();
+        }else{
+            $abonnements = Souscription::where('validate', false)->where('user_id', $user->id)->latest()->get();
+        }
+        return view('abonnement.paiement', compact("abonnements"));
+    }
+    public function confirmePaie($id){
+        $roleAutorises = ['Super admin'];
+        if (in_array(Auth::user()->user_role->role->libele, $roleAutorises)) {
+            return "pas d'acces";
+        }
+        $confirm = Souscription::find(  $id);
+        return $confirm;
+        // compare si date debut est inferieur ou egale a now si oui on active sinon on update debut et expire 
+        $update = ($confirm)?$confirm->update(['validate'=>false]):"not found validate";
+        return $update;
+    }
     public function ajouterMois($dateInitiale, $nombreDeMois) {
         // $dateInitiale au format "jj/mm/aaaa"
         list($jour, $mois, $annee) = explode("/", $dateInitiale);

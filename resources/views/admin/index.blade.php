@@ -1,5 +1,5 @@
 @extends('base')
-@section('title', "Liste de vente")
+@section('title', "Liste Admin")
 
 @section('header')
   @include('composant.hearder', ['user_email'=>Auth::user()->email, 'user_name'=>Auth::user()->name])
@@ -91,7 +91,7 @@
     </div>
     @endsection
 
-@include('composant.sideBarAdmin')
+@include('composant.sidebarAdmin',["user_id"=>auth::user()->id])
 
 @section('footer')
     @include('composant.footer')
