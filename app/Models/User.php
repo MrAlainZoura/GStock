@@ -51,7 +51,7 @@ class User extends Authenticatable
 
     public function souscription(){
         return $this->hasMany(Souscription::class);
-
+    }
     public function presence(){
         return $this->hasMany(Presence::class);
 
