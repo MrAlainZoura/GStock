@@ -130,9 +130,10 @@
                     <td > 
                         <div class="max-w-sm">
                             {{$item->city}} 
-                            <!-- long : {{$item->lon}} <br>
-                            lat : {{$item->lat}} -->
-                        </div> <br>
+                            long : {{$item->lon}} <br>
+                            lat : {{$item->lat}}<br>
+                            Ip : {{$item->ip}}<br>
+                        </div> 
                     </td>
                 <td>
                         @if (in_array(Auth::user()->user_role->role->libele,['Administrateur','Super admin']))

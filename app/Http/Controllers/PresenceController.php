@@ -75,17 +75,20 @@ class PresenceController extends Controller
         }
         //verifier si presence existe deja pour ce jour
         $verif_prese = Presence::where('user_id', $request->user_id)
-            ->whereDate('created_at', $today)
-            // ->latest()
-            ->first();
-
+        ->whereDate('created_at', $today)
+        // ->latest()
+        ->first();
+        
         if ($verif_prese && Carbon::parse($verif_prese->created_at)->isSameDay($today)) {
             return back()->with('success', "Signer la sortie et revenez le prochain jour de travail");
         }
         
         // $position = self::getPerimetre((float)$service->lon, (float)$service->lat,10,$request->ip());
-       //verif ip deja existe
-        $verif_ip = Presence::where('ip', $request->ip())
+        //verif ip deja existe
+        $ip = $request->ip();
+        $ipAPI = self::getIpClient($ip);
+        
+        $verif_ip = Presence::where('ip', $ipAPI)
             ->whereDate('created_at', $today)
             ->exists();
         if($verif_ip ){
@@ -100,7 +103,7 @@ class PresenceController extends Controller
             'user_id'=>$user->id,
             'depot_id'=>$service->id,
             'confirm'=>(is_numeric($distance) && $distance <= $rayon) ? true : false,
-            'ip'=>$request->ip(),
+            'ip'=>$ipAPI,
             'distance'=>$distance,
             'lon'=>$longitude,
             'lat'=>$latitude,
@@ -378,6 +381,17 @@ class PresenceController extends Controller
             // ?? $data['address']['village']
             // ?? $data['address']['city']
             ?? null;
+        }catch(Exception $e){
+            return null;
+        }
+    }
+
+    static function getIpClient(string $ip =""){
+        try{
+            $url = "http://ip-api.com/json/{$ip}";
+            $positionResponse = Http::timeout(10)->get($url);
+            $localisation = $positionResponse->json();
+            return $localisation['query'];
         }catch(Exception $e){
             return null;
         }
