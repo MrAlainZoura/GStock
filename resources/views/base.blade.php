@@ -9,8 +9,8 @@
     @vite(['resources/css/app.css','resources/js/app.js', 'resources/js/actionLink.js'])
     <title>@yield('title')</title>
 
-    <link rel="stylesheet" href="{{asset('build/assets/app-CwJZiasC.css')}}">
-    <link rel="stylesheet" href="{{asset('build/assets/app-jyNfBocD.js')}}">
+    <link rel="stylesheet" href="{{asset('build/assets/app-D0uqYYzE.css')}}">
+    <link rel="stylesheet" href="{{asset('build/assets/app-CI5RKnWv.js')}}">
     <link rel="stylesheet" href="{{asset('build/assets/actionLink-DnPPqJxu.js')}}">
     <link rel="stylesheet" href="{{asset('build/manifest.json')}}">
     <link rel="icon" type="image/x-icon" href="{{asset('img/icon.jpeg')}}">    

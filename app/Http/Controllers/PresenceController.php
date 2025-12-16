@@ -50,14 +50,14 @@ class PresenceController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
-    {
+    { 
         $validattion = Validator::make($request->all(), [
             'user_id'=>'required|int',
             'depot_id'=>'required|int',
         ]);
         if($validattion->fails()){
             $message = $validattion->errors();
-            return back()->with('echec',$message);
+            return back()->with('echec',"Données entrées sont incorrectes");
         }
         $time = Carbon::now();
         $today = $time->format('Y-m-d');
@@ -79,11 +79,11 @@ class PresenceController extends Controller
             // ->latest()
             ->first();
 
-        if ($verif_prese && Carbon::parse($verif_prese->h_arrive)->isSameDay($today)) {
+        if ($verif_prese && Carbon::parse($verif_prese->created_at)->isSameDay($today)) {
             return back()->with('success', "Signer la sortie et revenez le prochain jour de travail");
         }
         
-        $position = self::getPerimetre((float)$service->lon, (float)$service->lat,10,$request->ip());
+        // $position = self::getPerimetre((float)$service->lon, (float)$service->lat,10,$request->ip());
        //verif ip deja existe
         $verif_ip = Presence::where('ip', $request->ip())
             ->whereDate('created_at', $today)
@@ -91,18 +91,21 @@ class PresenceController extends Controller
         if($verif_ip ){
             return back()->with('success', "Quelqu'un a déjà signé la présence aujourd'hui avec cet appareil");
         }
-
+        $latitude = (float) $request->input('lat');
+        $longitude = (float) $request->input('lon');
+        $city = self::getCityByCoords($latitude, $longitude);
+        $distance = self::calculDistance($service->lat, $service->lon,$latitude, $longitude);
+        $rayon = 10;
         $insert = [
             'user_id'=>$user->id,
             'depot_id'=>$service->id,
-            'confirm'=>$position['confirmation'],
+            'confirm'=>(is_numeric($distance) && $distance <= $rayon) ? true : false,
             'ip'=>$request->ip(),
-            'distance'=>$position['distance'],
-            'lon'=>$position['long'],
-            'lat'=>$position['lat'],
-            'city'=>$position['city']
+            'distance'=>$distance,
+            'lon'=>$longitude,
+            'lat'=>$latitude,
+            'city'=>$city
         ];
-        
         $presence = Presence::create($insert);
         if($presence){
             return back()->with('success',"Vous avez signé votre présence à $presence->created_at");
@@ -283,7 +286,7 @@ class PresenceController extends Controller
         ];
     }
 
-    static private function calculDistance ( ?float $xCenter, ?float $yCenter, ?float $xUser, ?float $yUser){
+    static private function calculDistance ( ?float $xCenter, ?float $yCenter, ?float $xUser, ?float $yUser):int|null{
         if ($xCenter === null || $yCenter === null || $xUser === null || $yUser === null) {
             return null;
         }
@@ -359,4 +362,25 @@ class PresenceController extends Controller
             return $data;
         }
     }
+
+    static public function getCityByCoords($lat, $lon)
+    {
+        
+        try{
+            $data = Http::get('https://nominatim.openstreetmap.org/reverse', [
+            'lat' => $lat,
+            'lon' => $lon,
+            'format' => 'json'
+        ])->json();
+
+        return $data['address']['state']
+            // ?? $data['address']['town']
+            // ?? $data['address']['village']
+            // ?? $data['address']['city']
+            ?? null;
+        }catch(Exception $e){
+            return null;
+        }
+    }
+
 }
