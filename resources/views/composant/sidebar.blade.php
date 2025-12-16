@@ -253,11 +253,14 @@
                   @endif
                 @else
                   <li>
-                     <form action="{{route('presence.store')}}" method="post" class="flex items-center gap-2 w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
+                     <form action="{{route('presence.store')}}" id="formPresenceStore" method="post" class="flex items-center gap-2 w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
                         @csrf 
                         @method('post')
                         <input type="text" class="hidden" name="user_id" value="{{ Auth::user()->id }}">
                         <input type="text" class="hidden" name="depot_id" value="{{ $depot_id }}">
+                        <input type="text" class="hidden" name="lon"  id="lon">
+                        <input type="text" class="hidden" name="lat" id="lat">
+
                         <button type="submit" class="flex gap-2 w-full" >
                            <svg width="24px" height="24px" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" fill="#000000">
                               <g id="SVGRepo_bgCarrier" stroke-width="0"/>

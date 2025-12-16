@@ -283,12 +283,12 @@
                    @method('put')
                    <div class="grid gap-4 grid-cols-1 sm:grid-cols-2">
                      <div>
-                         <label for="lat" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Lattitude</label>
-                         <input type="text" name="lat" value="{{ $depotData->lat }}" id="lat" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" placeholder="" required />
+                         <label for="latM" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Lattitude</label>
+                         <input type="text" name="latM" value="{{ $depotData->lat }}" id="lat0" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" placeholder="" required />
                      </div>
                      <div>
-                         <label for="lon" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Longitude</label>
-                         <input type="text" name="lon" id="lon" value="{{ $depotData->lon }}"  class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" required />
+                         <label for="lonM" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Longitude</label>
+                         <input type="text" name="lonM" id="lon0" value="{{ $depotData->lon }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" required />
                      </div>
                    </div>
                     
@@ -297,11 +297,12 @@
                       <label for="modalgeo" class="text-body cursor-pointer bg-neutral-secondary-medium box-border border border-default-medium hover:bg-neutral-tertiary-medium hover:text-heading focus:ring-4 focus:ring-neutral-tertiary shadow-xs font-medium leading-5 rounded-base text-sm px-4 py-2.5 focus:outline-none">Auto</button>
                   </div>
                 </form>
-                <form method="post" action="{{ route('depotGeo',['depot'=>$depotData->id, 'action'=>"auto"]) }}" class="hidden">
-                  @csrf 
-                  @method('put')
-                    
-                  <button id="modalgeo" data-modal-hide="crud-modal" type="submit" class="text-body bg-neutral-secondary-medium box-border border border-default-medium hover:bg-neutral-tertiary-medium hover:text-heading focus:ring-4 focus:ring-neutral-tertiary shadow-xs font-medium leading-5 rounded-base text-sm px-4 py-2.5 focus:outline-none">Auto</button>
+                <form method="post" id="formUpdatePoDep" action="{{ route('depotGeo',['depot'=>$depotData->id, 'action'=>"auto"]) }}" class="hidden">
+                    @csrf 
+                    @method('put')
+                    <input type="text" class="hidden" name="lonAuto"  id="lonAuto">
+                    <input type="text" class="hidden" name="latAuto" id="latAuto">
+                    <button id="modalgeo" data-modal-hide="crud-modal" type="submit" class="text-body bg-neutral-secondary-medium box-border border border-default-medium hover:bg-neutral-tertiary-medium hover:text-heading focus:ring-4 focus:ring-neutral-tertiary shadow-xs font-medium leading-5 rounded-base text-sm px-4 py-2.5 focus:outline-none">Auto</button>
                 </form>
             </div>
         </div>

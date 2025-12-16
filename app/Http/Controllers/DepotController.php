@@ -302,25 +302,27 @@ class DepotController extends Controller
 
     public function geolocalisation(Request $request, $depot, $action){
         $getDepot = Depot::find($depot);
+        
        if(!$getDepot){
             return back()->with('echec',"Renseignement invalide");
        }
         if($action == 'auto'){
-            $positionAuto = self::getPosition($request->ip());
-            if(!$positionAuto['ok']){
-              return back()->with('echec',$positionAuto['error'] );
+            // $positionAuto = self::getPosition($request->ip());
+            // if(!$positionAuto['ok']){
+            //   return back()->with('echec',$positionAuto['error'] );
+            // }
+            if (!is_null($request->lonAuto) && is_numeric($request->lonAuto) &&
+                !is_null($request->latAuto) && is_numeric($request->latAuto)){
+
+                $getDepot->update(['lat'=>$request->latAuto, 'lon'=>$request->lonAuto]);
+                return back()->with('success', "Position mise à jour par détection automatique");
             }
-            $getDepot->update(['lat'=>$positionAuto['lat'], 'lon'=>$positionAuto['lon']]);
-            return back()->with('success', "Position mise à jour par détection automatique");
         }
         if($action == 'insert'){
-            if (!is_null($request->lon) && is_numeric($request->lon) &&
-            !is_null($request->lat) && is_numeric($request->lat)) {
+            if (!is_null($request->lonM) && is_numeric($request->lonM) &&
+                !is_null($request->latM) && is_numeric($request->latM)) {
                 
-                $lon = (float) $request->lon;
-                $lat = (float) $request->lat;
-                
-                $getDepot->update(['lat'=>$lat, 'lon'=>$lon]);
+                $getDepot->update(['lat'=>$request->latM, 'lon'=>$request->lonM]);
                 return back()->with('success', "Position mise à jour");
             }
             return back()->with('echec', 'Coordonnées invalides');
