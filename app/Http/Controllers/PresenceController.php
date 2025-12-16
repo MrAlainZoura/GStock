@@ -98,13 +98,13 @@ class PresenceController extends Controller
         $longitude = (float) $request->input('lon');
         $city = self::getCityByCoords($latitude, $longitude);
         $distance = self::calculDistance($service->lat, $service->lon,$latitude, $longitude);
-        $rayon = 10;
+        $rayon = 31;
         $insert = [
             'user_id'=>$user->id,
             'depot_id'=>$service->id,
             'confirm'=>(is_numeric($distance) && $distance <= $rayon) ? true : false,
             'ip'=>$ipAPI,
-            'distance'=>$distance,
+            'distance'=>(is_numeric($distance) && $distance > $rayon) ? $distance - $rayon : null,
             'lon'=>$longitude,
             'lat'=>$latitude,
             'city'=>$city
