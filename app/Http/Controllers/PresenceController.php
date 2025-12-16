@@ -316,7 +316,7 @@ class PresenceController extends Controller
      */
      static public function getPerimetre(float $long,float $lat, $rayon = 10, string $requestIp = ''){
 
-        $coord_bureau = ["long"=>$long, "lat"=>$lat];
+        $coord_bureau = ["lon"=>$long, "lat"=>$lat];
         $data = [
                 'ok' => false,
                 'long'=>null,
@@ -344,10 +344,9 @@ class PresenceController extends Controller
 
             // Décoder la réponse JSON
             $localisation = $positionResponse->json();
-
-           //Rayon de 10m par defaut autour du bureau
-            $distance = self::calculDistance($coord_bureau['lat'],$coord_bureau['long'],$localisation['lat'],$localisation['lon']);
-            $distance = ($distance ==null)?100:$distance;
+            //Rayon de 10m par defaut autour du bureau
+            $distance = self::calculDistance($coord_bureau['lat'],$coord_bureau['lon'],$localisation['lat'],$localisation['lon']);
+            $distance = (is_numeric ($distance))?$distance:"";
                return [
                     'ok'=>true,
                     'long'=>$localisation['lon'],
