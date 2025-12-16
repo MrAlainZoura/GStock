@@ -27,15 +27,9 @@ class AppServiceProvider extends ServiceProvider
         });
         Blade::if('beforelimit', function ($date) {
             $limit = $date->copy()->addDay()->setTime(12, 0, 0);
-            return $date <= $limit;
+            return now() <= $limit;
         });
-        Blade::directive('interv', function ($date) {
-            return "<?php 
-                \$d = \\Carbon\\Carbon::parse($date);
-                \$limit = \$d->copy()->addDay()->setTime(12, 0, 0);
-                echo (\$d <= \$limit) ? 'true' : 'false';
-            ?>";
-        });
+        
 
         Schema::defaultStringLength(191);
     }
