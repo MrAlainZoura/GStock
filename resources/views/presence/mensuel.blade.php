@@ -92,7 +92,7 @@
             </thead>
             <tbody>
 
-                @foreach ($presence as $jour=>$data )
+                @foreach ($presence->reverse() as $jour=>$data )
                 <tr>
                     <td colspan></td>
                     <td colspan>{{ ucfirst($jour) }}</td>
@@ -117,11 +117,11 @@
                     </td>
                     <td class="max-w-sm">
                         <div class="flex gap-2 sm:bloc">
-                        {{$item->created_at}}
+                        @heure($item->created_at)
                         </div>
                     </td>
                     <td >
-                        {{ $item->updated_at }}
+                         @heure($item->updated_at) 
                     </td>
                     <td > 
                         <div class="max-w-sm">
