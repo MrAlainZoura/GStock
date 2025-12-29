@@ -465,33 +465,33 @@
   </table> 
   
   <h2>Tableau de Présence {{ $rapport['periode'] }} {{ $depotLiebele }}</h2>
-  <!-- <table class="table-style">
-    <thead>
-      <tr class="header-row">
-        <th>N°</th>
-        <th>Nom complet</th>
-        <th>Présence</th>
-        <th>Absence</th>
-      </tr>
-    </thead>
-    <tbody>
-        @foreach ($rapport['stats'] as $kcle=> $stat)
-          <tr>
-            <td> {{$kcle}}</td>
-            <td>{{print_r( $stat['user'][0]->name)}}</td>
-            <td>
-              @php
-              dump($stat['user'][0]->id)
-              @endphp
-            </td>
-            <td>-</td>
-          </tr>
-        @endforeach        
-    </tbody>
-  </table> 
-<h3>Statistiques globales</h3> -->
-
-
+  @if (str_contains($rapport['periode'], "Journalier") == false)
+    <h3>Statistique globale</h3> 
+    <table class="table-style">
+      <thead>
+        <tr class="header-row">
+          <th>N°</th>
+          <th>Nom complet</th>
+          <th>Présence</th>
+          <th>Absence</th>
+        </tr>
+      </thead>
+      <tbody>
+        @php
+          $numerotation = 1;
+        @endphp
+          @foreach ($rapport['stats'] as $kcle=> $stat)
+            <tr>
+              <td> {{$numerotation++}}</td>
+              <td>{{$stat['user'][0]->user->name}} {{$stat['user'][0]->user->postnom}} {{$stat['user'][0]->user->prenom}}</td>
+              <td>{{ $stat['confirmed_true'] }}</td>
+              <td>{{ $stat['confirmed_false'] }}</td>
+            </tr>
+          @endforeach        
+      </tbody>
+    </table> 
+  @endif
+  <h3> {{  (str_contains($rapport['periode'], "Journalier") == false)? "Statistiques détailées":""}}</h3>
   <table class="table-style">
     <thead>
       <tr class="header-row">
@@ -596,7 +596,3 @@
     <h6>@coryright zouracorp 2025</h6>
 </body>
 </html>
-
-@php
-// die();
-@endphp
