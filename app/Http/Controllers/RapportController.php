@@ -15,6 +15,7 @@ use App\Models\ProduitDepot;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Approvisionnement;
+use App\Models\Presence;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
@@ -402,6 +403,25 @@ class RapportController extends Controller
             ->where($dateFilter())
             ->orderBy('user_id')
             ->get();
+            
+        Carbon::setLocale('fr');
+        $presenceInit = Presence::with(['user','depot'])
+            ->where('depot_id', $depot->id)
+            ->where($dateFilter())
+            ->get();
+        
+        $presence = $presenceInit->groupBy(function($item) {
+                return $item->created_at->translatedFormat('l j F Y');
+            });
+        
+        $stats = $presenceInit->groupBy('user_id')->map(function($userGroup) {
+            return [
+                'user' => $userGroup,
+                'confirmed_true' => $userGroup->where('confirm', true)->count(),
+                'confirmed_false' => $userGroup->where('confirm', false)->count(),
+            ];
+        });
+// dd($stats);
         if($periode == "today"){
             
             $venteJourPremierTour = Vente::where('depot_id', $depot->id)
@@ -601,7 +621,9 @@ class RapportController extends Controller
             'avanceTotal'=>$avanceTotal,
             'depot'=>$depot,
             'venteTri'=>$ventesParCategorie,
-            'showVente'=>$ventesParCategorie->count()
+            'showVente'=>$ventesParCategorie->count(),
+            'presence'=>$presence,
+            'stats'=>$stats
         ];
         // dd($rapport, $prodArrayResume, $restePaiementTranche[0]->paiement);
         return Pdf::loadView('mail.rapport', ['rapport' => $rapport]);
