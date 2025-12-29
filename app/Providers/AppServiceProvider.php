@@ -30,6 +30,9 @@ class AppServiceProvider extends ServiceProvider
             return now() <= $limit;
         });
         
+        Blade::directive('heure', function ($expression) {
+            return "<?php echo (new DateTime($expression))->format('H:i:s'); ?>";
+        });
 
         Schema::defaultStringLength(191);
     }

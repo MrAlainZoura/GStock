@@ -42,6 +42,9 @@
         .tb{
           font-weight: 700;
         }
+        .upcase{
+          text-transform: capitalize;
+        }
     </style>
 </head>
 <body>
@@ -460,6 +463,69 @@
     </tbody>
    
   </table> 
+  
+  <h2>Tableau de Présence {{ $rapport['periode'] }} {{ $depotLiebele }}</h2>
+  <!-- <table class="table-style">
+    <thead>
+      <tr class="header-row">
+        <th>N°</th>
+        <th>Nom complet</th>
+        <th>Présence</th>
+        <th>Absence</th>
+      </tr>
+    </thead>
+    <tbody>
+        @foreach ($rapport['stats'] as $kcle=> $stat)
+          <tr>
+            <td> {{$kcle}}</td>
+            <td>{{print_r( $stat['user'][0]->name)}}</td>
+            <td>
+              @php
+              dump($stat['user'][0]->id)
+              @endphp
+            </td>
+            <td>-</td>
+          </tr>
+        @endforeach        
+    </tbody>
+  </table> 
+<h3>Statistiques globales</h3> -->
+
+
+  <table class="table-style">
+    <thead>
+      <tr class="header-row">
+        <th>N°</th>
+        <th>Nom complet</th>
+        <th>Arrivée</th>
+        <th>Départ</th>
+        <th>Bureau</th>
+      </tr>
+    </thead>
+    <tbody>
+        @foreach ($rapport['presence'] as $jour=>$presence)
+        <tr>
+          <td colspan="5" class="upcase tb lc">{{ $jour }}</td>  
+        </tr>
+          @foreach ($presence as $clef=>$detail) 
+          <tr>
+            <td> {{$clef+1}}</td>
+            <td class="upcase"> {{$detail->user->name}} {{$detail->user->postnom}} {{$detail->user->prenom}}</td>
+            <td> @heure( $detail->created_at)</td>
+            <td> 
+            @if($detail->updated_at != $detail->created_at) 
+              @heure($detail->updated_at)
+            @else 
+             -
+            @endif
+            </td>
+            <td> {{ ($detail->confirm) ? "Oui" : "Ailleurs"}}           </td>
+          </tr>
+          @endforeach
+        @endforeach        
+    </tbody>
+  </table> 
+
   @if ((int)$rapport['showVente'] > 0)
     <h2>Tableau de resumé de produit vendu {{ $depotLiebele }}</h2>
     <table class="table-style">
@@ -530,3 +596,7 @@
     <h6>@coryright zouracorp 2025</h6>
 </body>
 </html>
+
+@php
+// die();
+@endphp
