@@ -108,11 +108,11 @@
                     </td>
                     <td class="max-w-sm">
                         <div class="flex gap-2 sm:bloc">
-                        {{$item->created_at}}
+                        @heure($item->created_at)
                         </div>
                     </td>
                     <td >
-                        {{ $item->updated_at }}
+                        @heure($item->updated_at)
                     </td>
                     <td > 
                         <div class="max-w-sm">

@@ -413,15 +413,14 @@ class RapportController extends Controller
         $presence = $presenceInit->groupBy(function($item) {
                 return $item->created_at->translatedFormat('l j F Y');
             });
-        
         $stats = $presenceInit->groupBy('user_id')->map(function($userGroup) {
             return [
                 'user' => $userGroup,
                 'confirmed_true' => $userGroup->where('confirm', true)->count(),
                 'confirmed_false' => $userGroup->where('confirm', false)->count(),
             ];
-        });
-// dd($stats);
+        })->sortByDesc('confirmed_true');
+        // dd($stats);
         if($periode == "today"){
             
             $venteJourPremierTour = Vente::where('depot_id', $depot->id)

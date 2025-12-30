@@ -63,6 +63,68 @@
     
     @endphp
   <h2>Rapport {{ $rapport['periode'] }}  {{ $depotLiebele }} </h2>
+    <h2>Tableau de Présence {{ $rapport['periode'] }} {{ $depotLiebele }}</h2>
+  @if (str_contains($rapport['periode'], "Journalier") == false)
+    <h3>Statistique globale</h3> 
+    <table class="table-style">
+      <thead>
+        <tr class="header-row">
+          <th>N°</th>
+          <th>Nom complet</th>
+          <th>Au Bureau</th>
+          <th>A l'Extérieur</th>
+        </tr>
+      </thead>
+      <tbody>
+        @php
+          $numerotation = 1;
+        @endphp
+          @foreach ($rapport['stats'] as $kcle=> $stat)
+            <tr>
+              <td> {{$numerotation++}}</td>
+              <td>{{$stat['user'][0]->user->name}} {{$stat['user'][0]->user->postnom}} {{$stat['user'][0]->user->prenom}}</td>
+              <td>{{ $stat['confirmed_true'] }}</td>
+              <td>{{ $stat['confirmed_false'] }}</td>
+            </tr>
+          @endforeach        
+      </tbody>
+    </table> 
+  @endif
+  <h3> {{  (str_contains($rapport['periode'], "Journalier") == false)? "Statistiques détailées":""}}</h3>
+  <table class="table-style">
+    <thead>
+      <tr class="header-row">
+        <th>N°</th>
+        <th>Nom complet</th>
+        <th>Arrivée</th>
+        <th>Départ</th>
+        <th>Bureau</th>
+      </tr>
+    </thead>
+    <tbody>
+        @foreach ($rapport['presence'] as $jour=>$presence)
+        <tr>
+          <td colspan="5" class="upcase tb lc">{{ $jour }}</td>  
+        </tr>
+          @foreach ($presence as $clef=>$detail) 
+          <tr>
+            <td> {{$clef+1}}</td>
+            <td class="upcase"> {{$detail->user->name}} {{$detail->user->postnom}} {{$detail->user->prenom}}</td>
+            <td> @heure( $detail->created_at)</td>
+            <td> 
+            @if($detail->updated_at != $detail->created_at) 
+              @heure($detail->updated_at)
+            @else 
+             -
+            @endif
+            </td>
+            <td> {{ ($detail->confirm) ? "Oui" : "Ailleurs"}}           </td>
+          </tr>
+          @endforeach
+        @endforeach        
+    </tbody>
+  </table> 
+
   <h2>Tableau de vente {{ $depotLiebele }} </h2>
   <table class="table-style">
     <thead>
@@ -462,68 +524,6 @@
         @endforeach        
     </tbody>
    
-  </table> 
-  
-  <h2>Tableau de Présence {{ $rapport['periode'] }} {{ $depotLiebele }}</h2>
-  @if (str_contains($rapport['periode'], "Journalier") == false)
-    <h3>Statistique globale</h3> 
-    <table class="table-style">
-      <thead>
-        <tr class="header-row">
-          <th>N°</th>
-          <th>Nom complet</th>
-          <th>Présence</th>
-          <th>Absence</th>
-        </tr>
-      </thead>
-      <tbody>
-        @php
-          $numerotation = 1;
-        @endphp
-          @foreach ($rapport['stats'] as $kcle=> $stat)
-            <tr>
-              <td> {{$numerotation++}}</td>
-              <td>{{$stat['user'][0]->user->name}} {{$stat['user'][0]->user->postnom}} {{$stat['user'][0]->user->prenom}}</td>
-              <td>{{ $stat['confirmed_true'] }}</td>
-              <td>{{ $stat['confirmed_false'] }}</td>
-            </tr>
-          @endforeach        
-      </tbody>
-    </table> 
-  @endif
-  <h3> {{  (str_contains($rapport['periode'], "Journalier") == false)? "Statistiques détailées":""}}</h3>
-  <table class="table-style">
-    <thead>
-      <tr class="header-row">
-        <th>N°</th>
-        <th>Nom complet</th>
-        <th>Arrivée</th>
-        <th>Départ</th>
-        <th>Bureau</th>
-      </tr>
-    </thead>
-    <tbody>
-        @foreach ($rapport['presence'] as $jour=>$presence)
-        <tr>
-          <td colspan="5" class="upcase tb lc">{{ $jour }}</td>  
-        </tr>
-          @foreach ($presence as $clef=>$detail) 
-          <tr>
-            <td> {{$clef+1}}</td>
-            <td class="upcase"> {{$detail->user->name}} {{$detail->user->postnom}} {{$detail->user->prenom}}</td>
-            <td> @heure( $detail->created_at)</td>
-            <td> 
-            @if($detail->updated_at != $detail->created_at) 
-              @heure($detail->updated_at)
-            @else 
-             -
-            @endif
-            </td>
-            <td> {{ ($detail->confirm) ? "Oui" : "Ailleurs"}}           </td>
-          </tr>
-          @endforeach
-        @endforeach        
-    </tbody>
   </table> 
 
   @if ((int)$rapport['showVente'] > 0)
