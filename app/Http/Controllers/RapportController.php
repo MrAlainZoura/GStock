@@ -648,7 +648,7 @@ class RapportController extends Controller
     }
     public static function rapport_send_mail($to, $depot, $depot_id){
         
-        $to = 'a.tshiyanze@gmail.com';
+        // $to = 'a.tshiyanze@gmail.com';
         // mbunzucalvin@gmail
         // $object = 'Rapport PDF';
         // $contenu = 'Voici le contenu du rapport.';
