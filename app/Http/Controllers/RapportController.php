@@ -375,42 +375,23 @@ class RapportController extends Controller
         $depot = Depot::find($id);
         $limite = Carbon::today()->setHour(17)->setMinute(30);
         // $periode = "mois";
-        // $dateFilter = function ($table = null) use ($periode) {
-        //     return function ($query) use ($periode, $table) {
-        //         $column = $table ? "{$table}.created_at" : "created_at";
-        //         switch ($periode) {
-        //             case 'mois':
-        //                 $query->whereMonth($column, Carbon::now()->month)
-        //                     ->whereYear($column, Carbon::now()->year);
-        //                 break;
-        //             case 'annee':
-        //                 $query->whereYear($column, Carbon::now()->year);
-        //                 break;
-        //             default:
-        //                 $query->whereDate($column, Carbon::today());
-        //                 break;
-        //         }
-        //     };
-        // };
-        $date = Carbon::parse('2025-12-31');
-        $dateFilter = function ($table = null) use ($periode, $date) {
-    
-            return function ($query) use ($periode, $table, $date) {
+        $dateFilter = function ($table = null) use ($periode) {
+            return function ($query) use ($periode, $table) {
                 $column = $table ? "{$table}.created_at" : "created_at";
                 switch ($periode) {
                     case 'mois':
-                        $query->whereMonth($column, 12)
-                            ->whereYear($column, 2025);
+                        $query->whereMonth($column, Carbon::now()->month)
+                            ->whereYear($column, Carbon::now()->year);
                         break;
                     case 'annee':
-                        $query->whereYear($column, 2025);
+                        $query->whereYear($column, Carbon::now()->year);
                         break;
                     default:
-                        $query->whereDate($column, $date);
+                        $query->whereDate($column, Carbon::today());
                         break;
                 }
             };
-        };
+        };        
 
         // Requêtes principales
         $approJour = Approvisionnement::where('depot_id', $depot->id)
@@ -513,7 +494,7 @@ class RapportController extends Controller
             ->whereDoesntHave('compassassion')
             ->get();
             // dd($restePaiementTranche);
-            // Somme des avances dans les paiements filtrés
+            // Somme des a vances dans les paiements filtrés
             $avanceTotal = $restePaiementTranche->sum(function ($vente) {
                 return $vente->paiement->sum(function ($paiement) use ($vente) {
                     return $paiement->avance * $vente->updateTaux;
@@ -653,17 +634,11 @@ class RapportController extends Controller
         // $object = 'Rapport PDF';
         // $contenu = 'Voici le contenu du rapport.';
         Carbon::setLocale('fr');
-        // $today = Carbon::now()->format('Y-m-d');
-         $today =Carbon::parse('2025-12-31');
-        // $moisEtAnnee = Carbon::now()->translatedFormat('F Y'); // "août 2025"    $finsDuMois = [];
-        $moisEtAnnee = $today->translatedFormat('F Y'); // "août 2025"    $finsDuMois = [];
-        // $annee = Carbon::now()->format('Y');
-        $annee = $today->format('Y');
-        // $today = Carbon::today()->format('Y-m-d');
-       
+        $today = Carbon::now()->format('Y-m-d');
+        $moisEtAnnee = Carbon::now()->translatedFormat('F Y'); // "août 2025"    $finsDuMois = [];
+        $annee = Carbon::now()->format('Y');
         $user = Auth::user();
-        // $name = $user ? "{$user->name} {$user->postnom} {$user->prenom}" : "System automatique";
-        $name =  "System automatique";
+        $name = $user ? "{$user->name} {$user->postnom} {$user->prenom}" : "System automatique";
 
         for ($mois = 1; $mois <= 12; $mois++) {
             // Crée une date au premier jour du mois suivant
@@ -674,7 +649,6 @@ class RapportController extends Controller
 
 
         try {
-            $today = $today->format("Y-m-d");
             
             $sendRapport = function ($periode, $label, $filename) use ($depot_id, $to, $depot, $name) {
                 $pdf = self::genererPDF($depot_id, $periode);
@@ -725,8 +699,7 @@ class RapportController extends Controller
             return back()->with('echec', "Renseignement fourni est incorrect");
         }
         $pdf = self::genererPDF($depot_id, 'today');
-        // $today = Carbon::now()->format('Y-m-d');
-        $today = Carbon::parse('2025-12-31');
+        $today = Carbon::now()->format('Y-m-d');
         // dd($getDepot, $depot_id);
         if($getDepot != null){
             // dd($getDepot->user->email);
