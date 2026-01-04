@@ -368,49 +368,142 @@ class RapportController extends Controller
   /**
      * Génère un PDF à partir d’un rapport par ID et une periode (aujourd'hui, mois ou annee).
      */
-   
-    public static function genererPDF($id, $periode = 'today')
-    {
-        $depot = Depot::find($id);
-        $limite = Carbon::today()->setHour(17)->setMinute(30);
-        // $periode = "mois";
-        $dateFilter = function ($table = null) use ($periode) {
-            return function ($query) use ($periode, $table) {
+   public static function dateFilter(string $periode, string $val, $table=null){
+    // $periode = "mois";
+        $dateFilter = function ($table) use ($periode, $val) {
+            return function ($query) use ($periode, $val, $table) {
                 $column = $table ? "{$table}.created_at" : "created_at";
                 switch ($periode) {
                     case 'mois':
-                        $query->whereMonth($column, Carbon::now()->month)
-                            ->whereYear($column, Carbon::now()->year);
+                        $part = explode('-', $val);
+                        $query->whereMonth($column, $part[0])
+                            ->whereYear($column, $part[1]);
                         break;
                     case 'annee':
-                        $query->whereYear($column, Carbon::now()->year);
+                        $query->whereYear($column, (int) $val);
                         break;
                     default:
-                        $query->whereDate($column, Carbon::today());
+                        $query->whereDate($column,Carbon::parse($val));
                         break;
                 }
             };
         };
 
+   }
+    public static function genererPDF($id, $periode = 'today', $val = null)
+    {
+        $depot = Depot::find($id);
+        $limite = Carbon::today()->setHour(17)->setMinute(30);
+        $val = ($val)? $val: Carbon::now()->format("Y-m-d");
+        // $periode = "mois";
+        // $val="2025-09";
+    
+        $dateFilter = function ($val, $table=null) use ($periode) {
+            return function ($query) use ($periode, $val, $table) {
+                $column = $table ? "{$table}.created_at" : "created_at";
+                switch ($periode) {
+                    case 'mois':
+                        $part = explode('-', $val);
+                        $query->whereMonth($column, $part[1])
+                            ->whereYear($column, $part[0]);
+                        break;
+                    case 'annee':
+                        $query->whereYear($column,  $val);
+                        break;
+                    default:
+                        $query->whereDate($column,Carbon::parse($val));
+                        break;
+                }
+            };
+        };
         // Requêtes principales
         $approJour = Approvisionnement::where('depot_id', $depot->id)
-            ->where($dateFilter())
+            ->where($dateFilter($val))
             ->orderBy('user_id')
+            ->get();
+        $transJour = Transfert::where('depot_id', $depot->id)
+            ->where($dateFilter($val))
             ->get();
 
-        $transJour = Transfert::where('depot_id', $depot->id)
-            ->where($dateFilter())
-            ->orderBy('user_id')
-            ->get();
         if($periode == "today"){
-            
-            $venteJourPremierTour = Vente::where('depot_id', $depot->id)
-                ->where($dateFilter())
+            $queryDay = self::queryDayDataVente($dateFilter($val),$depot->id,$limite);
+            $venteJour = $queryDay['venteJour'];
+            $compassassion = $queryDay['compassassion'];
+            $avanceTotal = $queryDay['avanceTotal'];
+        }else{
+            $queryOtherVente = self::queryDataOtherDateVente($dateFilter($val), $depot->id );
+            $venteJour = $queryOtherVente['venteJour'];
+            $compassassion = $queryOtherVente['compassassion'];
+            $avanceTotal = $queryOtherVente['avanceTotal'];
+        }
+        // Statistiques vendeurs (toujours sur le mois)
+        $vendeurs = Vente::selectRaw('user_id, COUNT(*) as count, depot_id')
+            ->whereMonth('created_at', Carbon::now()->month)
+            ->where('depot_id', $depot->id)
+            ->groupBy('user_id', 'depot_id')
+            ->orderByDesc('count')
+            ->get();
+
+        $queryProduct = self::queryProduct($dateFilter($val),$dateFilter($val,"ventes"),$dateFilter($val,'transferts'), $depot->id);
+        
+        $getDate = self::getDatePeriode($periode, $val);
+        $rapport = [
+            'approvisionnement' => $approJour,
+            'transfert' =>$transJour,
+            'vente' => $venteJour,
+            'resumeProduit' => $queryProduct['prodArrayResume'],
+            'vendeurs' => $vendeurs,
+            'compassassion' => $compassassion,
+            'periode' => $getDate,
+            'avanceTotal'=>$avanceTotal,
+            'depot'=>$depot,
+            'venteTri'=>$queryProduct['ventesParCategorie'],
+            'showVente'=>$queryProduct['ventesParCategorie']->count()
+        ];
+        // dd($rapport, $prodArrayResume, $restePaiementTranche[0]->paiement);
+        return Pdf::loadView('mail.rapport', ['rapport' => $rapport]);
+    }
+
+    static function getDatePeriode($periode, $val, $space=" "){
+         switch ($periode) {
+            case 'mois':
+                 $part = explode('-', $val);
+                 $createDate = "$part[0]-$part[1]-01";
+                 $getDate ='Mensuel'.$space. Carbon::parse($createDate)->translatedFormat('F Y');
+               break;
+            case 'annee':
+                $getDate ="Annuel".$space. $val;
+                break;
+            default:
+                $getDate ="Journalier".$space. Carbon::parse($val)->format('Y-m-d');
+                break;
+        }
+        return $getDate;
+    }
+    static function getValVPeriode($periode, $val=null):string{
+         switch ($periode) {
+            case 'mois':
+                 $part = explode('-', $val);
+                 $createDate =($val)? "$part[0]-$part[1]-01":null;
+                 $value = ($val)? Carbon::parse($createDate)->format('Y-m') : Carbon::now()->format('Y-m');
+                 break;
+                 case 'annee':
+                    $value = ($val)? $val : Carbon::now()->format('Y');
+                    break;
+                default:
+                    $value = ($val)? Carbon::parse($val)->format('Y-m-d') : Carbon::now()->format('Y-m-d');
+                break;
+        }
+        return $value;
+    }
+    public static function queryDayDataVente($dateFilter, $depot_id, $limite){
+        $venteJourPremierTour = Vente::where('depot_id', $depot_id)
+                ->where($dateFilter)
                 ->where('created_at', '<', $limite)
                 ->orderBy('user_id')
                 ->get();
-            $venteJourDeuxiemeTour = Vente::where('depot_id', $depot->id)
-                ->where($dateFilter())
+            $venteJourDeuxiemeTour = Vente::where('depot_id', $depot_id)
+                ->where($dateFilter)
                 ->where('created_at', '>=', $limite)
                 ->orderBy('user_id')
                 ->get();
@@ -421,17 +514,17 @@ class RapportController extends Controller
     
             $compassassionPremierTour = Vente::whereHas('compassassion', function ($query) use ($limite, $dateFilter) {
                     $query->where('created_at', '<', $limite)
-                            ->where($dateFilter());
+                            ->where($dateFilter);
                 })
                 ->with(['paiement', 'venteProduit', 'compassassion'])
-                ->where('depot_id', $depot->id)
+                ->where('depot_id', $depot_id)
                 ->get();
             $compassassionDeuxiemeTour = Vente::whereHas('compassassion', function ($query) use ($limite, $dateFilter) {
                     $query->where('created_at', '>=', $limite)
-                            ->where($dateFilter());
+                            ->where($dateFilter);
                 })
                 ->with(['paiement', 'venteProduit', 'compassassion'])
-                ->where('depot_id', $depot->id)
+                ->where('depot_id', $depot_id)
                 ->get();
            
             $compassassion = [
@@ -440,104 +533,89 @@ class RapportController extends Controller
             ];
             // dd($compassassion);
             $restePaiementTranche = Vente::with(['paiement' => function ($query) use ($dateFilter) {
-                $query->where($dateFilter());
+                $query->where($dateFilter);
             }])->whereHas('paiement', function ($query) use ($dateFilter) {
-                $query->where($dateFilter());
-            })->wherenot($dateFilter())
-            ->where('depot_id',$depot->id)
+                $query->where($dateFilter);
+            })->wherenot($dateFilter)
+            ->where('depot_id',$depot_id)
             ->whereDoesntHave('compassassion')
             ->get();
             
-            // dd($restePaiementTranche);
-            // Somme des avances dans les paiements filtrés
             $avanceTotal = $restePaiementTranche->sum(function ($vente) {
                 return $vente->paiement->sum(function ($paiement) use ($vente) {
                     return $paiement->avance * $vente->updateTaux;
                 });
             });
-        }else{
-            $venteJour = Vente::where('depot_id', $depot->id)
-                ->where($dateFilter())
-                ->orderBy('user_id')
-                ->get();
-    
-            $compassassion = Vente::whereHas('compassassion', $dateFilter())
-                ->with(['paiement', 'venteProduit', 'compassassion'])
-                ->where('depot_id',$depot->id)
-                ->get();
-    
-            $restePaiementTranche = Vente::with(['paiement' => function ($query) use ($dateFilter) {
-                $query->where($dateFilter());
-            }])->whereHas('paiement', function ($query) use ($dateFilter) {
-                $query->where($dateFilter());
-            })->wherenot($dateFilter())
-            ->where('depot_id',$depot->id)
-            ->whereDoesntHave('compassassion')
-            ->get();
-            // dd($restePaiementTranche);
-            // Somme des avances dans les paiements filtrés
-            $avanceTotal = $restePaiementTranche->sum(function ($vente) {
-                return $vente->paiement->sum(function ($paiement) use ($vente) {
-                    return $paiement->avance * $vente->updateTaux;
-                });
-            });
-            $venteJour = Vente::where('depot_id', $depot->id)
-                ->where($dateFilter())
-                ->orderBy('user_id')
-                ->get();
-    
-            $compassassion = Vente::whereHas('compassassion', $dateFilter())
-                ->with(['paiement', 'venteProduit', 'compassassion'])
-                ->where('depot_id',$depot->id)
-                ->get();
-    
-            $restePaiementTranche = Vente::with(['paiement' => function ($query) use ($dateFilter) {
-                $query->where($dateFilter());
-            }])->whereHas('paiement', function ($query) use ($dateFilter) {
-                $query->where($dateFilter());
-            })->wherenot($dateFilter())
-            ->whereDoesntHave('compassassion')
-            ->get();
-            // dd($restePaiementTranche);
-            // Somme des avances dans les paiements filtrés
-            $avanceTotal = $restePaiementTranche->sum(function ($vente) {
-                return $vente->paiement->sum(function ($paiement) use ($vente) {
-                    return $paiement->avance * $vente->updateTaux;
-                });
-            });
-        }
-        // Statistiques vendeurs (toujours sur le mois)
-        $vendeurs = Vente::selectRaw('user_id, COUNT(*) as count, depot_id')
-            ->whereMonth('created_at', Carbon::now()->month)
-            ->where('depot_id', $depot->id)
-            ->groupBy('user_id', 'depot_id')
-            ->orderByDesc('count')
-            ->get();
 
+            return [
+                'venteJour'=>$venteJour,
+                'compassassion'=>$compassassion,
+                'avanceTotal'=>$avanceTotal
+            ];
+    }
+
+    static public function queryDataOtherDateVente($dateFilter, $depot_id){
+            $venteJour = Vente::where('depot_id', $depot_id)
+                ->where($dateFilter)
+                ->orderBy('user_id')
+                ->get();
+    
+            $compassassion = Vente::whereHas('compassassion', $dateFilter)
+                ->with(['paiement', 'venteProduit', 'compassassion'])
+                ->where('depot_id',$depot_id)
+                ->get();
+    
+            $restePaiementTranche = Vente::with(['paiement' => function ($query) use ($dateFilter) {
+                $query->where($dateFilter);
+            }])->whereHas('paiement', function ($query) use ($dateFilter) {
+                $query->where($dateFilter);
+            })->wherenot($dateFilter)
+            ->where('depot_id',$depot_id)
+            ->whereDoesntHave('compassassion')
+            ->get();
+            // dd($restePaiementTranche);
+            // Somme des avances dans les paiements filtrés
+            $avanceTotal = $restePaiementTranche->sum(function ($vente) {
+                return $vente->paiement->sum(function ($paiement) use ($vente) {
+                    return $paiement->avance * $vente->updateTaux;
+                });
+            });
+            
+
+            return [
+                'avanceTotal'=>$avanceTotal,
+                'compassassion'=>$compassassion,
+                'venteJour'=>$venteJour
+            ];
+    }
+
+    public static function queryProduct($dateFilter,$dateFilteVente,$dateFilterTrans , $depot_id){
         // Produits du dépôt
-        $allProdDepot = ProduitDepot::where('depot_id', $depot->id)
+        $allProdDepot = ProduitDepot::where('depot_id', $depot_id)
             ->with('produit.marque.categorie')
             ->get();
 
         // Résumés par produit
-        $appros = Approvisionnement::where('depot_id', $depot->id)
-            ->where($dateFilter())
+        $appros = Approvisionnement::where('depot_id', $depot_id)
+            ->where($dateFilter)
             ->select('produit_id', DB::raw('SUM(quantite) as total'))
             ->groupBy('produit_id')
             ->pluck('total', 'produit_id');
 
         $ventes = DB::table('ventes')
             ->join('vente_produits', 'ventes.id', '=', 'vente_produits.vente_id')
-            ->where($dateFilter('ventes')) 
-            ->where('ventes.depot_id', $depot->id)
+            // ->where($dateFilter('ventes')) 
+            ->where($dateFilteVente) 
+            ->where('ventes.depot_id', $depot_id)
             ->select('vente_produits.produit_id', DB::raw('SUM(vente_produits.quantite) as total'))
             ->groupBy('vente_produits.produit_id')
             ->pluck('total', 'vente_produits.produit_id');
 
         $transferts = DB::table('transferts')
             ->join('produit_transferts', 'transferts.id', '=', 'produit_transferts.transfert_id')
-            ->where($dateFilter( 'transferts'))
-            ->where('depot_id', $depot->id)
+            // ->where($dateFilter( 'transferts'))
+            ->where($dateFilterTrans)
+            ->where('depot_id', $depot_id)
             ->select('produit_id', DB::raw('SUM(produit_transferts.quantite) as total'))
             ->groupBy('produit_id')
             ->pluck('total', 'produit_id');
@@ -579,44 +657,25 @@ class RapportController extends Controller
                     ->sortDesc(); // Tri des marques par quantité vendue
         });
         // fin new tri
-        switch ($periode) {
-            case 'mois':
-                $getDate ='Mensuel '. Carbon::now()->translatedFormat('F Y');
-               break;
-            case 'annee':
-                $getDate ="Annuel ". Carbon::now()->format('Y');
-                break;
-            default:
-                $getDate ="Journalier ". Carbon::today()->format('Y-m-d');
-                break;
-        }
-        $rapport = [
-            'approvisionnement' => $approJour,
-            'transfert' => $transJour,
-            'vente' => $venteJour,
-            'resumeProduit' => $prodArrayResume,
-            'vendeurs' => $vendeurs,
-            'compassassion' => $compassassion,
-            'periode' => $getDate,
-            'avanceTotal'=>$avanceTotal,
-            'depot'=>$depot,
-            'venteTri'=>$ventesParCategorie,
-            'showVente'=>$ventesParCategorie->count()
+
+        return [
+            'prodArrayResume'=>$prodArrayResume,
+            'ventesParCategorie'=>$ventesParCategorie
         ];
-        // dd($rapport, $prodArrayResume, $restePaiementTranche[0]->paiement);
-        return Pdf::loadView('mail.rapport', ['rapport' => $rapport]);
     }
-    public static function rapport_send_mail($to, $depot, $depot_id){
+    public static function rapport_send_mail($to, $depot, $depot_id, $periode ,$val){
         
         // $to = 'a.tshiyanze@gmail.com';
         // mbunzucalvin@gmail
         // $object = 'Rapport PDF';
         // $contenu = 'Voici le contenu du rapport.';
         Carbon::setLocale('fr');
-        $today = Carbon::now()->format('Y-m-d');
-        $moisEtAnnee = Carbon::now()->translatedFormat('F Y'); // "août 2025"    $finsDuMois = [];
+        // $today = Carbon::now()->format('Y-m-d');
+        // $moisEtAnnee = Carbon::now()->translatedFormat('F Y'); // "août 2025"    $finsDuMois = [];
         $annee = Carbon::now()->format('Y');
-        $today = Carbon::today()->format('Y-m-d');
+        // $today = Carbon::today()->format('Y-m-d');
+        $ajustVal = self::getValVPeriode($periode, $val);
+        $getDate = self::getDatePeriode($periode, $ajustVal,'_');
         $user = Auth::user();
         $name = $user ? "{$user->name} {$user->postnom} {$user->prenom}" : "System automatique";
 
@@ -627,11 +686,14 @@ class RapportController extends Controller
             $finsDuMois[] = $date->format('Y-m-d');
         }
 
-
         try {
             
-            $sendRapport = function ($periode, $label, $filename) use ($depot_id, $to, $depot, $name) {
-                $pdf = self::genererPDF($depot_id, $periode);
+            $sendRapport = function ($periode, $label, $filename, $val) use ($depot_id, $to, $depot, $name) {
+                $ajustVal = self::getValVPeriode($periode, $val);
+            // $getDate = self::getDatePeriode($periode, $ajustVal,"_");
+                $pdf = self::genererPDF($depot_id, $periode,$ajustVal);
+           
+                // $pdf = self::genererPDF($depot_id, $periode);
                 Mail::send([], [], function ($message) use ($pdf, $to, $label, $depot, $name, $filename) {
                     $message->to($to)
                         ->subject("Rapport $label $depot")
@@ -641,19 +703,21 @@ class RapportController extends Controller
             };
             // Cas : fin d’année
             $lastDayOfYear = end($finsDuMois);
-            if ($today === $lastDayOfYear) {
-                $sendRapport('annee', "Annuel $annee", $annee);
-                $sendRapport('mois', "Mensuel $moisEtAnnee", $moisEtAnnee);
-                $sendRapport('today', "journalier $today", $today);
+            // if ($today === $lastDayOfYear) {
+            //     $sendRapport('annee', "Annuel $annee", $annee, $val);
+            //     $sendRapport('mois', "Mensuel $moisEtAnnee", $moisEtAnnee, $val);
+            //     $sendRapport('today', "journalier $today", $today, $val);
 
-            // Cas : fin de mois
-            } elseif (in_array($today, $finsDuMois)) {
-                $sendRapport('mois', "Mensuel $moisEtAnnee", $moisEtAnnee);
-                $sendRapport('today', "journalier $today", $today);
-
-            // Cas : jour ordinaire
+            // // Cas : fin de mois
+            // } else
+            if (in_array($ajustVal, $finsDuMois)) {
+                $sendRapport('mois', "$getDate", $getDate, $ajustVal);
+                $sendRapport('today', "$getDate", $getDate, $ajustVal);
+                // dd('fin mois', $ajustVal, $periode, $getDate);
             } else {
-                $sendRapport('today', "journalier $today", $today);
+                // Cas : jour ordinaire
+                // dd('journaee ordi', $ajustVal, $periode, $getDate);
+                $sendRapport('today', "$getDate", $getDate, $ajustVal);
             }
 
             return response()->json([
@@ -671,7 +735,7 @@ class RapportController extends Controller
         }
 
     }
-    public function sendMailrapport($depot){
+    public function sendMailrapport($depot, $periode = "today", $val = null){
         $depot_id = $depot/123;
         $getDepot = Depot::find($depot_id);
         if(!$getDepot){
@@ -683,9 +747,9 @@ class RapportController extends Controller
         if($getDepot != null){
             // dd($getDepot->user->email);
             $to = $getDepot->user->email;
-            $sendMailRapport = self::rapport_send_mail($to,$getDepot->libele,$getDepot->id);
+            $sendMailRapport = self::rapport_send_mail($to,$getDepot->libele,$getDepot->id, $periode, $val);
             if($sendMailRapport->getData()->status == true){
-                $rapportDwl= 'rapport_' . $today."_$getDepot->libele" . '.pdf';
+                $rapportDwl= 'rapport_journalier_' . $today."_$getDepot->libele" . '.pdf';
                 return $pdf->download($rapportDwl); 
             }
             return back()->with('echec',"Email non envoyé, adresse mail invalide << $to >>!");
@@ -696,7 +760,7 @@ class RapportController extends Controller
 
     }
 
-    public static function rapportDownload ($depot, $periode){
+    public static function rapportDownload ($depot, $periode, $val = null){
         $depot_id = $depot/12;
         $getDepot = Depot::find($depot_id);
         if(!$getDepot){
@@ -704,18 +768,9 @@ class RapportController extends Controller
         }
 
         if(in_array($periode, ['today','mois', 'annee'])){
-            switch ($periode) {
-                    case 'mois':
-                        $getDate = Carbon::now()->translatedFormat('F Y');
-                       break;
-                    case 'annee':
-                        $getDate = Carbon::now()->format('Y');
-                        break;
-                    default:
-                        $getDate = Carbon::today()->format('Y-m-d');
-                        break;
-                }
-            $pdf = self::genererPDF($depot_id, $periode);
+            $ajustVal = self::getValVPeriode($periode, $val);
+            $getDate = self::getDatePeriode($periode, $ajustVal,"_");
+            $pdf = self::genererPDF($depot_id, $periode,$ajustVal);
             $rapportDwl= 'rapport_'.$getDate."_$getDepot->libele" . '.pdf';
             return $pdf->download($rapportDwl);
         }
