@@ -57,7 +57,7 @@ Route::get('transfert/{transfert}/detail', [TransfertController::class,'show'])-
 Route::get('transfert/{transfert}/edit', [TransfertController::class,'edit'])->name('transEdit')->middleware( AuthentifyMiddleware::class);
 Route::delete('transfert/{transfert}/delete', [TransfertController::class,'destroy'])->name('transDelete')->middleware( AuthentifyMiddleware::class);
 
-Route::get('vente/{depot}/{depot_id}', [VenteController::class,'showDepotVente'])->name('venteDepot')->middleware( AuthentifyMiddleware::class);
+Route::get('vente/{depot}/{depot_id}/{tranche?}', [VenteController::class,'showDepotVente'])->name('venteDepot')->middleware( AuthentifyMiddleware::class);
 Route::get('vente/{depot_id}/supprimer/{depot}', [VenteController::class,'venteTrashed'])->name('venteTrashed')->middleware( AuthentifyMiddleware::class);
 Route::get('vente/{depot}/create/{depot_id}', [VenteController::class,'create'])->name('venteCreate')->middleware( AuthentifyMiddleware::class);
 Route::post('vente/{depot}/store', [VenteController::class,'store'])->name('venteStore')->middleware( AuthentifyMiddleware::class);
@@ -90,7 +90,7 @@ Route::get('rapport/{depot}/voir-plus/{action}', [RapportController::class,'seem
 Route::get('rapport/{vente}/facture/{action}', [RapportController::class,'facture'])->name('facturePDF')->middleware( AuthentifyMiddleware::class);
 Route::get('rapport/{depot}/mail', [RapportController::class,'sendMailrapport'])->name('sendMailrapport')->middleware( AuthentifyMiddleware::class);
 Route::get('rapport/{depot}/mail-job', [RapportController::class,'sendMailrapportJob'])->name('sendMailrapportJob')->middleware( AuthentifyMiddleware::class);
-Route::get('rapport/{depot}/{periode}/download', [RapportController::class,'rapportDownload'])->name('rapportDownload')->middleware( AuthentifyMiddleware::class);
+Route::get('rapport/{depot}/{periode}/download/{val?}', [RapportController::class,'rapportDownload'])->name('rapportDownload')->middleware( AuthentifyMiddleware::class);
 
 Route::get('abonnements/list/{admin}', [AbonnementController::class,'index'])->name('abonnement.list')->middleware(AuthentifyMiddleware::class);
 Route::get('abonnement/{admin}/create', [AbonnementController::class,'create'])->name('abonnement.create')->middleware(AuthentifyMiddleware::class);
