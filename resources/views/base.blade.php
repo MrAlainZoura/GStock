@@ -9,9 +9,9 @@
     @vite(['resources/css/app.css','resources/js/app.js', 'resources/js/actionLink.js'])
     <title>@yield('title')</title>
 
-    <link rel="stylesheet" href="{{asset('build/assets/app-T0NEsHWA.css')}}">
-    <link rel="stylesheet" href="{{asset('build/assets/app-BC2Awuhs.js')}}">
-    <link rel="stylesheet" href="{{asset('build/assets/actionLink-D_Vna_Lo.js')}}">
+    <link rel="stylesheet" href="{{asset('build/assets/app-D0uqYYzE.css')}}">
+    <link rel="stylesheet" href="{{asset('build/assets/app-CI5RKnWv.js')}}">
+    <link rel="stylesheet" href="{{asset('build/assets/actionLink-DnPPqJxu.js')}}">
     <link rel="stylesheet" href="{{asset('build/manifest.json')}}">
     <link rel="icon" type="image/x-icon" href="{{asset('img/icon.jpeg')}}">    
     <script src="https://cdn.jsdelivr.net/npm/simple-datatables@9.0.3"></script>
@@ -21,8 +21,9 @@
     <header>
          @yield('header')
     </header>
-
+    
     <main class="w-full bg-gray-100 ">
+        @include('composant.loader')
         @yield('main')
     </main>
 

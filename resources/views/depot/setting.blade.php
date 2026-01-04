@@ -79,7 +79,7 @@
       </div>
 
       <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-        <dt class="text-sm/6 font-medium text-gray-900">Attachments</dt>
+        <dt class="text-sm/6 font-medium text-gray-900">Identification Nationale</dt>
         <dd class="mt-2 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
           <ul role="list" class="divide-y divide-gray-100 rounded-md border border-gray-200">
             <li class="flex items-center justify-between py-4 pr-5 pl-4 text-sm/6">
@@ -109,6 +109,48 @@
               <!-- <div class="ml-4 shrink-0">
                 <a href="#" class="font-medium text-indigo-600 hover:text-indigo-500">Download</a>
               </div> -->
+            </li>
+          </ul>
+        </dd>
+      </div>
+      <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+        <dt class="text-sm/6 font-medium text-gray-900 flex">
+          Coordonnées Géologiques</dt>
+        <dd class="mt-2 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
+          <ul role="list" class="divide-y divide-gray-100 rounded-md border border-gray-200">
+            <li class="flex items-center justify-between py-4 pr-5 pl-4 text-sm/6">
+              <div class="flex w-0 flex-1 items-center">
+                <svg class="size-5 shrink-0 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" data-slot="icon">
+                  <path fill-rule="evenodd" d="M15.621 4.379a3 3 0 0 0-4.242 0l-7 7a3 3 0 0 0 4.241 4.243h.001l.497-.5a.75.75 0 0 1 1.064 1.057l-.498.501-.002.002a4.5 4.5 0 0 1-6.364-6.364l7-7a4.5 4.5 0 0 1 6.368 6.36l-3.455 3.553A2.625 2.625 0 1 1 9.52 9.52l3.45-3.451a.75.75 0 1 1 1.061 1.06l-3.45 3.451a1.125 1.125 0 0 0 1.587 1.595l3.454-3.553a3 3 0 0 0 0-4.242Z" clip-rule="evenodd" />
+                </svg>
+                <div class="ml-4 flex min-w-0 flex-1 gap-2">
+                  <span class="truncate font-medium">Lattitude : </span>
+                  <span class="shrink-0 text-gray-400">{{ $depotData->lat }}</span>
+                </div>
+              </div>
+              <!-- <div class="ml-4 shrink-0">
+                <a href="#" class="font-medium text-indigo-600 hover:text-indigo-500">Download</a>
+              </div> -->
+            </li>
+            <li class="flex items-center justify-between py-4 pr-5 pl-4 text-sm/6">
+              <div class="flex w-0 flex-1 items-center">
+                <svg class="size-5 shrink-0 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" data-slot="icon">
+                  <path fill-rule="evenodd" d="M15.621 4.379a3 3 0 0 0-4.242 0l-7 7a3 3 0 0 0 4.241 4.243h.001l.497-.5a.75.75 0 0 1 1.064 1.057l-.498.501-.002.002a4.5 4.5 0 0 1-6.364-6.364l7-7a4.5 4.5 0 0 1 6.368 6.36l-3.455 3.553A2.625 2.625 0 1 1 9.52 9.52l3.45-3.451a.75.75 0 1 1 1.061 1.06l-3.45 3.451a1.125 1.125 0 0 0 1.587 1.595l3.454-3.553a3 3 0 0 0 0-4.242Z" clip-rule="evenodd" />
+                </svg>
+                <div class="ml-4 flex min-w-0 flex-1 gap-2">
+                  <span class="truncate font-medium">Longitude :</span>
+                  <span class="shrink-0 text-gray-400">{{ $depotData->lon }}</span>
+                </div>
+              </div>
+              <div class="ml-4 shrink-0">
+                <div title="Mettre à jour" data-modal-target="crud-modal" data-modal-toggle="crud-modal" class="cursor-pointer ml-2 flex font-medium text-blue-700">
+                  <svg fill="#0b12ea" height="24px" width="24px" id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+                  <g id="SVGRepo_bgCarrier" stroke-width="0"/>
+                  <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"/>
+                  <g id="SVGRepo_iconCarrier"> <path class="cls-1" d="M15,7V9H12.89923A5.0048,5.0048,0,0,1,9,12.89923V15H7V12.89166A4.99091,4.99091,0,0,1,3.10223,8.9068l-1.51959.58289,2.00208-4,1.99792,4-1.472-.5882A3.99857,3.99857,0,1,0,7,4.1286V1H9V3.10077A5.0048,5.0048,0,0,1,12.89923,7ZM10,8.01038a2,2,0,1,1-2-2A2,2,0,0,1,10,8.01038Z"/> </g>
+                </svg>
+                Actualiser
+              </div>
             </li>
           </ul>
         </dd>
@@ -218,6 +260,55 @@
         </div>
     </div>
 </div> 
+
+<!-- modedal geolocalisation -->
+<div id="crud-modal" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+    <div class="relative p-4 w-full max-w-md max-h-full">
+        <!-- Modal content -->
+        <div class="relative bg-white rounded-lg shadow-sm dark:bg-gray-700">
+            <!-- Modal header -->
+            <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600 border-gray-200">
+                <h3 class="text-xl font-semibold text-gray-900 dark:text-white" id="textEditeDevise">
+                    Mettre à jour les Coordonnées 
+                </h3>
+                <button type="button" class="text-body bg-transparent hover:bg-neutral-tertiary hover:text-heading rounded-base text-sm w-9 h-9 ms-auto inline-flex justify-center items-center" data-modal-hide="crud-modal">
+                    <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18 17.94 6M18 18 6.06 6"/></svg>
+                    <span class="sr-only">Close modal</span>
+                </button>
+            </div>
+            <!-- Modal body -->
+            <div class="p-4 md:p-5">
+                <form class="space-y-4" action="{{ route('depotGeo',['depot'=>$depotData->id, 'action'=>"insert"]) }}" method="post" id="modalInsert">
+                   @csrf 
+                   @method('put')
+                   <div class="grid gap-4 grid-cols-1 sm:grid-cols-2">
+                     <div>
+                         <label for="latM" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Lattitude</label>
+                         <input type="text" name="latM" value="{{ $depotData->lat }}" id="lat0" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" placeholder="" required />
+                     </div>
+                     <div>
+                         <label for="lonM" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Longitude</label>
+                         <input type="text" name="lonM" id="lon0" value="{{ $depotData->lon }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" required />
+                     </div>
+                   </div>
+                    
+                    <div class="flex items-center space-x-4 border-t border-default pt-4 md:pt-6">
+                      <button type="submit" class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Mettre à jour</button>
+                      <label for="modalgeo" class="text-body cursor-pointer bg-neutral-secondary-medium box-border border border-default-medium hover:bg-neutral-tertiary-medium hover:text-heading focus:ring-4 focus:ring-neutral-tertiary shadow-xs font-medium leading-5 rounded-base text-sm px-4 py-2.5 focus:outline-none">Auto</button>
+                  </div>
+                </form>
+                <form method="post" id="formUpdatePoDep" action="{{ route('depotGeo',['depot'=>$depotData->id, 'action'=>"auto"]) }}" class="hidden">
+                    @csrf 
+                    @method('put')
+                    <input type="text" class="hidden" name="lonAuto"  id="lonAuto">
+                    <input type="text" class="hidden" name="latAuto" id="latAuto">
+                    <button id="modalgeo" data-modal-hide="crud-modal" type="submit" class="text-body bg-neutral-secondary-medium box-border border border-default-medium hover:bg-neutral-tertiary-medium hover:text-heading focus:ring-4 focus:ring-neutral-tertiary shadow-xs font-medium leading-5 rounded-base text-sm px-4 py-2.5 focus:outline-none">Auto</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div> 
+
 
 
 @endsection

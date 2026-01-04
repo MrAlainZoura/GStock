@@ -15,6 +15,7 @@ use App\Models\ProduitDepot;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Approvisionnement;
+use App\Models\Presence;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
@@ -387,7 +388,7 @@ class RapportController extends Controller
                         break;
                 }
             };
-        };
+        };        
 
    }
     public static function genererPDF($id, $periode = 'today', $val = null)
@@ -424,6 +425,24 @@ class RapportController extends Controller
         $transJour = Transfert::where('depot_id', $depot->id)
             ->where($dateFilter($val))
             ->get();
+            
+        Carbon::setLocale('fr');
+        $presenceInit = Presence::with(['user','depot'])
+            ->where('depot_id', $depot->id)
+            ->where($dateFilter($val))
+            ->get();
+        
+        $presence = $presenceInit->groupBy(function($item) {
+                return $item->created_at->translatedFormat('l j F Y');
+            });
+        $stats = $presenceInit->groupBy('user_id')->map(function($userGroup) {
+            return [
+                'user' => $userGroup,
+                'confirmed_true' => $userGroup->where('confirm', true)->count(),
+                'confirmed_false' => $userGroup->where('confirm', false)->count(),
+            ];
+        })->sortByDesc('confirmed_true');
+        // dd($stats);
 
         if($periode == "today"){
             $queryDay = self::queryDayDataVente($dateFilter($val),$depot->id,$limite);
@@ -673,9 +692,11 @@ class RapportController extends Controller
         // $today = Carbon::now()->format('Y-m-d');
         // $moisEtAnnee = Carbon::now()->translatedFormat('F Y'); // "août 2025"    $finsDuMois = [];
         $annee = Carbon::now()->format('Y');
+
         // $today = Carbon::today()->format('Y-m-d');
         $ajustVal = self::getValVPeriode($periode, $val);
         $getDate = self::getDatePeriode($periode, $ajustVal,'_');
+
         $user = Auth::user();
         $name = $user ? "{$user->name} {$user->postnom} {$user->prenom}" : "System automatique";
 
@@ -707,7 +728,6 @@ class RapportController extends Controller
             //     $sendRapport('annee', "Annuel $annee", $annee, $val);
             //     $sendRapport('mois', "Mensuel $moisEtAnnee", $moisEtAnnee, $val);
             //     $sendRapport('today', "journalier $today", $today, $val);
-
             // // Cas : fin de mois
             // } else
             if (in_array($ajustVal, $finsDuMois)) {

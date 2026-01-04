@@ -1,6 +1,6 @@
 {
   "resources/css/app.css": {
-    "file": "assets/app-T0NEsHWA.css",
+    "file": "assets/app-D0uqYYzE.css",
     "src": "resources/css/app.css",
     "isEntry": true
   },
@@ -10,13 +10,13 @@
     "isEntry": true
   },
   "resources/js/actionLink.js": {
-    "file": "assets/actionLink-D_Vna_Lo.js",
+    "file": "assets/actionLink-DnPPqJxu.js",
     "name": "actionLink",
     "src": "resources/js/actionLink.js",
     "isEntry": true
   },
   "resources/js/app.js": {
-    "file": "assets/app-BC2Awuhs.js",
+    "file": "assets/app-CI5RKnWv.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true
