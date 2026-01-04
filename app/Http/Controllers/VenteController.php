@@ -178,15 +178,20 @@ class VenteController extends Controller
     /**
      * Display the specified resource.
      */
-    public function showDepotVente($depotVar, $id){
+    public function showDepotVente($depotVar, $id, $tranche = null){
         // dd($depotVar, $id);
         // if(session('depot') === null){
         //     return to_route('dashboard');
         // }
         $depot= Depot::where('libele',$depotVar)->where('id', $id)->first();
+        $tranche = ($tranche)? $tranche : 1;
         if($depot){
-            // dd($depot->vente, $depot->devise);
-            return view('vente.index', compact('depot')) ;
+            $month = Carbon::now()->subMonths($tranche)->format('Y-m-d');
+            $vente = $depot->vente
+                    ->where('created_at', '>=',$month );
+                // ->where('created_at', '<=', Carbon::today()->endOfDay());
+            $tranche = ($tranche==1) ? null : $tranche;
+            return view('vente.index', compact('depot', 'vente', 'tranche')) ;
         }else{
             return back()->with("echec","Erreur depot introuvable");
         }
