@@ -477,7 +477,9 @@ class RapportController extends Controller
             'avanceTotal'=>$avanceTotal,
             'depot'=>$depot,
             'venteTri'=>$queryProduct['ventesParCategorie'],
-            'showVente'=>$queryProduct['ventesParCategorie']->count()
+            'showVente'=>$queryProduct['ventesParCategorie']->count(),
+            'presence'=>$presence,
+            'stats'=>$stats
         ];
         // dd($rapport, $prodArrayResume, $restePaiementTranche[0]->paiement);
         return Pdf::loadView('mail.rapport', ['rapport' => $rapport]);
