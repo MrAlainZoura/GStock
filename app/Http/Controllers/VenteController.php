@@ -188,7 +188,7 @@ class VenteController extends Controller
         if($depot){
             $month = Carbon::now()->subMonths($tranche)->format('Y-m-d');
             $vente = $depot->vente
-                    ->where('created_at', '>=',$month );
+                    ->where('created_at', '>=',$month )->reverse();
                 // ->where('created_at', '<=', Carbon::today()->endOfDay());
             $tranche = ($tranche==1) ? null : $tranche;
             return view('vente.index', compact('depot', 'vente', 'tranche')) ;
