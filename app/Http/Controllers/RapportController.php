@@ -391,9 +391,11 @@ class RapportController extends Controller
         };        
 
    }
-    public static function genererPDF($id, $periode = 'today', $val = null)
+    public static function genererPDF(Depot $depot, $periode = 'today', $val = null)
     {
-        $depot = Depot::find($id);
+        ini_set('memory_limit','512M');
+        $used = memory_get_usage(true);
+        Log::info("memoire debut generation ".$used. " octet");
         $limite = Carbon::today()->setHour(17)->setMinute(30);
         $val = ($val)? $val: Carbon::now()->format("Y-m-d");
         // $periode = "mois";
@@ -418,31 +420,15 @@ class RapportController extends Controller
             };
         };
         // Requêtes principales
-        $approJour = Approvisionnement::where('depot_id', $depot->id)
-            ->where($dateFilter($val))
-            ->orderBy('user_id')
-            ->get();
-        $transJour = Transfert::where('depot_id', $depot->id)
-            ->where($dateFilter($val))
-            ->get();
+        // $approJour = Approvisionnement::where('depot_id', $depot->id)
+        //     ->where($dateFilter($val))
+        //     ->orderBy('user_id')
+        //     ->get();
+        // $transJour = Transfert::where('depot_id', $depot->id)
+        //     ->where($dateFilter($val))
+        //     ->get();
             
         Carbon::setLocale('fr');
-        $presenceInit = Presence::with(['user','depot'])
-            ->where('depot_id', $depot->id)
-            ->where($dateFilter($val))
-            ->get();
-        
-        $presence = $presenceInit->groupBy(function($item) {
-                return $item->created_at->translatedFormat('l j F Y');
-            });
-        $stats = $presenceInit->groupBy('user_id')->map(function($userGroup) {
-            return [
-                'user' => $userGroup,
-                'confirmed_true' => $userGroup->where('confirm', true)->count(),
-                'confirmed_false' => $userGroup->where('confirm', false)->count(),
-            ];
-        })->sortByDesc('confirmed_true');
-        // dd($stats);
 
         if($periode == "today"){
             $queryDay = self::queryDayDataVente($dateFilter($val),$depot->id,$limite);
@@ -467,10 +453,7 @@ class RapportController extends Controller
         
         $getDate = self::getDatePeriode($periode, $val);
         $rapport = [
-            'approvisionnement' => $approJour,
-            'transfert' =>$transJour,
             'vente' => $venteJour,
-            'resumeProduit' => $queryProduct['prodArrayResume'],
             'vendeurs' => $vendeurs,
             'compassassion' => $compassassion,
             'periode' => $getDate,
@@ -478,11 +461,101 @@ class RapportController extends Controller
             'depot'=>$depot,
             'venteTri'=>$queryProduct['ventesParCategorie'],
             'showVente'=>$queryProduct['ventesParCategorie']->count(),
-            'presence'=>$presence,
-            'stats'=>$stats
         ];
         // dd($rapport, $prodArrayResume, $restePaiementTranche[0]->paiement);
         return Pdf::loadView('mail.rapport', ['rapport' => $rapport]);
+    }
+    public static function genererPresencePDF(Depot $depot, $periode = 'today', $val = null)
+    {
+        ini_set('memory_limit','512M');
+        $memory_used = memory_get_usage(true);
+        Log::info("memoire debut generation ".$memory_used. " octet");
+        $val = ($val)? $val: Carbon::now()->format("Y-m-d");
+            
+        $dateFilter = function ($val, $table=null) use ($periode) {
+            return function ($query) use ($periode, $val, $table) {
+                $column = $table ? "{$table}.created_at" : "created_at";
+                switch ($periode) {
+                    case 'mois':
+                        $part = explode('-', $val);
+                        $query->whereMonth($column, $part[1])
+                            ->whereYear($column, $part[0]);
+                        break;
+                    case 'annee':
+                        $query->whereYear($column,  $val);
+                        break;
+                    default:
+                        $query->whereDate($column,Carbon::parse($val));
+                        break;
+                }
+            };
+        };
+            
+        Carbon::setLocale('fr');
+        $presenceInit = Presence::with(['user','depot'])
+            ->where('depot_id', $depot->id)
+            ->where($dateFilter($val))
+            ->get();
+        
+        $presence = $presenceInit->groupBy(function($item) {
+                return $item->created_at->translatedFormat('l j F Y');
+            });
+        $stats = $presenceInit->groupBy('user_id')->map(function($userGroup) {
+            return [
+                'user' => $userGroup,
+                'confirmed_true' => $userGroup->where('confirm', true)->count(),
+                'confirmed_false' => $userGroup->where('confirm', false)->count(),
+            ];
+        })->sortByDesc('confirmed_true');
+        // dd($stats);
+
+        $getDate = self::getDatePeriode($periode, $val);
+        $rapport = [
+            'depot'=>$depot,
+            'presence'=>$presence,
+            'stats'=>$stats,
+            'periode'=>$getDate
+        ];
+        return Pdf::loadView('mail.presence', ['rapport' => $rapport]);
+    }
+    public static function genererProduitPDF(Depot $depot, $periode = 'today', $val = null)
+    {
+        ini_set('memory_limit','512M');
+        $used = memory_get_usage(true);
+        Log::info("memoire debut generation ".$used. " octet");
+        $val = ($val)? $val: Carbon::now()->format("Y-m-d");
+            
+        $dateFilter = function ($val, $table=null) use ($periode) {
+            return function ($query) use ($periode, $val, $table) {
+                $column = $table ? "{$table}.created_at" : "created_at";
+                switch ($periode) {
+                    case 'mois':
+                        $part = explode('-', $val);
+                        $query->whereMonth($column, $part[1])
+                            ->whereYear($column, $part[0]);
+                        break;
+                    case 'annee':
+                        $query->whereYear($column,  $val);
+                        break;
+                    default:
+                        $query->whereDate($column,Carbon::parse($val));
+                        break;
+                }
+            };
+        };
+    
+        $queryProduct = self::queryProduct($dateFilter($val),$dateFilter($val,"ventes"),$dateFilter($val,'transferts'), $depot->id);
+        
+        $getDate = self::getDatePeriode($periode, $val);
+        $rapport = [
+            'depot'=>$depot,
+            'venteTri'=>$queryProduct['ventesParCategorie'],
+            'showVente'=>$queryProduct['ventesParCategorie']->count(), 
+            'periode' =>$getDate,
+            'resumeProduit' => $queryProduct['prodArrayResume'],
+        ];
+        
+        return Pdf::loadView('mail.produit', ['rapport' => $rapport]);
     }
 
     static function getDatePeriode($periode, $val, $space=" "){
@@ -682,9 +755,11 @@ class RapportController extends Controller
         return [
             'prodArrayResume'=>$prodArrayResume,
             'ventesParCategorie'=>$ventesParCategorie
+            // 'prodArrayResume'=>[],
+            // 'ventesParCategorie'=>[]
         ];
     }
-    public static function rapport_send_mail($to, $depot, $depot_id, $periode ,$val){
+    public static function rapport_send_mail($to, Depot $depot, $periode ,$val){
         
         // $to = 'a.tshiyanze@gmail.com';
         // mbunzucalvin@gmail
@@ -711,30 +786,35 @@ class RapportController extends Controller
 
         try {
             
-            $sendRapport = function ($periode, $label, $filename, $val) use ($depot_id, $to, $depot, $name) {
+            $sendRapport = function ($periode, $label, $filename, $val) use ($depot, $to, $name) {
                 $ajustVal = self::getValVPeriode($periode, $val);
             // $getDate = self::getDatePeriode($periode, $ajustVal,"_");
-                $pdf = self::genererPDF($depot_id, $periode,$ajustVal);
+                $pdf = self::genererPDF($depot, $periode,$ajustVal);
+                $pdf_presence = self::genererPresencePDF($depot, $periode,$ajustVal);
+                $pdf_produit = self::genererProduitPDF($depot, $periode,$ajustVal);
            
                 // $pdf = self::genererPDF($depot_id, $periode);
-                Mail::send([], [], function ($message) use ($pdf, $to, $label, $depot, $name, $filename) {
+                Mail::send([], [], function ($message) use ($pdf, $pdf_presence, $pdf_produit, $to, $label, $depot, $name, $filename) {
                     $message->to($to)
-                        ->subject("Rapport $label $depot")
+                        ->subject("Rapport $label $depot->libele")
                         ->html("<p>Le rapport $label en pièce jointe, envoyé par $name</p>")
-                        ->attachData($pdf->output(), "rapport_{$filename}_{$depot}.pdf");
+                        ->attachData($pdf->output(), "rapport_{$filename}_01_vente_{$depot->libele}.pdf")
+                        ->attachData($pdf_presence->output(), "rapport_{$filename}_02_presence_{$depot->libele}.pdf")
+                        ->attachData($pdf_produit->output(), "rapport_{$filename}_03_produit_{$depot->libele}.pdf");
                 });
             };
             // Cas : fin d’année
             $lastDayOfYear = end($finsDuMois);
-            // if ($today === $lastDayOfYear) {
-            //     $sendRapport('annee', "Annuel $annee", $annee, $val);
-            //     $sendRapport('mois', "Mensuel $moisEtAnnee", $moisEtAnnee, $val);
-            //     $sendRapport('today', "journalier $today", $today, $val);
-            // // Cas : fin de mois
-            // } else
+            /* if ($today === $lastDayOfYear) {
+                 $sendRapport('annee', "Annuel $annee", $annee, $val);
+                 $sendRapport('mois', "Mensuel $moisEtAnnee", $moisEtAnnee, $val);
+                 $sendRapport('today', "journalier $today", $today, $val);
+              Cas : fin de mois
+             } else*/
             if (in_array($ajustVal, $finsDuMois)) {
-                $sendRapport('mois', "$getDate", $getDate, $ajustVal);
-                $sendRapport('today', "$getDate", $getDate, $ajustVal);
+                $getDateMois = self::getDatePeriode($periode, $ajustVal,'_');
+                $sendRapport('mois', $getDateMois, $getDateMois, $ajustVal);
+                $sendRapport('today', $getDate, $getDate, $ajustVal);
                 // dd('fin mois', $ajustVal, $periode, $getDate);
             } else {
                 // Cas : jour ordinaire
@@ -750,7 +830,7 @@ class RapportController extends Controller
             Log::error('Erreur envoi PDF : ' . $e->getMessage());
 
             return response()->json([
-                'error' => 'Échec de l’envoi du mail.',
+                'error' => "Échec d’envoi du mail.",
                 'details' => $e->getMessage(),
                 'status'=>false
             ], 500);
@@ -763,17 +843,19 @@ class RapportController extends Controller
         if(!$getDepot){
             return back()->with('echec', "Renseignement fourni est incorrect");
         }
-        $pdf = self::genererPDF($depot_id, 'today');
+        $pdf = self::genererPDF($getDepot, 'today');
         $today = Carbon::now()->format('Y-m-d');
         // dd($getDepot, $depot_id);
         if($getDepot != null){
             // dd($getDepot->user->email);
+            // $to = "a.tshiyanze@gmail.com";
             $to = $getDepot->user->email;
-            $sendMailRapport = self::rapport_send_mail($to,$getDepot->libele,$getDepot->id, $periode, $val);
+            $sendMailRapport = self::rapport_send_mail($to,$getDepot, $periode, $today);
             if($sendMailRapport->getData()->status == true){
                 $rapportDwl= 'rapport_journalier_' . $today."_$getDepot->libele" . '.pdf';
                 return $pdf->download($rapportDwl); 
             }
+            // dd($sendMailRapport);
             return back()->with('echec',"Email non envoyé, adresse mail invalide << $to >>!");
             // dd($sendMailRapport->getData()->details, 'echec');
         }
@@ -792,7 +874,8 @@ class RapportController extends Controller
         if(in_array($periode, ['today','mois', 'annee'])){
             $ajustVal = self::getValVPeriode($periode, $val);
             $getDate = self::getDatePeriode($periode, $ajustVal,"_");
-            $pdf = self::genererPDF($depot_id, $periode,$ajustVal);
+            $pdf = self::genererPDF($getDepot   , $periode,$ajustVal);
+            Log::info("memoire à la fin ". memory_get_usage(true). " octets");
             $rapportDwl= 'rapport_'.$getDate."_$getDepot->libele" . '.pdf';
             return $pdf->download($rapportDwl);
         }
