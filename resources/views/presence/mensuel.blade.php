@@ -121,7 +121,7 @@
                         </div>
                     </td>
                     <td >
-                         @heure($item->updated_at) 
+                       -  <!-- @heure($item->updated_at)  -->
                     </td>
                     <td > 
                         <div class="max-w-sm">
