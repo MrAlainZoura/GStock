@@ -26,7 +26,7 @@
         <div class="w-full flex justify-end m-5 gap-5">
             <div class="">
                 <select required name="" id="filtre" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                     <option selected value="1"> {{ $tranche ? $tranche.' mois' : "Filtre moi" }}</option>
+                     <option selected value="1"> {{ $tranche ? $tranche.' mois' : "Filtre mois" }}</option>
                         @for($i=1; $i<19; $i++ )
                             <option value="{{$i}}">
                                 {{ $i }} mois
