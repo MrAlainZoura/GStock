@@ -184,7 +184,7 @@ class VenteController extends Controller
         //     return to_route('dashboard');
         // }
         $depot= Depot::where('libele',$depotVar)->where('id', $id)->first();
-        $tranche = ($tranche)? $tranche : 1;
+        $tranche = ($tranche)? $tranche : 0;
         if($depot){
             $month = Carbon::now()->subMonths($tranche)->format('Y-m-d');
             $vente = $depot->vente
