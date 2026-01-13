@@ -100,9 +100,9 @@
             <td> @heure( $detail->created_at)</td>
             <td> 
             @if($detail->updated_at != $detail->created_at) 
-              @heure($detail->updated_at)
+              - <!-- @heure($detail->updated_at) -->
             @else 
-             -
+              -
             @endif
             </td>
             <td> {{ ($detail->confirm) ? "Oui" : "Ailleurs"}}           </td>
