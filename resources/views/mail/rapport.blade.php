@@ -56,76 +56,10 @@
         $restePaiementTrancheFc=0;
         $restePaiementTrancheFcPT=0;
         $restePaiementTrancheFcDT=0;
-        $depotLiebele ="";
-        if (count( $rapport['vendeurs']) >0) {
-          $depotLiebele = $rapport['vendeurs'][0]->depot->libele;
-        }
-    
+        $depotLibele = $rapport['depot']->libele;
     @endphp
-  <h2>Rapport {{ $rapport['periode'] }}  {{ $depotLiebele }} </h2>
-    <h2>Tableau de Présence {{ $rapport['periode'] }} {{ $depotLiebele }}</h2>
-  @if (str_contains($rapport['periode'], "Journalier") == false)
-    <h3>Statistique globale</h3> 
-    <table class="table-style">
-      <thead>
-        <tr class="header-row">
-          <th>N°</th>
-          <th>Nom complet</th>
-          <th>Au Bureau</th>
-          <th>A l'Extérieur</th>
-        </tr>
-      </thead>
-      <tbody>
-        @php
-          $numerotation = 1;
-        @endphp
-          @foreach ($rapport['stats'] as $kcle=> $stat)
-            <tr>
-              <td> {{$numerotation++}}</td>
-              <td>{{$stat['user'][0]->user->name}} {{$stat['user'][0]->user->postnom}} {{$stat['user'][0]->user->prenom}}</td>
-              <td>{{ $stat['confirmed_true'] }}</td>
-              <td>{{ $stat['confirmed_false'] }}</td>
-            </tr>
-          @endforeach        
-      </tbody>
-    </table> 
-  @endif
-  <h3> {{  (str_contains($rapport['periode'], "Journalier") == false)? "Statistiques détailées":""}}</h3>
-  <table class="table-style">
-    <thead>
-      <tr class="header-row">
-        <th>N°</th>
-        <th>Nom complet</th>
-        <th>Arrivée</th>
-        <th>Départ</th>
-        <th>Bureau</th>
-      </tr>
-    </thead>
-    <tbody>
-        @foreach ($rapport['presence'] as $jour=>$presence)
-        <tr>
-          <td colspan="5" class="upcase tb lc">{{ $jour }}</td>  
-        </tr>
-          @foreach ($presence as $clef=>$detail) 
-          <tr>
-            <td> {{$clef+1}}</td>
-            <td class="upcase"> {{$detail->user->name}} {{$detail->user->postnom}} {{$detail->user->prenom}}</td>
-            <td> @heure( $detail->created_at)</td>
-            <td> 
-            @if($detail->updated_at != $detail->created_at) 
-              @heure($detail->updated_at)
-            @else 
-             -
-            @endif
-            </td>
-            <td> {{ ($detail->confirm) ? "Oui" : "Ailleurs"}}           </td>
-          </tr>
-          @endforeach
-        @endforeach        
-    </tbody>
-  </table> 
-
-  <h2>Tableau de vente {{ $depotLiebele }} </h2>
+  <h2>Rapport {{ $rapport['periode'] }}  {{ $depotLibele }} </h2>
+  <h2>Tableau de vente {{ $depotLibele }} </h2>
   <table class="table-style">
     <thead>
       <tr class="header-row">
@@ -474,7 +408,6 @@
                    @formaMille( (float)$recetteFc/(float)$dev->taux ) {{ $dev->libele }} ({{ $dev->taux }}) <br>
                 @endforeach
               </td>
-            <!-- <td colspan="2">—</td> -->
         </tr>
         @if($rapport ['avanceTotal']>0)
             <tr class="footer-row">
@@ -504,7 +437,7 @@
         @endif
     </tfoot>
   </table>        
-  <h2>Tableau Classement Vendeur du mois {{ $depotLiebele }}</h2>
+  <h2>Tableau Classement Vendeur du mois {{ $depotLibele }}</h2>
 
   <table class="table-style">
     <thead>
@@ -527,7 +460,7 @@
   </table> 
 
   @if ((int)$rapport['showVente'] > 0)
-    <h2>Tableau de resumé de produit vendu {{ $depotLiebele }}</h2>
+    <h2>Tableau de resumé de produit vendu {{ $depotLibele }}</h2>
     <table class="table-style">
       <thead>
         <tr class="header-row">
@@ -564,34 +497,7 @@
     </table>        
   @else 
     <h4>Aucune vente enregistrée dans cette intervalle</h4>
-  @endif
-  <h2>Tableau de resumé de stock produit {{ $depotLiebele }}</h2>
-  <table class="table-style">
-    <thead>
-      <tr class="header-row">
-        <th>#. Libele</th>
-        <th>Categorie</th>
-        <th>Entrée</th>
-        <th>Transf</th>
-        <th>Vendu</th>
-        <th>Reste</th>
-      </tr>
-    </thead>
-    <tbody>
-        @foreach ($rapport['resumeProduit'] as $k=>$v)
-            <tr>
-              <td>{{ $k+1 }}. {{$v['libele']}}</td>
-              <td>{{$v['cat']}}</td>
-              <td> {{$v['enter']}}</td>
-              <td>{{$v['trans']}}</td>
-              <td>{{$v['vente']}}</td>
-              <td>{{$v['rest']}}</td>
-            </tr>
-        @endforeach        
-    </tbody>
-   
-  </table>        
-
+  @endif        
     <!-- <h6>Pas de panique c'est zoura, je teste mon application</h6> -->
     <h6>@coryright zouracorp 2025</h6>
 </body>

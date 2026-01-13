@@ -198,10 +198,13 @@ class PresenceController extends Controller
             $jourHier = Carbon::createFromFormat('Y-m-d',$limite->format('Y-m-d'),'UTC')->setTime(00,00,00);
             $today = $jourHier->addDay()->addHours(12);
 
+            //update
+            $presence->confirm = true;
+
             if($now >= $today){
                 return back()->with('echec','Tentative de corruption, dépasser 12h00 la présence ne peut être modifiée');
             }
-            if(in_array(Auth::user()->user_role->role->libele,['Administrateur','Super admin']) && $presence->update(['confirm' => true])){
+            if(in_array(Auth::user()->user_role->role->libele,['Administrateur','Super admin']) && $presence->save()){
                 return back()->with('success',"La présence de {$presence->user->name} a été confirmée avec succès");
             }
         }
