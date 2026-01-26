@@ -396,11 +396,12 @@ class RapportController extends Controller
         ini_set('memory_limit','512M');
         $used = memory_get_usage(true);
         Log::info("memoire debut generation ".$used. " octet");
-        $limite = Carbon::today()->setHour(17)->setMinute(30);
+        $limite =($val)
+            ? Carbon::parse($val)->setHour(17)->setMinute(30) 
+            : Carbon::today()->setHour(17)->setMinute(30);
         $val = ($val)? $val: Carbon::now()->format("Y-m-d");
         // $periode = "mois";
         // $val="2025-09";
-    
         $dateFilter = function ($val, $table=null) use ($periode) {
             return function ($query) use ($periode, $val, $table) {
                 $column = $table ? "{$table}.created_at" : "created_at";
