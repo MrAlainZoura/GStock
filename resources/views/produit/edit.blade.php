@@ -90,8 +90,21 @@
                                 <label for="assertionInput1" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                                 Quantité
                                 </label>
+                             
                                 <input type="text"  class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                placeholder="Saisir le nom de produit" name="quantite" disabled value="{{ $produit->produitDepot[0]->quantite }}">
+                                placeholder="Saisir le nom de produit" name="quantite" disabled value="{{  
+                                $produit->produitDepot
+                                        ->where('depot_id', $depot_id)
+                                        ->where('produit_id', $produit->id)
+                                        ->first()->quantite 
+                                        }}">
+                            </div>
+                            <div class="mb-5">
+                                <label for="unite" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                                Unité de mesure
+                                </label>
+                                <input type="text"  class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                placeholder="Saisir unité de mesure" name="unite" value="{{ $produit->unite }}">
                             </div>
                             <div class="mb-5">
                                 <label for="" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">

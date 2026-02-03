@@ -126,7 +126,7 @@
                                 $paiment += (float) $prix;
                             }
                         @endphp
-                        <label for="" class="block"> {{$val->produit->libele}} : {{$val->quantite}} pc</label>
+                        <label for="" class="block"> {{$val->produit->libele}} : {{$val->quantite}} {{( $val->quantite>1)?$val->produit->unite."s":$val->produit->unite}}</label>
                     @endforeach
                    
                 @endif

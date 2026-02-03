@@ -328,6 +328,7 @@ class ProduitController extends Controller
             "libele" =>$request-> libele,
             "prix" => $request->prix,
             "etat" => $request->etat,
+            "unite" => $request->unite,
             "description" =>$request->description
         ];
         $data = array_filter($dataUpdate, function($val){return !is_null($val);});

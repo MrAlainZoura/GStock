@@ -2,7 +2,7 @@
 if($findVenteDetail->user != null){
     $user = $findVenteDetail->user->name ;
     $prenom = $findVenteDetail->user->prenom;
-    $postnom = $findVenteDetail->user->prenom;
+    $postnom = $findVenteDetail->user->postnom;
     $email ="" ;
     $image = $findVenteDetail->user->image;
 }else{
@@ -11,7 +11,8 @@ if($findVenteDetail->user != null){
     $postnom ="";
     $email="";
     $image = null;
-}   
+}  
+$qtProduit = count($findVenteDetail->venteProduit);
 @endphp
 <div class="alert-success hidden" id="alert">
     @include('composant.alert_suc', ['message'=>"Impression encours... et Lien copié avec succes, coller le pour le partager!"])
@@ -25,8 +26,8 @@ if($findVenteDetail->user != null){
                     {{$user}} {{$postnom}} {{$prenom}}
                      pour le compte de {{$findVenteDetail->depot->libele}} en date du 
                      {{$findVenteDetail->created_at}} au client {{$findVenteDetail->client->name}} {{$findVenteDetail->client->prenom}} qui a acheté 
-                     {{count($findVenteDetail->venteProduit) }}
-                     produit(s) dont 
+                     {{$qtProduit}}
+                     produit{{ ($qtProduit > 1)?"s":""}} dont 
                      @php
                     $quantite = 0;
                     $netPaye = 0;
@@ -37,7 +38,7 @@ if($findVenteDetail->user != null){
                             $netPaye+=(float)$val->prixT;
                         @endphp
                     @endforeach
-                     {{$quantite}} piece(s) au total et le prix net payé @formaMille((float)$netPaye) {{  $findVenteDetail->devise }} au taux d'échange de {{  $findVenteDetail->taux }} pour la monnaie locale.
+                     {{$quantite}} pc{{ ($quantite > 1)?"s":"" }} au total et le prix net payé @formaMille((float)$netPaye) {{  $findVenteDetail->devise }} au taux d'échange de {{  $findVenteDetail->taux }} pour la monnaie locale.
                 </p>
                 <div class="flex flex-col justify-between sm:flex gap-2 sm:flex-row sm:flex-1">
                                         
@@ -116,7 +117,7 @@ if($findVenteDetail->user != null){
                                         <!-- {{$item->produit->etat}} -->
                                     </th>
                                     <td class="px-3 py-2">
-                                    {{$item->quantite}} pc
+                                    {{$item->quantite}} {{($val->quantite> 1 )?$item->produit->unite."s":$item->produit->unite }}
                                     </td>
                                     <td class="px-3 py-2">
                                     @formaMille((float)$item->prixT)  {{$findVenteDetail->devise}}

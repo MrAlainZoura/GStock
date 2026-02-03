@@ -12,6 +12,7 @@ class HomeController extends Controller
     public function dashboard(){
         //depot
         Depot::where('type',"")->update(['type'=>"Shop"]);
+        Produit::where('unite',"")->update(['unite'=>"pc"]);
         $depot = Depot::latest()->get();
         $depotType = DepotType::cases();
         $user = auth()->user();
