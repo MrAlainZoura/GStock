@@ -23,7 +23,8 @@ class Depot extends Model
         'autres',
         'remboursement_delay',
         'lon',
-        'lat'
+        'lat',
+        'type'
     ];
 
     public function user(){

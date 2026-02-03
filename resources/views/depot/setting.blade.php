@@ -21,7 +21,7 @@
     <div class=" w-full p-10">
         <div>
   <div class="px-4 sm:px-0">
-    <h3 class="text-base/7 font-semibold text-gray-900">Information sur le depôt</h3>
+    <h3 class="text-base/7 font-semibold text-gray-900">Information sur {{ $depotData->type }}</h3>
     <p class="mt-1 max-w-2xl text-sm/6 text-gray-500">Details et parammètre.</p>
   </div>
   <div class="mt-6 border-t border-gray-100">
@@ -201,7 +201,7 @@
               </svg>
               <span class="sr-only">Info</span>
               <div class="ms-3 text-sm font-medium">
-                  Supprimer le depot << {{ $depotData->libele }} >>, cette opération est irreversible !
+                  Supprimer {{ $depotData->type }} << {{ $depotData->libele }} >>, cette opération est irreversible !
                   <input type="text" name="libele" value="{{ $depotData->libele}}" class="hidden bg-transparent border-gray-100 outline-none">
               </div>
             <button type="submit"  class="ms-auto -mx-1.5 -my-1.5 bg-red-50 text-red-500 rounded-lg focus:ring-2 focus:ring-red-400 p-1.5 hover:bg-red-200 inline-flex items-center justify-center h-8 w-8 dark:bg-gray-800 dark:text-red-400 dark:hover:bg-gray-700">

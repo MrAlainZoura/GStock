@@ -109,7 +109,7 @@
                 @if ($findVenteDetail->depot->logo)
                     <img src="data:image/jpeg;base64,{{ base64_encode(file_get_contents(public_path('uploads/logo/'.$findVenteDetail->depot->logo))) }}" alt="logo">
                 @else
-                    Shop {{$findVenteDetail->depot->libele}}
+                   {{ $findVenteDetail->depot->type }} {{$findVenteDetail->depot->libele}}
                 @endif
             </div>
         <h3>Détails de la Vente</h3>
