@@ -112,10 +112,8 @@
                    {{ $findVenteDetail->depot->type }} {{$findVenteDetail->depot->libele}}
                 @endif
             </div>
-        <h3>Détails de la Vente</h3>
-        @if ($findVenteDetail->compassassion->count() > 0)
-            <h3>Compassaion</h3>
-        @endif
+        <h3>Détails de la Reservation</h3>
+        
         <h3>{{ $findVenteDetail->depot->cpostal }}</h3>
         <!-- <h3>Ets. Ujisha</h3> -->
         <div class="idnat">
@@ -129,12 +127,7 @@
                 <label class="politique">{{ $findVenteDetail->depot->remboursement_delay }} </label>
             @endif
             Phone : {{ $findVenteDetail->depot->contact }} {{ $findVenteDetail->depot->contact1 }}
-            <!-- RCCM:KNG/RCCM/22-A-01256 ID.NAT : <br> 01-G4701-N998728, N.Impot: A23119069 <br>
-            ***
-            Adresse: Croisement Des Avenues Kasongolunda N°292 Et 24 Novembre (Liberation) Ref :Station KYONDO OIL en face de l'académie de beaux-arts. Kinshasa, RDC.
-            ***  <br>
-            Phone: +243822109929, +243808400183 <br> -->
-            <!-- Contact@ujisha.com -->
+            
         </div>
         <div class="sansInterligne">
             <p class="left"> 
@@ -166,63 +159,27 @@
                 </tr>
             </thead>
             <tbody>
-                @if ($findVenteDetail->compassassion->count() > 0)
-                    @foreach ($findVenteDetail->compassassion as $item)
-                        @php
-                            $quantite +=(float)$item->quantite;
-                            $netPaye+=(float) $item->prixT;
-                        @endphp
-                        <tr class="tdDashed">
-                            <th class="left pad">
-                                {{$item->produit->marque->libele}} 
-                                {{$item->produit->libele}}<br>
-                                <!-- {{$item->produit->etat}} -->
-                            </th>
-                            <td >
-                                {{$item->quantite}}
-                            </td>
-                            <td >
-                                @formaMille((float)$item->prixT * (float)$findVenteDetail->taux ) cdf
-                            </td>
-                        </tr>
-                    @endforeach
-                    <tr><td colspan="3" class="separated">Article vente précédente </td></tr>
-                    @foreach ($findVenteDetail->venteProduit as $item)
-                        <tr class="tdDashed">
-                            <th class="left pad">
-                                {{$item->produit->marque->libele}} 
-                                {{$item->produit->libele}}<br>
-                                <!-- {{$item->produit->etat}} -->
-                            </th>
-                            <td >
-                                {{$item->quantite}}
-                            </td>
-                            <td >
-                                @formaMille((float)$item->prixT * (float)$findVenteDetail->taux ) cdf
-                            </td>
-                        </tr>
-                    @endforeach
-                @else
-                    @foreach ($findVenteDetail->venteProduit as $item)
-                         @php
-                            $quantite +=(float) $item->quantite;
-                            $netPaye+=(float) $item->prixT;
-                        @endphp
-                        <tr class="tdDashed">
-                            <th class="left pad">
-                                {{$item->produit->marque->libele}} 
-                                {{$item->produit->libele}}<br>
-                                <!-- {{$item->produit->etat}} -->
-                            </th>
-                            <td >
-                                {{$item->quantite}}
-                            </td>
-                            <td >
-                                @formaMille((float)$item->prixT *(float)$findVenteDetail->taux ) cdf
-                            </td>
-                        </tr>
-                    @endforeach
-                @endif
+                
+                @foreach ($findVenteDetail->venteProduit as $item)
+                    @php
+                        $quantite +=(float) $item->quantite;
+                        $netPaye+=(float) $item->prixT;
+                    @endphp
+                    <tr class="tdDashed">
+                        <th class="left pad">
+                            {{$item->produit->marque->libele}} 
+                            {{$item->produit->libele}}<br>
+                            <!-- {{$item->produit->etat}} -->
+                        </th>
+                        <td >
+                            {{$item->quantite}}
+                        </td>
+                        <td >
+                            @formaMille((float)$item->prixT *(float)$findVenteDetail->taux ) cdf
+                        </td>
+                    </tr>
+                @endforeach
+                
             <tr class="separated">
                 <td colspan="3">Paiement</td>
             </tr>
