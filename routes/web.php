@@ -18,6 +18,7 @@ use App\Http\Controllers\CompassassionController;
 use App\Http\Controllers\ApprovisionnementController;
 use App\Http\Controllers\SouscriptionController;
 use App\Http\Controllers\PresenceController;
+use App\Http\Controllers\ReservationController;
 
 // Route::get('/', function () {
 //     return view('home');
@@ -81,6 +82,13 @@ Route::prefix('presence')->middleware(AuthentifyMiddleware::class)->group(functi
     Route::put('{presence}/sortie', [PresenceController::class,'updateSortie'])->name('presence.out');
     Route::put('{presence}/confirmation', [PresenceController::class,'update'])->name('presence.confirm');
     Route::delete('{presence}/delete', [PresenceController::class,'destroy'])->name('presence.destroy');
+});
+Route::prefix('reservation')->middleware(AuthentifyMiddleware::class)->group(function () {
+    Route::post('/', [ReservationController::class,'store'])->name('reservation.store');
+    Route::get('{depot}/list', [ReservationController::class,'show'])->name('reservation.show');
+    Route::get('/{depot}/create', [ReservationController::class,'create'])->name('reservation.create');
+    // Route::get('annuel/{depot}/list', [ReservationController::class,'presenceAnnuel'])->name('reservation.annee');
+    Route::delete('{reservation}/delete', [PresenceController::class,'destroy'])->name('reservation.destroy');
 });
 
 Route::get('rapport/{depot}/journalier/{id}', [RapportController::class,'journalier'])->name('rapport.jour')->middleware( AuthentifyMiddleware::class);

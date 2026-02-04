@@ -11,10 +11,16 @@ class Client extends Model
         'prenom',
         'tel',
         'adresse',
-        "genre"
+        "genre",
+        "peice_identite",
+        "numero_piece",
+        "image_piece"
     ] ;
 
     public function vente(){
         return $this->hasMany(Vente::class) ;
+    }
+    public function reservation(){
+        return $this->hasMany(Reservation::class) ;
     }
 }
