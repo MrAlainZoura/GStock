@@ -99,11 +99,11 @@
                             <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white" for="file_input">Photo pièce</label>
                             <input class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" 
                             aria-describedby="file_input_help" 
-                            id="file_input" type="file" name="image" accept=".jpg, .jpeg, .png, .gif, .jfif" />
-                            <p class="mt-1 text-sm text-gray-500 dark:text-gray-300" id="file_input_help">SVG, PNG, JPG ou GIF (MAX. 800x400px).</p>
+                            id="file_input" type="file" name="image" accept=".jpg, .jpeg, .png" max="" />
+                            <p class="mt-1 text-sm text-gray-500 dark:text-gray-300" id="file_input_help">PNG, JPG ou jpeg (MAX. 800x400px).</p>
                           </div>                           
                           <img id="imagePreview" class="w-1/2 h-12 rounded-sm m-2 border border-gray-300 " 
-                          src="{{asset('svg/man.svg')}}"  
+                          src="{{asset('svg/cardId.svg')}}"  
                           alt="Voir"> 
                     </div>
                     </div>
@@ -599,8 +599,7 @@ function imagePieceIdentitePreview(){
 
     imageInput.addEventListener('change', function() {
         const file = this.files[0];
-
-        if (file) {
+        if (file && file.size < 2 * 1024 * 1024) {
             const reader = new FileReader();
             reader.onload = function(event) {
                 imagePreview.setAttribute('src', event.target.result);
@@ -608,6 +607,8 @@ function imagePieceIdentitePreview(){
             }
             reader.readAsDataURL(file);
         } else {
+            alert("Le fichier dépasse la taille maximale de 2 Mo.");
+            this.value = ""; 
             imagePreview.classList.add('hidden'); // Cache l'image si aucun fichier
         }
     });

@@ -85,7 +85,8 @@ Route::prefix('presence')->middleware(AuthentifyMiddleware::class)->group(functi
 });
 Route::prefix('reservation')->middleware(AuthentifyMiddleware::class)->group(function () {
     Route::post('/', [ReservationController::class,'store'])->name('reservation.store');
-    Route::get('{depot}/list', [ReservationController::class,'show'])->name('reservation.show');
+    Route::get('{reservation}/detail', [ReservationController::class,'show'])->name('reservation.show');
+    Route::get('/list/{depot}', [ReservationController::class,'index'])->name('reservation.list');
     Route::get('/{depot}/create', [ReservationController::class,'create'])->name('reservation.create');
     // Route::get('annuel/{depot}/list', [ReservationController::class,'presenceAnnuel'])->name('reservation.annee');
     Route::delete('{reservation}/delete', [PresenceController::class,'destroy'])->name('reservation.destroy');
