@@ -65,7 +65,10 @@ class ReservationController extends Controller
             Storage::disk('direct_public')->makeDirectory($dossier);
         }
         $now = Carbon::now();
-        [$partie, $partie2]  = str_split( $now->getMicrosecond(),3);
+        // [$partie, $partie2]  = str_split( $now->getMicrosecond(),3);
+        $micro = $now->format('u'); // retourne 6 chiffres
+        [$partie, $partie2] = str_split($micro, 3);
+
         $code = $this->initialNameAdmin()."_$partie"."_$partie2";
        
         // dd($request->all(), $request->reservations);

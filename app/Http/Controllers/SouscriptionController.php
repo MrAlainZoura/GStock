@@ -54,7 +54,11 @@ class SouscriptionController extends Controller
         [$montant, $red] = $this->calculerMontantAvecReduction($typeAb->prix,$request->duree);
         [$debut, $expire]  = $this->ajouterMois($request->debut, (int)$request->duree);
         $microSecond = new DateTime();
-        [$partie, $partie2]  = str_split( $microSecond->getMicrosecond(),3);
+        $now = Carbon::now();
+        // [$partie, $partie2]  = str_split( $microSecond->getMicrosecond(),3);
+        $micro = $now->format('u'); // retourne 6 chiffres
+        [$partie, $partie2] = str_split($micro, 3);
+
         $code = $this->initialNameAdmin()."-$partie-$partie2";
         $data = [
             "user_id"=>$request->user_id,
