@@ -100,7 +100,7 @@ Route::get('rapport/{depot}/voir-plus/{action}', [RapportController::class,'seem
 Route::get('rapport/{vente}/facture/{action}/{table?}', [RapportController::class,'facture'])->name('facturePDF')->middleware( AuthentifyMiddleware::class);
 Route::get('rapport/{depot}/mail', [RapportController::class,'sendMailrapport'])->name('sendMailrapport')->middleware( AuthentifyMiddleware::class);
 Route::get('rapport/{depot}/mail-job', [RapportController::class,'sendMailrapportJob'])->name('sendMailrapportJob')->middleware( AuthentifyMiddleware::class);
-Route::get('rapport/{depot}/{periode}/download/{val?}', [RapportController::class,'rapportDownload'])->name('rapportDownload')->middleware( AuthentifyMiddleware::class);
+Route::get('rapport/{depot}/{periode}/{table}/download/{val?}', [RapportController::class,'rapportDownload'])->name('rapportDownload')->middleware( AuthentifyMiddleware::class);
 
 Route::get('abonnements/list/{admin}', [AbonnementController::class,'index'])->name('abonnement.list')->middleware(AuthentifyMiddleware::class);
 Route::get('abonnement/{admin}/create', [AbonnementController::class,'create'])->name('abonnement.create')->middleware(AuthentifyMiddleware::class);

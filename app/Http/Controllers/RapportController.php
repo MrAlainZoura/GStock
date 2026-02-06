@@ -17,11 +17,13 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Approvisionnement;
 use App\Models\Presence;
 use App\Models\Reservation;
+use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\View;
+use Termwind\Components\Raw;
 
 class RapportController extends Controller
 {
@@ -48,6 +50,9 @@ class RapportController extends Controller
                     ->where('created_at','like','%'.$today.'%')
                     ->get();
         $venteJour = Vente::orderBy('user_id')->where('depot_id', $depot->id)
+                        ->where('created_at','like','%'.$today.'%')
+                        ->get();
+        $reservationJour = Reservation::orderBy('user_id')->where('depot_id', $depot->id)
                         ->where('created_at','like','%'.$today.'%')
                         ->get();
                 //resume stock chaque produit
@@ -98,7 +103,7 @@ class RapportController extends Controller
         });
         // dd($prodArrayResume);
         
-        return view('rapport.journalier', compact ( "approJour", "transJour", "venteJour","prodArrayResume", "depot", "compassassion"));
+        return view('rapport.journalier', compact ( "approJour", "transJour", "venteJour","reservationJour", "prodArrayResume", "depot", "compassassion"));
     }
     public function mensuel($depot, $id){
         // dd($depot, $id, "mensuel");
@@ -474,6 +479,73 @@ class RapportController extends Controller
         // dd($rapport, $prodArrayResume, $restePaiementTranche[0]->paiement);
         return Pdf::loadView('mail.rapport', ['rapport' => $rapport]);
     }
+    public static function genererReservationPDF(Depot $depot, $periode = 'today', $val = null)
+    {
+        ini_set('memory_limit','512M');
+        $used = memory_get_usage(true);
+        Log::info("memoire debut generation ".$used. " octet");
+        $limite =($val)
+            ? Carbon::parse($val)->setHour(17)->setMinute(30) 
+            : Carbon::today()->setHour(17)->setMinute(30);
+        $val = ($val)? $val: Carbon::now()->format("Y-m-d");
+        // $periode = "mois";
+        // $val="2025-09";
+        $dateFilter = function ($val, $table=null) use ($periode) {
+            return function ($query) use ($periode, $val, $table) {
+                $column = $table ? "{$table}.created_at" : "created_at";
+                switch ($periode) {
+                    case 'mois':
+                        $part = explode('-', $val);
+                        $query->whereMonth($column, $part[1])
+                            ->whereYear($column, $part[0]);
+                        break;
+                    case 'annee':
+                        $query->whereYear($column,  $val);
+                        break;
+                    default:
+                        $query->whereDate($column,Carbon::parse($val));
+                        break;
+                }
+            };
+        };
+        
+        Carbon::setLocale('fr');
+
+        if($periode == "today"){
+            $queryDay = self::queryDayDataReservation($dateFilter($val),$depot->id,$limite);
+            $venteJour = $queryDay['venteJour'];
+            $compassassion = $queryDay['compassassion'];
+            $avanceTotal = $queryDay['avanceTotal'];
+        }else{
+            $queryOtherVente = self::queryDataOtherDateVente($dateFilter($val), $depot->id );
+            $venteJour = $queryOtherVente['venteJour'];
+            $compassassion = $queryOtherVente['compassassion'];
+            $avanceTotal = $queryOtherVente['avanceTotal'];
+        }
+        // Statistiques vendeurs (toujours sur le mois)
+        $vendeurs = Reservation::selectRaw('user_id, COUNT(*) as count, depot_id')
+            ->whereMonth('created_at', Carbon::now()->month)
+            ->where('depot_id', $depot->id)
+            ->groupBy('user_id', 'depot_id')
+            ->orderByDesc('count')
+            ->get();
+
+        $queryProduct = self::queryProductReservation($dateFilter($val,"reservations"), $depot->id);
+        
+        $getDate = self::getDatePeriode($periode, $val);
+        $rapport = [
+            'vente' => $venteJour,
+            'vendeurs' => $vendeurs,
+            'compassassion' => $compassassion,
+            'periode' => $getDate,
+            'avanceTotal'=>$avanceTotal,
+            'depot'=>$depot,
+            'venteTri'=>$queryProduct['ventesParCategorie'],
+            'showVente'=>$queryProduct['ventesParCategorie']->count(),
+        ];
+        // dd($rapport);
+        return Pdf::loadView('mail.reservation', ['rapport' => $rapport]);
+    }
     public static function genererPresencePDF(Depot $depot, $periode = 'today', $val = null)
     {
         ini_set('memory_limit','512M');
@@ -656,7 +728,77 @@ class RapportController extends Controller
                 'avanceTotal'=>$avanceTotal
             ];
     }
+    public static function queryDayDataReservation($dateFilter, $depot_id, $limite){
+        $venteJourPremierTour = Reservation::where('depot_id', $depot_id)
+                ->where($dateFilter)
+                ->where('created_at', '<', $limite)
+                ->orderBy('user_id')
+                ->get();
+            $venteJourDeuxiemeTour = Reservation::where('depot_id', $depot_id)
+                ->where($dateFilter)
+                ->where('created_at', '>=', $limite)
+                ->orderBy('user_id')
+                ->get();
+            $venteJour=[
+                'avant'=>$venteJourPremierTour,
+                'apres'=>$venteJourDeuxiemeTour,
+            ];
+              
+            $restePaiementTranche = Reservation::with(['paiement' => function ($query) use ($dateFilter) {
+                $query->where($dateFilter);
+            }])->whereHas('paiement', function ($query) use ($dateFilter) {
+                $query->where($dateFilter);
+            })->wherenot($dateFilter)
+            ->where('depot_id',$depot_id)
+            // ->whereDoesntHave('compassassion')
+            ->get();
+            
+            $avanceTotal = $restePaiementTranche->sum(function ($vente) {
+                return $vente->paiement->sum(function ($paiement) use ($vente) {
+                    return $paiement->avance * $vente->updateTaux;
+                });
+            });
 
+            return [
+                'venteJour'=>$venteJour,
+                'compassassion'=>[],
+                'avanceTotal'=>$avanceTotal
+            ];
+    }
+
+    static public function queryDataOtherDateReservation($dateFilter, $depot_id){
+            $venteJour = Reservation::where('depot_id', $depot_id)
+                ->where($dateFilter)
+                ->orderBy('user_id')
+                ->get();
+    
+            // $compassassion = Reservation::whereHas('compassassion', $dateFilter)
+            //     ->with(['paiement', 'venteProduit', 'compassassion'])
+            //     ->where('depot_id',$depot_id)
+            //     ->get();
+    
+            $restePaiementTranche = Reservation::with(['paiement' => function ($query) use ($dateFilter) {
+                $query->where($dateFilter);
+            }])->whereHas('paiement', function ($query) use ($dateFilter) {
+                $query->where($dateFilter);
+            })->wherenot($dateFilter)
+            ->where('depot_id',$depot_id)
+            ->whereDoesntHave('compassassion')
+            ->get();
+            
+            $avanceTotal = $restePaiementTranche->sum(function ($vente) {
+                return $vente->paiement->sum(function ($paiement) use ($vente) {
+                    return $paiement->avance * $vente->updateTaux;
+                });
+            });
+            
+
+            return [
+                'avanceTotal'=>$avanceTotal,
+                'compassassion'=>[],
+                'venteJour'=>$venteJour
+            ];
+    }
     static public function queryDataOtherDateVente($dateFilter, $depot_id){
             $venteJour = Vente::where('depot_id', $depot_id)
                 ->where($dateFilter)
@@ -692,6 +834,64 @@ class RapportController extends Controller
             ];
     }
 
+    public static function queryProductReservation($dateFilteVente, $depot_id){
+        // Produits du dépôt
+        $allProdDepot = ProduitDepot::where('depot_id', $depot_id)
+            ->with('produit.marque.categorie')
+            ->get();
+
+
+        $reservations = DB::table('reservations')
+            ->join('reservation_produits', 'reservations.id', '=', 'reservation_produits.reservation_id')
+            // ->where($dateFilter('ventes')) 
+            ->where($dateFilteVente) 
+            ->where('reservations.depot_id', $depot_id)
+            ->select('reservation_produits.produit_id', DB::raw('COUNT(reservation_produits.produit_id) as total'))
+            ->groupBy('reservation_produits.produit_id')
+            ->pluck('total', 'reservation_produits.produit_id');
+
+        $prodArrayResume = $allProdDepot->map(function ($val) use ($reservations) {
+            return [
+                'libele' => $val->produit->libele,
+                'cat' => $val->produit->marque->categorie->libele . ' ' . $val->produit->marque->libele,
+                'vente' => $reservations[$val->produit_id] ?? 0,
+            ];
+        })->sortBy('cat')->values()->all();
+        // debut new tri
+        $ventesParCategorie = $allProdDepot
+            ->map(function ($val) use ($reservations) {
+                $produit = $val->produit;
+                $categorie = $produit->marque->categorie->libele;
+                $marque = $produit->marque->libele;
+                $quantiteVendue = $reservations[$val->produit_id] ?? 0;
+
+                return [
+                    'categorie' => $categorie,
+                    'marque' => $marque,
+                    'quantite' => $quantiteVendue,
+                ];
+            })
+            ->filter(function ($item) {
+                return $item['quantite'] >= 1;
+            })
+            ->groupBy('categorie')
+            ->map(function ($group) {
+                return $group
+                    ->groupBy('marque')
+                    ->map(function ($items) {
+                        return $items->sum('quantite');
+                    })
+                    ->sortDesc(); // Tri des marques par quantité vendue
+        });
+        // fin new tri
+
+       return [
+            'prodArrayResume'=>$prodArrayResume,
+            'ventesParCategorie'=>$ventesParCategorie
+            // 'prodArrayResume'=>[],
+            // 'ventesParCategorie'=>[]
+        ];
+    }
     public static function queryProduct($dateFilter,$dateFilteVente,$dateFilterTrans , $depot_id){
         // Produits du dépôt
         $allProdDepot = ProduitDepot::where('depot_id', $depot_id)
@@ -801,16 +1001,31 @@ class RapportController extends Controller
                 $pdf = self::genererPDF($depot, $periode,$ajustVal);
                 $pdf_presence = self::genererPresencePDF($depot, $periode,$ajustVal);
                 $pdf_produit = self::genererProduitPDF($depot, $periode,$ajustVal);
+                $pdf_reservation = self::genererReservationPDF($depot, $periode,$ajustVal);
            
                 // $pdf = self::genererPDF($depot_id, $periode);
-                Mail::send([], [], function ($message) use ($pdf, $pdf_presence, $pdf_produit, $to, $label, $depot, $name, $filename) {
-                    $message->to($to)
-                        ->subject("Rapport $label $depot->libele")
-                        ->html("<p>Le rapport $label en pièce jointe, envoyé par $name</p>")
-                        ->attachData($pdf->output(), "rapport_{$filename}_01_vente_{$depot->libele}.pdf")
-                        ->attachData($pdf_presence->output(), "rapport_{$filename}_02_presence_{$depot->libele}.pdf")
-                        ->attachData($pdf_produit->output(), "rapport_{$filename}_03_produit_{$depot->libele}.pdf");
-                });
+               if($depot->type == "Shop"){
+                
+                    Mail::send([], [], function ($message) use ($pdf, $pdf_presence, $pdf_produit, $pdf_reservation, $to, $label, $depot, $name, $filename) {
+                        $message->to($to)
+                            ->subject("Rapport $label $depot->libele")
+                            ->html("<p>Le rapport $label en pièce jointe, envoyé par $name</p>")
+                            ->attachData($pdf->output(), "rapport_{$filename}_01_vente_{$depot->libele}.pdf")
+                            ->attachData($pdf_presence->output(), "rapport_{$filename}_02_presence_{$depot->libele}.pdf")
+                            ->attachData($pdf_produit->output(), "rapport_{$filename}_03_produit_{$depot->libele}.pdf");
+                    });
+                }else{
+                    
+                    Mail::send([], [], function ($message) use ($pdf, $pdf_presence, $pdf_produit, $pdf_reservation, $to, $label, $depot, $name, $filename) {
+                        $message->to($to)
+                            ->subject("Rapport $label $depot->libele")
+                            ->html("<p>Le rapport $label en pièce jointe, envoyé par $name</p>")
+                            ->attachData($pdf->output(), "rapport_{$filename}_01_vente_{$depot->libele}.pdf")
+                            ->attachData($pdf_presence->output(), "rapport_{$filename}_02_presence_{$depot->libele}.pdf")
+                            ->attachData($pdf_produit->output(), "rapport_{$filename}_03_produit_{$depot->libele}.pdf")
+                            ->attachData($pdf_reservation->output(), "rapport_{$filename}_04_reservation_{$depot->libele}.pdf");
+                    });
+                }
             };
             // Cas : fin d’année
             $lastDayOfYear = end($finsDuMois);
@@ -835,7 +1050,7 @@ class RapportController extends Controller
                 'message' => 'Email envoyé avec succès.',
                 'status'=>true
             ]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Erreur envoi PDF : ' . $e->getMessage());
 
             return response()->json([
@@ -873,7 +1088,7 @@ class RapportController extends Controller
 
     }
 
-    public static function rapportDownload ($depot, $periode, $val = null){
+    public static function rapportDownload ($depot, $periode, $table, $val = null){
         $depot_id = $depot/12;
         $getDepot = Depot::find($depot_id);
         if(!$getDepot){
@@ -883,10 +1098,14 @@ class RapportController extends Controller
         if(in_array($periode, ['today','mois', 'annee'])){
             $ajustVal = self::getValVPeriode($periode, $val);
             $getDate = self::getDatePeriode($periode, $ajustVal,"_");
-            $pdf = self::genererPDF($getDepot   , $periode,$ajustVal);
+            $pdf = ($table == "vente")
+                 ? self::genererPDF($getDepot   , $periode,$ajustVal) 
+                 : self::genererReservationPDF($getDepot   , $periode,$ajustVal);
+           
             Log::info("memoire à la fin ". memory_get_usage(true). " octets");
-            $rapportDwl= 'rapport_'.$getDate."_$getDepot->libele" . '.pdf';
-            return $pdf->download($rapportDwl);
+            $rapportDwl= ($table == "vente")? 'rapport_vente_'.$getDate."_$getDepot->libele" . '.pdf' : 'rapport_reservation_'.$getDate."_$getDepot->libele" . '.pdf';
+            
+           return ($table == "vente")? $pdf->download($rapportDwl)  : $pdf->download($rapportDwl);
         }
         return back()->with('echec', "Erreur, Intervalle invalide");
     }

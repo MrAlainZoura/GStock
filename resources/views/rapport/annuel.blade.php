@@ -27,7 +27,7 @@
              <div class="ml-4 shrink-0">
                 <button  data-modal-target="crud-modal" data-modal-toggle="crud-modal" class="text-body text-blue-700 cursor-pointer bg-neutral-secondary-medium box-border border border-default-medium rounded-lg hover:bg-neutral-tertiary-medium hover:text-heading focus:ring-4 focus:ring-neutral-tertiary shadow-xs font-medium leading-5 rounded-base text-sm px-4 py-2.5 focus:outline-none">Plus d'options</button>
               </div>
-            <a href="{{route('rapportDownload',['depot'=>$depot->id*12, 'periode'=>'annee'])}}" class="inline-flex items-center px-5 py-2.5 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+            <a id="linkDwl" href="{{route('rapportDownload',['depot'=>$depot->id*12, 'periode'=>'annee', 'table'=>'vente'])}}" class="inline-flex items-center px-5 py-2.5 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
                 Télécharger PDF
                 <img src="{{asset('svg/pdf.svg')}}" class="w-6 rounded" alt="">
             </a>
@@ -114,9 +114,10 @@
 
          const dwload =()=>{
                 const valAnnee = window.document.getElementById('annee');
-                let url = @json(route('rapportDownload',["depot"=>$depot->id*12, "periode"=>"annee"]));
+                const linkDwl =window.document.getElementById('linkDwl');
+                let url = linkDwl.getAttribute('href');
                     url =`${url}/${valAnnee.value}`;
-                (valAnnee.value >= 2025)? link(url):null;
+                (parseInt(valAnnee.value) >= 2025)? link(url):null;
                 // console.log(url);
         }
 </script>
