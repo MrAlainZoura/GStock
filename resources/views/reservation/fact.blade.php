@@ -82,7 +82,7 @@
         }
         .imprime{
             text-align: center;
-            font-size: 10.5px;
+            font-size: 11px;
         }
         .politique{
             text-align: center;
@@ -224,7 +224,7 @@
             Merci pour votre achat ! <br>
             {{ $findVenteDetail->depot->autres}}
         </p>
-        <p class="imprime">Logiciel @copyright zouraCorp +243 812 995 373</p>
+        <p class="imprime">Logiciel @copyright 2026 zouraCorp +243 812 995 373</p>
     </div>
 </div>
 </body>
