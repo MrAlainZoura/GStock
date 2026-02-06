@@ -17,7 +17,7 @@
         @include('composant.alert_echec', ['message'=>session('echec')])
     </div>
     @endif
-    <div class="flex flex-wrap justify-left items-left gap-4 p-4 sm:items-center     ">
+    <div class="flex flex-wrap justify-center items-center gap-5 p-4 sm:items-center     ">
         @foreach($cat as $key=>$v)
             @include('composant.cat', ['id'=>$v->id,'image'=>"$v->image" ,'libele'=>"$v->libele",'marque'=>count($v->marque),'tab'=>$v->marque])
         @endforeach   

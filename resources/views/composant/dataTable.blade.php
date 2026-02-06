@@ -68,11 +68,11 @@
                 
             {{$item->quantite}} 
                     @if($item->quantite >=2 )
-                    pièces
+                    {{$item->produit->unite}}s
                     @elseif ($item->quantite==null) 
-                    0 pièce
+                    0 {{$item->produit->unite}}
                     @else
-                    pièce
+                    {{$item->produit->unite}}
                     @endif
                     <br/>
                 {{$item->produit->prix}} $

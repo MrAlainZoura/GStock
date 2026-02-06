@@ -23,7 +23,8 @@ class Depot extends Model
         'autres',
         'remboursement_delay',
         'lon',
-        'lat'
+        'lat',
+        'type'
     ];
 
     public function user(){
@@ -38,6 +39,9 @@ class Depot extends Model
     }
     public function vente(){
         return $this->hasMany(Vente::class);
+    }
+    public function reservation(){
+        return $this->hasMany(Reservation::class);
     }
     public function transfert(){
         return $this->hasMany(Transfert::class);

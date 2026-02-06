@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enum\DepotType;
 use Exception;
 use Carbon\Carbon;
 use App\Models\User;
@@ -47,6 +48,7 @@ class DepotController extends Controller
         $validateDate = Validator::make($request->all(),
         [
             'libele'=>'required|string|max:255',
+            'type'=>'required|string|max:255',
             'monnaie'=>'required|string|max:255',
             'taux'=>'required|max:255',
         ]);
@@ -56,6 +58,7 @@ class DepotController extends Controller
         }
         $data = [
             'libele'=>$request->libele,
+            'type'=>$request->type,
             'user_id'=>Auth::user()->id
         ];
         // dd($data, $dataDevise);
@@ -167,7 +170,8 @@ class DepotController extends Controller
         // dd($depot);
         $getDepotInformation = Depot::where('libele', $depot)->where('id', session('depot_id'))->first();
         if($getDepotInformation != null){
-            return view('depot.update',compact("getDepotInformation"));
+            $depotType = DepotType::cases();
+            return view('depot.update',compact("getDepotInformation","depotType"));
         }
         return back()->with('echec',"Une erreur inattendue s'est produite");
 
@@ -209,7 +213,8 @@ class DepotController extends Controller
             'idNational'=>$request->idNat,
             'numImpot'=>$request->impot,
             'autres'=>$request->autres,
-            'remboursement_delay'=>$request->remboursement_delay
+            'remboursement_delay'=>$request->remboursement_delay,
+            'type'=>$request->type
         ];
         $data = array_filter($data, function($val){return !is_null($val);});
 
@@ -259,7 +264,7 @@ class DepotController extends Controller
                 ]);
             }
         }
-        return back()->with('success','Depot ajouté avec success');
+        return back()->with('success','Information mise à jour avec success');
     }
 
     /**
@@ -271,8 +276,8 @@ class DepotController extends Controller
         $id = $id/13;
         $delete = Depot::where('id',$id)->where('libele', $libele)->first();
         if($delete){
-            $delete->delete();
-            return to_route('dashboard')->with('success','Depot supprimé avec succès');
+           // $delete->delete();
+            return to_route('dashboard')->with('success','Bientot disponible');
         }
         return back()->with('echec','Echec depot introuvable');
 

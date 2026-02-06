@@ -25,6 +25,14 @@
                         <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Libele {{$libele}}</label>
                         <input type="text" name="libele" id="email" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" placeholder="" required />
                     </div>
+                    <div class="">
+                        <select required name="type" id="typeDepot" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                            <option selected value="" > Categorie de point de vente</option>
+                            @foreach ($depotType as $type)
+                                <option value="{{ $type->value }}">{{ $type->label() }}</option>
+                            @endforeach 
+                        </select>
+                    </div>
                     <div class="inline-flex items-center justify-center w-full">
                         <hr class="w-64 h-1 my-8 bg-gray-200 border-0 rounded dark:bg-gray-700">
                         <div class="absolute px-4 -translate-x-1/2 bg-white left-1/2 dark:bg-gray-900">

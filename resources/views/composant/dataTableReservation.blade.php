@@ -94,42 +94,20 @@
                 </div>
             </td>
             <td >
-                @if ($item->compassassion->count()>0)
                     @php
                         $paiment = 0;
                     @endphp
-                    @foreach ( $item->compassassion as $comp)
-                    @php
-                       // $paiment +=(float)$val->prixT;
-                        $prix = preg_replace('/[^\d.]/', '', $comp->prixT);
-                        if (is_numeric($prix)) {
-                            $paiment += (float) $prix;
-                        }
-                    @endphp
-                        <label class="block"> 
-                            @if($comp->produit)
-                            {{$comp->produit->libele}} : {{$comp->quantite}} pc
-                            @else 
-                                Produit retiré : {{$comp->quantite}} pc
-                            @endif   
-                        </label>
-                    @endforeach
-                @else 
-                    @php
-                        $paiment = 0;
-                    @endphp
-                    @foreach ( $item->venteProduit as $val)
+                    @foreach ( $item->reservationProduit as $val)
                         @php
                         // $paiment +=(float)$val->prixT;
-                            $prix = preg_replace('/[^\d.]/', '', $val->prixT);
-                            if (is_numeric($prix)) {
-                                $paiment += (float) $prix;
+                            $montant = preg_replace('/[^\d.]/', '', $val->montant);
+                            if (is_numeric($montant)) {
+                                $paiment += (float) $montant;
                             }
                         @endphp
-                        <label for="" class="block"> {{$val->produit->libele}} : {{$val->quantite}} {{( $val->quantite>1)?$val->produit->unite."s":$val->produit->unite}}</label>
+                        <label for="" class="block"> {{$val->produit->libele}} : {{$val->duree}}</label>
                     @endforeach
-                   
-                @endif
+                               
             </td>
             <td >
                 @formaMille($paiment)
@@ -140,7 +118,7 @@
             </td>
 
             <td>
-                @include('composant.actionLink', ['itemName'=>"Vente_".$item->user->name."_".$item->created_at."_".$prix . $item->devise->libele,'seeRoute'=>'venteShow','seeParam'=>["vente"=>56745264509*$item->id, "depot"=>$item->depot_id*12], 'deleteRoute'=>"venteDelete",'deleteParam'=>56745264509*$item->id, 'editeRoute'=>"compCreate",'editParam'=>['depot'=>$item->depot->libele, 'vente_id'=>$item->id]])
+                @include('composant.actionLink', ['itemName'=>"Reservation_".$item->user->name."_".$item->created_at."_".$montant . $item->devise->libele,'seeRoute'=>'reservation.show','seeParam'=>56*$item->id, 'deleteRoute'=>"reservation.destroy",'deleteParam'=>$item->id, 'editeRoute'=>"reservation.edit",'editParam'=>$item->id])
             </td>
         </tr>
         @php

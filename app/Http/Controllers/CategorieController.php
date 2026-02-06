@@ -18,6 +18,9 @@ class CategorieController extends Controller
     {
         $cat = Categorie::latest()->get();
         $user = Auth::user();
+        if(session('depot') == null){
+           return to_route("dashboard");
+        }
         return view("categorie.index", compact("cat","user"));
     }
 

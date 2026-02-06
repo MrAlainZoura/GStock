@@ -124,7 +124,7 @@
                             <!-- {{$item->client->tel }}               -->
                             @foreach ( $item->venteProduit as $val)
                                 <label class="block">
-                                    {{ $val->produit ? $val->produit->libele : "Produit retiré" }} : {{$val->quantite}}pc
+                                    {{ $val->produit ? $val->produit->libele : "Produit retiré" }} : {{$val->quantite}} {{($val->quantite> 1 )?$val->produit->unite."s":$val->produit->unite }}
                                 </label>
                             @endforeach
                         </div>
@@ -142,9 +142,9 @@
                                 @endphp
                                 <label class="block"> 
                                     @if($comp->produit)
-                                    {{$comp->produit->libele}} : {{$comp->quantite}} pc
+                                    {{$comp->produit->libele}} : {{$comp->quantite}} {{($comp->quantite> 1 )?$comp->produit->unite."s":$comp->produit->unite }}
                                     @else 
-                                        Produit retiré : {{$comp->quantite}} pc
+                                        Produit retiré : {{$comp->quantite}}  {{($comp->quantite> 1 )?$comp->produit->unite."s":$comp->produit->unite }}
                                     @endif   
                                 </label>
                             @endforeach

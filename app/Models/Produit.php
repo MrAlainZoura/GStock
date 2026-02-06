@@ -12,7 +12,8 @@ class Produit extends Model
         'description',
         'prix',
         'etat',
-        'image'
+        'image',
+        'unite'
     ];
 
     public function marque(){
@@ -30,5 +31,8 @@ class Produit extends Model
     }
     public function produitTransfert(){
         return $this->hasMany(ProduitTransfert::class);
+    }
+    public function produitCollection(){
+        return $this->hasMany(CollectionProduit::class);
     }
 }

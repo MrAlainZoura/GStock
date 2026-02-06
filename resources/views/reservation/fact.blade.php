@@ -75,6 +75,7 @@
         }
         .right{
             text-align: right;
+            padding-right: 5px;
         }
         .center{
             text-align: center;
@@ -99,7 +100,6 @@
 <div class="main">
             
     @php
-        $quantite = 0;
         $netPaye = 0;
     @endphp
 
@@ -112,10 +112,8 @@
                    {{ $findVenteDetail->depot->type }} {{$findVenteDetail->depot->libele}}
                 @endif
             </div>
-        <h3>Détails de la Vente</h3>
-        @if ($findVenteDetail->compassassion->count() > 0)
-            <h3>Compassaion</h3>
-        @endif
+        <h3>Détails de la Reservation</h3>
+        
         <h3>{{ $findVenteDetail->depot->cpostal }}</h3>
         <!-- <h3>Ets. Ujisha</h3> -->
         <div class="idnat">
@@ -129,12 +127,7 @@
                 <label class="politique">{{ $findVenteDetail->depot->remboursement_delay }} </label>
             @endif
             Phone : {{ $findVenteDetail->depot->contact }} {{ $findVenteDetail->depot->contact1 }}
-            <!-- RCCM:KNG/RCCM/22-A-01256 ID.NAT : <br> 01-G4701-N998728, N.Impot: A23119069 <br>
-            ***
-            Adresse: Croisement Des Avenues Kasongolunda N°292 Et 24 Novembre (Liberation) Ref :Station KYONDO OIL en face de l'académie de beaux-arts. Kinshasa, RDC.
-            ***  <br>
-            Phone: +243822109929, +243808400183 <br> -->
-            <!-- Contact@ujisha.com -->
+            
         </div>
         <div class="sansInterligne">
             <p class="left"> 
@@ -155,10 +148,10 @@
             <thead class="">
                 <tr class="trHead">
                     <th  class="header-cell rounded-left">
-                        Produit
+                        Reservation de
                     </th>
                     <th  class="header-cell">
-                        Qté
+                        Durée
                     </th>
                     <th  class="header-cell rounded-right">
                         Prix
@@ -166,63 +159,30 @@
                 </tr>
             </thead>
             <tbody>
-                @if ($findVenteDetail->compassassion->count() > 0)
-                    @foreach ($findVenteDetail->compassassion as $item)
-                        @php
-                            $quantite +=(float)$item->quantite;
-                            $netPaye+=(float) $item->prixT;
-                        @endphp
-                        <tr class="tdDashed">
-                            <th class="left pad">
-                                {{$item->produit->marque->libele}} 
-                                {{$item->produit->libele}}<br>
-                                <!-- {{$item->produit->etat}} -->
-                            </th>
-                            <td >
-                                {{$item->quantite}}
-                            </td>
-                            <td >
-                                @formaMille((float)$item->prixT * (float)$findVenteDetail->taux ) cdf
-                            </td>
-                        </tr>
-                    @endforeach
-                    <tr><td colspan="3" class="separated">Article vente précédente </td></tr>
-                    @foreach ($findVenteDetail->venteProduit as $item)
-                        <tr class="tdDashed">
-                            <th class="left pad">
-                                {{$item->produit->marque->libele}} 
-                                {{$item->produit->libele}}<br>
-                                <!-- {{$item->produit->etat}} -->
-                            </th>
-                            <td >
-                                {{$item->quantite}}
-                            </td>
-                            <td >
-                                @formaMille((float)$item->prixT * (float)$findVenteDetail->taux ) cdf
-                            </td>
-                        </tr>
-                    @endforeach
-                @else
-                    @foreach ($findVenteDetail->venteProduit as $item)
-                         @php
-                            $quantite +=(float) $item->quantite;
-                            $netPaye+=(float) $item->prixT;
-                        @endphp
-                        <tr class="tdDashed">
-                            <th class="left pad">
-                                {{$item->produit->marque->libele}} 
-                                {{$item->produit->libele}}<br>
-                                <!-- {{$item->produit->etat}} -->
-                            </th>
-                            <td >
-                                {{$item->quantite}}
-                            </td>
-                            <td >
-                                @formaMille((float)$item->prixT *(float)$findVenteDetail->taux ) cdf
-                            </td>
-                        </tr>
-                    @endforeach
-                @endif
+                
+                @foreach ($findVenteDetail->reservationProduit as $item)
+                    @php
+                        $netPaye+=(float) $item->montant;
+                    @endphp
+                    <tr>
+                        <th class="left pad">
+                            {{$item->produit->marque->libele}} 
+                            {{$item->produit->libele}}<br>
+                            <!-- {{$item->produit->etat}} -->
+                        </th>
+                        <td >
+                            {{$item->duree}}
+                        </td>
+                        <td >
+                            @formaMille((float)$item->montant *(float)$findVenteDetail->taux ) cdf
+                        </td>
+
+                    </tr>
+                    <tr class="tdDashed">
+                        <td colspan="3">De {{$item->debut}} à {{$item->fin}}</td>
+                    </tr>
+                @endforeach
+                
             <tr class="separated">
                 <td colspan="3">Paiement</td>
             </tr>
@@ -238,7 +198,7 @@
                     @foreach($findVenteDetail->paiement as $cle=>$valeur)
                         <tr>
                             <td class="left">{{$valeur->created_at}}</td>
-                            <td colspan="2" class="center">@formaMille((float)$valeur->avance * (float)$findVenteDetail->taux ) cdf</td>
+                            <td colspan="2" class="right">@formaMille((float)$valeur->avance * (float)$findVenteDetail->taux ) cdf</td>
                         </tr>
                     @endforeach
 
@@ -251,7 +211,7 @@
                 @endif
                 <tr class="footer-row trHead">
                     <th class="footer-cell" >Total</th>
-                    <th class="footer-cell" colspan="2">
+                    <th class="footer-cell right" colspan="2">
                         (cdf) @formaMille((float)$netPaye * (float)$findVenteDetail->taux)<br>
                         ({{ $findVenteDetail->devise }}) @formaMille((float)$netPaye)
                     </th>
@@ -262,11 +222,9 @@
     <div class="invoice-footer">
         <p>
             Merci pour votre achat ! <br>
-            {{ $findVenteDetail->depot->autres }}
-            <!-- Les marchandises vendue sont ni reprises ni échangées!<br> -->
-            <!-- 1 mois de garentie et celle-ci n'inclut pas le display et chargeur! -->
+            {{ $findVenteDetail->depot->autres}}
         </p>
-        <p class="imprime"> Imprimer par {{Auth::user()->name ." ".Auth::user()->postnom ." ".Auth::user()->prenom}}</p>
+        <p class="imprime">Logiciel @copyright zouraCorp +243 812 995 373</p>
     </div>
 </div>
 </body>

@@ -24,10 +24,14 @@
             <h1 class="mb-4 text-2xl font-extrabold tracking-tight leading-none text-gray-900 md:text-3xl lg:text-4xl dark:text-white">Rapport journalier  {{session('depot')}} <span id="today"></span> </h1>
         </div>
         <div class="flex justify-end m-5 gap-4">
+            <div class="flex items-center">
+                <input id="link-checkbox" type="checkbox" value="false" name="ancien" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                <label for="link-checkbox" id="labeleAncien" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Reservation</label>
+            </div>
             <div class="ml-4 shrink-0">
                 <button  data-modal-target="crud-modal" data-modal-toggle="crud-modal" class="text-body text-blue-700 cursor-pointer bg-neutral-secondary-medium box-border border border-default-medium rounded-lg hover:bg-neutral-tertiary-medium hover:text-heading focus:ring-4 focus:ring-neutral-tertiary shadow-xs font-medium leading-5 rounded-base text-sm px-4 py-2.5 focus:outline-none">Plus d'options</button>
             </div>
-            <a href="{{route('rapportDownload',['depot'=>$depot->id*12, 'periode'=>'today'])}}" class="inline-flex items-center px-5 py-2.5 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+            <a id="linkDwl" href="{{route('rapportDownload',['depot'=>$depot->id*12, 'periode'=>'today', 'table'=>'vente'])}}" class="inline-flex items-center px-5 py-2.5 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
                 Télécharger PDF
                 <img src="{{asset('svg/pdf.svg')}}" class="w-6 rounded" alt="">
             </a>
@@ -37,6 +41,13 @@
         </div>
         
         @include('composant.rapportTable',['data'=> $venteJour,"period"=>"Recette du jour", "compassassion"=>$compassassion])
+        
+        @if ($reservationJour->count() > 0)
+        <div class="py-4 px-2 mx-auto max-w-screen-xl text-left lg:py-4">
+            <h1 class="mb-4 text-xl  tracking-tight leading-none text-gray-900 md:text-xl lg:text-xl dark:text-white">1.1. RESERVATION </h1>
+        </div>
+            @include('composant.rapportTableReservation',['data'=> $reservationJour,"period"=>"Recette du jour", "compassassion"=>$compassassion])
+        @endif
 
         <div class="py-4 px-2 mx-auto max-w-screen-xl text-left lg:py-4">
             <h1 class="mb-4 text-xl  tracking-tight leading-none text-gray-900 md:text-xl lg:text-xl dark:text-white">2. APPROVISIONNEMENT </h1>
@@ -108,6 +119,7 @@
     document.addEventListener("DOMContentLoaded", () => {
         today();
         dwload();
+        checkReservation();
     });
     const today = ()=>{
         const dateTimeElement = document.getElementById('today');
@@ -146,10 +158,11 @@
         const valAnnee = window.document.getElementById('annee');
         const valMois = window.document.getElementById('mois');
         const valJour = window.document.getElementById('jour');
+        const linkDwl =window.document.getElementById('linkDwl');
         const parameters =`${valAnnee.value}-${valMois.value}-${valJour.value}`;
-        let url = @json(route('rapportDownload',["depot"=>$depot->id*12, "periode"=>"today"]));
+        let url =linkDwl.getAttribute('href');
             url =`${url}/${parameters}`;
-        console.log("les valeurs : ",valAnnee.value, valMois.value, valJour.value)
+        // console.log("les valeurs : ",valAnnee.value, valMois.value, valJour.value)
         isValidDate(parseInt (valAnnee.value), parseInt(valMois.value), parseInt(valJour.value)) 
             ? link( url)
             : null ;
@@ -165,5 +178,18 @@
         );
     };
 
-
+function checkReservation(){
+    const linkDwl =window.document.getElementById('linkDwl');
+    const checkboxResevation = document.getElementById('link-checkbox');
+    let hrf = linkDwl.getAttribute('href');
+    checkboxResevation.addEventListener('change', function() {
+        if (this.checked) {
+          this.value = true;
+          linkDwl.href = hrf.replace(/vente/g, "reservation");
+        }else{
+            this.value = false;
+            linkDwl.href = hrf.replace(/reservation/g, "vente");
+        }
+    });
+}
 </script>

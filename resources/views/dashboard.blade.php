@@ -50,19 +50,19 @@
     <!-- Main modal -->
     @if($user->user_role->role->libele=='Administrateur')
         @foreach($user->depot as $cl=>$v)
-            @include('composant.depot',['libele'=>"$v->libele", 'route'=>"depot/".$v->id*12726654])
+            @include('composant.depot',['libele'=>"{$v->type} {$v->libele}", 'route'=>"depot/".$v->id*12726654])
         @endforeach  
         
     @elseif($user->user_role->role->libele=='Super admin')
         @foreach($depot as $cl=>$v)
-            @include('composant.depot',['libele'=>"$v->libele", 'route'=>"depot/".$v->id*12726654])
+            @include('composant.depot',['libele'=> "{$v->type} {$v->libele}", 'route'=>"depot/".$v->id*12726654])
         @endforeach
     @else
         @foreach($user->depotUser as $cl=>$v)
-            @include('composant.depot',['libele'=>$v->depot->libele , 'route'=>"depot/".$v->depot->id*12726654])
+            @include('composant.depot',['libele'=>"{$v->depot->type} {$v->depot->libele}" , 'route'=>"depot/".$v->depot->id*12726654])
         @endforeach
     @endif
-    @include('composant.modal',['libele'=>'dépôt', 'action'=>"depot.store",'user_id'=> $user->id ]) 
+    @include('composant.modal',['libele'=>'Point de vente', 'action'=>"depot.store",'user_id'=> $user->id,'depotType'=>$depotType]) 
    </section>
 @endsection
 

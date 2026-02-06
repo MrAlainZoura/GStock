@@ -105,7 +105,7 @@
             <td >
                  
                 @foreach ( $item->venteProduit as $val)
-                    <label for="" class="block"> {{$val->produit->libele}} : {{$val->quantite}} pc</label>
+                    <label for="" class="block"> {{$val->produit->libele}} : {{($val->quantite> 1 )?$val->produit->unite."s":$val->produit->unite }}</label>
                 @endforeach
             </td>
             <td >
