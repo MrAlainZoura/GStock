@@ -338,10 +338,10 @@
       </tbody>
     </table>        
   @else 
-    <h4>Aucune vente enregistrée dans cette intervalle</h4>
+    <h4>Aucune reservation enregistrée dans cette intervalle</h4>
   @endif        
     <!-- <h6>Pas de panique c'est zoura, je teste mon application</h6> -->
-    <h6>@coryright zouracorp 2025</h6>
+    <h6>@coryright zouracorp 2026</h6>
 </body>
 </html>
 @php

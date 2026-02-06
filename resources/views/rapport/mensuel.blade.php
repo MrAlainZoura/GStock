@@ -23,6 +23,10 @@
             <h1 class="mb-4 text-2xl font-extrabold tracking-tight leading-none text-gray-900 md:text-3xl lg:text-4xl dark:text-white">Rapport Mensuel  {{session('depot')}} {{$mois}} </h1>
         </div>
         <div class="flex justify-end m-5 gap-4">
+            <div class="flex items-center">
+                <input id="link-checkbox" type="checkbox" value="false" name="ancien" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                <label for="link-checkbox" id="labeleAncien" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Reservation</label>
+            </div>
              <div class="ml-4 shrink-0">
                 <button  data-modal-target="crud-modal" data-modal-toggle="crud-modal" class="text-body text-blue-700 cursor-pointer bg-neutral-secondary-medium box-border border border-default-medium rounded-lg hover:bg-neutral-tertiary-medium hover:text-heading focus:ring-4 focus:ring-neutral-tertiary shadow-xs font-medium leading-5 rounded-base text-sm px-4 py-2.5 focus:outline-none">Plus d'options</button>
             </div>
@@ -101,6 +105,7 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", () => {
+        checkReservation();
         dwload();
     });
         
@@ -123,4 +128,19 @@
             (valAnnee.value >= 2025 && valMois.value > 0  && valMois.value < 13)? link(url):null;
             // console.log(url);
         }
+
+    function checkReservation(){
+        const linkDwl =window.document.getElementById('linkDwl');
+        const checkboxResevation = document.getElementById('link-checkbox');
+        let hrf = linkDwl.getAttribute('href');
+        checkboxResevation.addEventListener('change', function() {
+            if (this.checked) {
+            this.value = true;
+            linkDwl.href = hrf.replace(/vente/g, "reservation");
+            }else{
+                this.value = false;
+                linkDwl.href = hrf.replace(/reservation/g, "vente");
+            }
+        });
+    }
 </script>
