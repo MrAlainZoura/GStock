@@ -39,7 +39,7 @@
                 <img src="{{asset('svg/pdf.svg')}}" class="w-6 rounded" alt="">
             </a>
         </div>
-        @include('composant.dataTableVente',["data"=>$vente, 'deviseList'=>$depot->devise])
+        @include('composant.dataTableReservation',["data"=>$reservation, 'deviseList'=>$depot->devise])
     </section>
     
 
@@ -56,7 +56,7 @@
         const selectFilte =window.document.getElementById("filtre");
         if(selectFilte){
                 selectFilte.addEventListener('change', ()=>{
-                    let url = @json(route('venteDepot',["depot"=>$depot->libele, "depot_id"=>$depot->id]));
+                    let url = @json(route('reservation.list',$depot->id*13));
                         url =`${url}/${selectFilte.value}`
                     // console.log(url);
                     link(url);

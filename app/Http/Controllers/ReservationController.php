@@ -34,11 +34,10 @@ class ReservationController extends Controller
                     ->where('created_at', '>=',$month )->reverse();
                 // ->where('created_at', '<=', Carbon::today()->endOfDay());
             $tranche = ($tranche==1) ? null : $tranche;
-            dd($reservation, $depot);
+            // dd($reservation, $depot);
             return view('reservation.index', compact('depot', 'reservation', 'tranche')) ;
         }
-
-        dd( $depot);
+        return back()->with('echec',"Une erreur s'est produite, reessayer plus tard");
     }
 
     /**
@@ -170,9 +169,9 @@ class ReservationController extends Controller
                 $dataReservationPro =[
                     "produit_id"=>$id,
                     "reservation_id"=>$reservationCreate->id,
-                    "duree"=>self::getDuree( $reservation['startAt'], $reservation['endAt']),
-                    "debut"=>Carbon::parse( $reservation['startAt'])->format('Y-m-d H:mm') ,
-                    "fin"=>Carbon::parse( $reservation['endAt'])->format('Y-m-d H:mm') ,
+                    "duree"=>self::getDuree2( $reservation['startAt'], $reservation['endAt']),
+                    "debut"=>Carbon::parse( $reservation['startAt'])->format('Y-m-d H:i:s'),
+                    "fin"=>Carbon::parse( $reservation['endAt'])->format('Y-m-d H:i:s'),
                     "montant"=>$reservation['montant'],
                     // "reduction"=>""
                 ];
@@ -190,7 +189,7 @@ class ReservationController extends Controller
             "completed"=>($checkTranche == true ) ? false : true
         ];
         $createPaiement = ReservationPaiement::create($dataPaiement);
-        return to_route("reservation.show", $reservationCreate->id*56745264509);
+        return to_route("reservation.show", $reservationCreate->id*56);
         // dd($reservationCreate, $reservationCreate->reservationProduit, $reservationCreate->paiement);
     }
 
@@ -199,7 +198,7 @@ class ReservationController extends Controller
      */
      public function show($reservation)
     {
-        $id= $reservation/56745264509;
+        $id= $reservation/56;
         $detailVente = Reservation::where('id',$id)->first();
         if($detailVente == null){
             return back()->with('echec','Renseignements fournient sont invalides');
@@ -247,7 +246,7 @@ class ReservationController extends Controller
      */
     public function edit(Reservation $resevation)
     {
-        //
+        return back()->with( 'success',"Bientot disponible");
     }
 
     /**
@@ -263,7 +262,7 @@ class ReservationController extends Controller
      */
     public function destroy(Reservation $resevation)
     {
-        //
+        return back()->with( 'success',"Bientot disponible");
     }
 
      public function initialNameAdmin(String $name=""){
@@ -321,5 +320,32 @@ class ReservationController extends Controller
 
         return $result;
 
+    }
+
+    public static function getDuree2($start, $end) {
+            $startAt = Carbon::parse($start);
+            $endAt   = Carbon::parse($end);
+
+            $diff = $startAt->diff($endAt); // retourne un DateInterval
+
+            $parts = [];
+
+            if ($diff->y > 0) {
+                $parts[] = $diff->y . ' ' . ($diff->y > 1 ? 'années' : 'année');
+            }
+            if ($diff->m > 0) {
+                $parts[] = $diff->m . ' ' . ($diff->m > 1 ? 'mois' : 'mois');
+            }
+            if ($diff->d > 0) {
+                $parts[] = $diff->d . ' ' . ($diff->d > 1 ? 'jours' : 'jour');
+            }
+            if ($diff->h > 0) {
+                $parts[] = $diff->h . ' ' . ($diff->h > 1 ? 'heures' : 'heure');
+            }
+            if ($diff->i > 0) {
+                $parts[] = $diff->i . ' ' . ($diff->i > 1 ? 'minutes' : 'minute');
+            }
+
+            return implode(' et ', $parts);
     }
 }

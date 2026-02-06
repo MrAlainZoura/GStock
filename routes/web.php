@@ -86,17 +86,18 @@ Route::prefix('presence')->middleware(AuthentifyMiddleware::class)->group(functi
 Route::prefix('reservation')->middleware(AuthentifyMiddleware::class)->group(function () {
     Route::post('/', [ReservationController::class,'store'])->name('reservation.store');
     Route::get('{reservation}/detail', [ReservationController::class,'show'])->name('reservation.show');
-    Route::get('/list/{depot}', [ReservationController::class,'index'])->name('reservation.list');
+    Route::get('/list/{depot}/{tranche?}', [ReservationController::class,'index'])->name('reservation.list');
     Route::get('/{depot}/create', [ReservationController::class,'create'])->name('reservation.create');
+    Route::get('/{reservation}/edit', [ReservationController::class,'edit'])->name('reservation.edit');
     // Route::get('annuel/{depot}/list', [ReservationController::class,'presenceAnnuel'])->name('reservation.annee');
-    Route::delete('{reservation}/delete', [PresenceController::class,'destroy'])->name('reservation.destroy');
+    Route::delete('/{reservation}/delete', [ReservationController::class,'destroy'])->name('reservation.destroy');
 });
 
 Route::get('rapport/{depot}/journalier/{id}', [RapportController::class,'journalier'])->name('rapport.jour')->middleware( AuthentifyMiddleware::class);
 Route::get('rapport/{depot}/mensuel/{id}', [RapportController::class,'mensuel'])->name('rapport.mois')->middleware( AuthentifyMiddleware::class);
 Route::get('rapport/{depot}/annuel/{id}', [RapportController::class,'annuel'])->name('rapport.annee')->middleware( AuthentifyMiddleware::class);
 Route::get('rapport/{depot}/voir-plus/{action}', [RapportController::class,'seemore'])->name('rapport.more')->middleware( AuthentifyMiddleware::class);
-Route::get('rapport/{vente}/facture/{action}', [RapportController::class,'facture'])->name('facturePDF')->middleware( AuthentifyMiddleware::class);
+Route::get('rapport/{vente}/facture/{action}/{table?}', [RapportController::class,'facture'])->name('facturePDF')->middleware( AuthentifyMiddleware::class);
 Route::get('rapport/{depot}/mail', [RapportController::class,'sendMailrapport'])->name('sendMailrapport')->middleware( AuthentifyMiddleware::class);
 Route::get('rapport/{depot}/mail-job', [RapportController::class,'sendMailrapportJob'])->name('sendMailrapportJob')->middleware( AuthentifyMiddleware::class);
 Route::get('rapport/{depot}/{periode}/download/{val?}', [RapportController::class,'rapportDownload'])->name('rapportDownload')->middleware( AuthentifyMiddleware::class);

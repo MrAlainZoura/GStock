@@ -1,5 +1,5 @@
 @extends('base')
-@section('title', "Vente ")
+@section('title', "Reservation ")
 
 @section('header')
   @include('composant.hearder', ['user_email'=>Auth::user()->email, 'user_name'=>Auth::user()->name])
@@ -18,7 +18,7 @@
     </div>
     @endif
     
-    @include('composant.sectionVenteShow',['findVenteDetail'=>$detailVente])
+    @include('composant.sectionReservationShow',['findVenteDetail'=>$detailVente])
 
     @include('composant.sidebar',['depot'=> $detailVente->depot->libele, 'depot_id'=>$detailVente->depot->id])
     @endsection

@@ -75,6 +75,7 @@
         }
         .right{
             text-align: right;
+            padding-right: 5px;
         }
         .center{
             text-align: center;
@@ -99,7 +100,6 @@
 <div class="main">
             
     @php
-        $quantite = 0;
         $netPaye = 0;
     @endphp
 
@@ -148,10 +148,10 @@
             <thead class="">
                 <tr class="trHead">
                     <th  class="header-cell rounded-left">
-                        Produit
+                        Reservation de
                     </th>
                     <th  class="header-cell">
-                        Qté
+                        Durée
                     </th>
                     <th  class="header-cell rounded-right">
                         Prix
@@ -160,23 +160,26 @@
             </thead>
             <tbody>
                 
-                @foreach ($findVenteDetail->venteProduit as $item)
+                @foreach ($findVenteDetail->reservationProduit as $item)
                     @php
-                        $quantite +=(float) $item->quantite;
-                        $netPaye+=(float) $item->prixT;
+                        $netPaye+=(float) $item->montant;
                     @endphp
-                    <tr class="tdDashed">
+                    <tr>
                         <th class="left pad">
                             {{$item->produit->marque->libele}} 
                             {{$item->produit->libele}}<br>
                             <!-- {{$item->produit->etat}} -->
                         </th>
                         <td >
-                            {{$item->quantite}}
+                            {{$item->duree}}
                         </td>
                         <td >
-                            @formaMille((float)$item->prixT *(float)$findVenteDetail->taux ) cdf
+                            @formaMille((float)$item->montant *(float)$findVenteDetail->taux ) cdf
                         </td>
+
+                    </tr>
+                    <tr class="tdDashed">
+                        <td colspan="3">De {{$item->debut}} à {{$item->fin}}</td>
                     </tr>
                 @endforeach
                 
@@ -195,7 +198,7 @@
                     @foreach($findVenteDetail->paiement as $cle=>$valeur)
                         <tr>
                             <td class="left">{{$valeur->created_at}}</td>
-                            <td colspan="2" class="center">@formaMille((float)$valeur->avance * (float)$findVenteDetail->taux ) cdf</td>
+                            <td colspan="2" class="right">@formaMille((float)$valeur->avance * (float)$findVenteDetail->taux ) cdf</td>
                         </tr>
                     @endforeach
 
@@ -208,7 +211,7 @@
                 @endif
                 <tr class="footer-row trHead">
                     <th class="footer-cell" >Total</th>
-                    <th class="footer-cell" colspan="2">
+                    <th class="footer-cell right" colspan="2">
                         (cdf) @formaMille((float)$netPaye * (float)$findVenteDetail->taux)<br>
                         ({{ $findVenteDetail->devise }}) @formaMille((float)$netPaye)
                     </th>
@@ -219,11 +222,9 @@
     <div class="invoice-footer">
         <p>
             Merci pour votre achat ! <br>
-            {{ $findVenteDetail->depot->autres }}
-            <!-- Les marchandises vendue sont ni reprises ni échangées!<br> -->
-            <!-- 1 mois de garentie et celle-ci n'inclut pas le display et chargeur! -->
+            {{ $findVenteDetail->depot->autres}}
         </p>
-        <p class="imprime"> Imprimer par {{Auth::user()->name ." ".Auth::user()->postnom ." ".Auth::user()->prenom}}</p>
+        <p class="imprime">Logiciel @copyright zouraCorp +243 812 995 373</p>
     </div>
 </div>
 </body>

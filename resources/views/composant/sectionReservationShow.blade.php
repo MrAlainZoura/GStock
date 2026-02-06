@@ -1,0 +1,246 @@
+@php 
+if($findVenteDetail->user != null){
+    $user = $findVenteDetail->user->name ;
+    $prenom = $findVenteDetail->user->prenom;
+    $postnom = $findVenteDetail->user->postnom;
+    $email ="" ;
+    $image = $findVenteDetail->user->image;
+}else{
+    $user = "Utilisateur à problème";
+    $prenom ="";
+    $postnom ="";
+    $email="";
+    $image = null;
+}  
+$qtProduit = count($findVenteDetail->reservationProduit);
+@endphp
+<div class="alert-success hidden" id="alert">
+    @include('composant.alert_suc', ['message'=>"Impression encours... et Lien copié avec succes, coller le pour le partager!"])
+</div>
+<section class="bg-white py-10 sm:py-16">
+        <div class="mx-auto max-w-7xl px-6 lg:px-8">
+            <div class="mx-auto max-w-2xl lg:mx-0">
+                <h2 class="text-4xl font-semibold tracking-tight text-pretty text-gray-900 sm:text-5xl">Reservation {{$findVenteDetail->code}} Détails </h2>
+                <p class="mt-2 text-lg/8 text-gray-600"> Description de la reservation : <br>
+                    Reservation numéro {{$findVenteDetail->code}} effectué par 
+                    {{$user}} {{$postnom}} {{$prenom}}
+                     pour le compte de {{$findVenteDetail->depot->libele}} en date du 
+                     {{$findVenteDetail->created_at}} au client {{$findVenteDetail->client->name}} {{$findVenteDetail->client->prenom}} qui a reservé 
+                     {{$qtProduit}}
+                     service{{ ($qtProduit > 1)?"s":""}} voir le tableau en bas 
+                     @php
+                        $netPaye = 0;
+                    @endphp
+                    @foreach ( $findVenteDetail->reservationProduit as $val)
+                        @php
+                            $netPaye+=(float)$val->montant;
+                        @endphp
+                    @endforeach
+                       et le prix net payé @formaMille((float)$netPaye) {{  $findVenteDetail->devise }} au taux d'échange de {{  $findVenteDetail->taux }} pour la monnaie locale.
+                </p>
+                <div class="flex flex-col justify-between sm:flex gap-2 sm:flex-row sm:flex-1">
+                                        
+                    <button onclick="imprimerPDF('{{route('facturePDF',['vente'=>$findVenteDetail->id*56, 'action'=>'print', 'table'=>'reservation'])}}')" class="inline-flex items-center px-5 py-2.5 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                        Imprimer
+                        <img src="{{asset('svg/print.svg')}}" class="w-8 rounded" alt="">
+                    </button>
+                    <a href="{{route('facturePDF',['vente'=>$findVenteDetail->id*56, 'action'=>'download', 'table'=>'reservation'])}}" class="inline-flex items-center px-5 py-2.5 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                        PDF
+                        <img src="{{asset('svg/pdf.svg')}}" class="w-6 rounded" alt="">
+                    </a>
+                </div>
+                <div class="flex flex-col justify-between sm:flex sm:flex-row sm:flex-1">
+                    <div class="">
+                    <h3 class="mt-3 text-lg/6 font-semibold text-gray-900 group-hover:text-gray-600">
+                        <div>
+                            <span class=""></span>
+                            Vendeur : 
+                        </div>
+                    </h3>
+                    <div class="relative mt-8 flex items-center gap-x-4">
+                    @if ($image == null)
+                        <img class="w-10 h-10 rounded" src="{{asset('svg/man.svg')}}" alt="Produit">
+                    @else
+                        <img src="{{asset('uploads/users/'.$findVenteDetail->user->image)}}" alt="photo" class="size-14 rounded-sm bg-gray-50">
+                    @endif
+                        <div class="text-sm/6">
+                            <p class="font-semibold text-gray-900">
+                            <a href="#">
+                                <span class=""></span>
+                                {{$user}} {{$postnom}} {{$prenom}}
+                            </a>
+                            </p>
+                            <p class="text-gray-600">{{$email}}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="">
+                    <h3 class="mt-3 text-lg/6 font-semibold text-gray-900 group-hover:text-gray-600">
+                        <div>
+                            Client :
+                        </div>
+                    </h3>
+                    <div class="relative mt-8 flex items-center gap-x-4">
+                        <div class="text-sm/6">
+                            <p class="font-semibold text-red-900">{{$findVenteDetail->client->name}} {{$findVenteDetail->client->prenom}} <br/>{{$findVenteDetail->client->tel}}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+                
+            </div>
+            <div class="mx-auto mt-10 grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 border-t border-gray-200 pt-10 sm:mt-16 sm:pt-16 lg:mx-0 lg:max-w-none ">
+            <div class="relative max-w-md">
+                <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                    <thead class="text-xs text-gray-700 uppercase bg-gray-100 dark:bg-gray-700 dark:text-gray-400">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 rounded-s-lg">
+                                Reservation de
+                            </th>
+                            <th scope="col" class="px-6 py-3">
+                                Durée
+                            </th>
+                            <th scope="col" class="px-6 py-3 rounded-e-lg">
+                                Prix
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @foreach ( $findVenteDetail->reservationProduit as $item)  
+                        <tr class="bg-white dark:bg-gray-800">
+                            <th scope="row" class="px-3 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                {{$item->produit->marque->libele}} 
+                                {{$item->produit->libele}}<br>
+                                {{$item->produit->etat}}
+                            </th>
+                            <td class="px-3 py-2">
+                                {{$item->duree}} de
+                                {{$item->debut}} à
+                                {{$item->fin}}
+                            </td>
+                            <td class="px-3 py-2">
+                            @formaMille((float)$item->montant)  {{$findVenteDetail->devise}}
+                            </td>
+                        </tr>
+                    @endforeach
+                    </tbody>
+                    <tfoot>
+                        <tr class="font-semibold text-gray-900 dark:text-white">
+                            <th scope="row" class="px-4 py-3 text-base">Total</th>
+                            <td class="px-3 py-3">
+                              
+                               
+                            </td>
+                            <td class="px-3 py-3">({{$findVenteDetail->devise}}) @formaMille((float)$netPaye) <br>
+                                (cdf) @formaMille((float)$netPaye *(float)$findVenteDetail->taux)
+                            </td>
+                        </tr>
+                        
+                    </tfoot>
+                </table>
+                
+                
+            @if($findVenteDetail->paiement !=null)
+                <div class="w-full pt-5 text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                    <div>
+                        <div class="grid grid-cols-4 p-1 text-sm font-medium text-gray-900 bg-gray-100 border-t border-b border-gray-200 gap-2 dark:bg-gray-800 dark:border-gray-700 dark:text-white">
+                            <div class="flex items-center">Date</div>
+                            <div>Versement</div>
+                            <div>Reste</div>
+                            <div>Soldé</div>
+                        </div>
+                        
+                        @foreach($findVenteDetail->paiement as $cl=>$val)
+                        <div class="grid grid-cols-4  py-5 text-sm text-gray-700 border-b border-gray-200 gap-x-3 dark:border-gray-700">
+                            <div class="text-gray-500 dark:text-gray-400">{{$val->created_at}}</div>
+                            <div>
+                               {{$val->avance}}
+                            </div>
+                            <div>
+                                {{$val->solde}}
+                            </div>
+                            <div>
+                                @if($val->completed==false)
+                                <svg class="w-3 h-3 text-red-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                                </svg>
+                                @else
+                                <svg class="w-3 h-3 text-green-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 12">
+                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5.917 5.724 10.5 15 1.5"/>
+                                </svg>
+                                @endif
+                            </div>
+                        </div>
+                          @endforeach                          
+                    </div>
+                </div>
+
+            @endif
+            </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+    // function imprimerPDF(url) {
+    //     const fenetre = window.open(url, '_blank');
+    //     fenetre.onload = function () {
+    //         fenetre.print();
+    //     };
+    // }
+    function imprimerPDF(url) {
+        if (!url || typeof url !== 'string') {
+            console.log('URL invalide. Impossible d’imprimer le document.');
+            return;
+        }
+        navigator.clipboard.writeText(url)
+            .then(() => console.log("Lien copié dans le presse-papiers !"))
+            .catch(() => console.log("Échec de la copie."));
+        try {
+            const fenetre = window.open(url, '_blank');
+
+            if (!fenetre) {
+                console.log('Impossible d’ouvrir la fenêtre. Vérifiez si votre navigateur bloque les popups.');
+                return;
+            }
+
+            let tentatives = 0;
+            const maxTentatives = 6;
+            const delay = 500;
+
+            const timer = setInterval(() => {
+                try {
+                    if (fenetre.closed) {
+                        clearInterval(timer);
+                        console.log('La fenêtre a été fermée avant le lancement de l’impression.');
+                        return;
+                    }
+
+                    if (fenetre.document.readyState === 'complete') {
+                        clearInterval(timer);
+                        const alert = document.getElementById('alert');
+                        if(alert){
+                            alert.classList.remove('hidden');
+                            setTimeout(() => {
+                            alert.classList.add('hidden');
+                            }, 30000);
+                        }
+                        console.log('Impression du document en cours...');
+                        fenetre.print();
+                    } else if (++tentatives >= maxTentatives) {
+                        clearInterval(timer);
+                        console.log('Impression forcée après plusieurs tentatives...');
+                        fenetre.print();
+                    }
+                } catch (e) {
+                    clearInterval(timer);
+                    console.log('Une erreur est survenue pendant l’impression. Veuillez réessayer.');
+                    console.error('Erreur JS :', e.message);
+                }
+            }, delay);
+        } catch (erreur) {
+            console.log('Erreur inattendue. Impossible de lancer l’impression.');
+            console.error('Exception JS :', erreur.message);
+        }
+    }
+</script>

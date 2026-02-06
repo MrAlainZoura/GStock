@@ -16,6 +16,7 @@ use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Approvisionnement;
 use App\Models\Presence;
+use App\Models\Reservation;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
@@ -284,10 +285,17 @@ class RapportController extends Controller
         $pdf = Pdf::loadView('pdf.rapportJ', $data);
         return $pdf->download('invoice.pdf');
     }
-    public function facture($vente, $action){
-       
-        $id= $vente/56745264509;
-        $findVenteDetail = Vente::where('id',$id)->first();
+    public function facture($id, $action, $table = null){
+       if($table != null){
+        // dd('reservation');
+        $id= $id/56;
+        $findVenteDetail = Reservation::where('id',$id)->first();
+       }else{
+        //    dd('vente');
+           $id= $id/56745264509;
+           $findVenteDetail = Vente::where('id',$id)->first();
+       }
+    //    dd($findVenteDetail);
         if(!$findVenteDetail){
             return to_route('dashboard')->with('echec', "Facture introuvable. Elle a peut-être été supprimée !");
         }
@@ -315,7 +323,7 @@ class RapportController extends Controller
         // $pdf->setPaper($customPaper);
         // return $pdf->download($facture);
 
-         $html = View::make('vente.fact', $data)->render();
+         $html = ($table == null)? View::make('vente.fact', $data)->render():View::make('reservation.fact', $data)->render();
 
         // Étape 1 – Mesurer la hauteur
         $GLOBALS['bodyHeight'] = 0;
