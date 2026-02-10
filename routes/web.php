@@ -26,6 +26,8 @@ use App\Http\Controllers\ReservationController;
 // Route::get('/',[HomeController::class, 'home'])->name('home');
 Route::get('/',[UserController::class, 'loginCreate'])->name('home');
 Route::get('dashbord',[HomeController::class, 'dashboard'])->name('dashboard')->middleware(AuthentifyMiddleware::class);
+Route::get('guide',[HomeController::class, 'guide'])->name('guide');//->middleware(AuthentifyMiddleware::class);
+Route::get('faq',[HomeController::class, 'faq'])->name('guide');//->middleware(AuthentifyMiddleware::class);
 
 Route::get('confirmation/{message}/{id}/{route}',[AdminController::class,"confirmDeleteItem"])->name("admin.confirmDeleteItem")->middleware(AuthentifyMiddleware::class);
 

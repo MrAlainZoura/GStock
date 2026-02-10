@@ -23,5 +23,12 @@ class HomeController extends Controller
         return view('home', compact('produit'));
     }
 
+    public function guide(){
+        return view('use.index');
+    }
+    public function faq(){
+        return view('use.faq');
+    }
+
     
 }

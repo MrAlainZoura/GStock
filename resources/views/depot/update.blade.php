@@ -45,17 +45,17 @@
                   </div>
                   @endforeach
                 </div>
-                <div class="col-span-full">
+                <div class="col-span-3 sm:w-full">
                   <label for="libele" class="block text-sm/6 font-medium text-gray-900">Appellation {{ $getDepotInformation->type }}</label>
                   <div class="mt-2">
-                    <input type="text" name="libele" id="libele" value="{{ $getDepotInformation->libele }}" autocomplete="off" class="block w-1/3 rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6" />
+                    <input type="text" name="libele" id="libele" value="{{ $getDepotInformation->libele }}" autocomplete="off" class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6" />
                   </div>
                 </div>
-                <div class="col-span-full">
+                <div class="col-span-3 sm:w-full">
                   <label for="libele" class="block text-sm/6 font-medium text-gray-900">Catégorie </label>
                   <div class="mt-2">
                      
-                        <select name="type" id="typeDepot" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-1/3 md:w-1/2 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                        <select name="type" id="typeDepot" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full  p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                             <option selected value="{{ $getDepotInformation->type }}" > {{ $getDepotInformation->type }}</option>
                             @foreach ($depotType as $type)
                                 <option value="{{ $type->value }}">{{ $type->label() }}</option>
@@ -64,10 +64,10 @@
                     
                     </div>
                 </div>
-                <div class="col-span-full">
+                <div class="col-span-3 sm:w-full">
                   <label for="ets" class="block text-sm/6 font-medium text-gray-900">Entreprise ou Société mère</label>
                   <div class="mt-2">
-                    <input type="text" id="ets" name="codeP" value="{{ $getDepotInformation->cpostal }}" autocomplete="off" class="block w-1/3 rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6" />
+                    <input type="text" id="ets" name="codeP" value="{{ $getDepotInformation->cpostal }}" autocomplete="off" class="block sm:full w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6" />
                   </div>
                 </div>
                 <div class="col-span-full">
@@ -143,7 +143,7 @@
                     <input type="text" name="numSecond" id="last-name" value="{{ $getDepotInformation->contact1 }}" autocomplete="off" class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6" />
                   </div>
                 </div>
-                <div class="sm:col-span-4">
+                <div class="sm:col-span-3">
                   <label for="email" class="block text-sm/6 font-medium text-gray-900">Adresse Email</label>
                   <div class="mt-2">
                     <input id="email" name="email" type="email" value="{{ $getDepotInformation->email }}" autocomplete="email" class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6" />
@@ -169,14 +169,14 @@
                   </div>
                 </div>
 
-                <div class="sm:col-span-2 sm:col-start-1">
+                <div class="sm:col-span-3 sm:col-start-1">
                   <label for="city" class="block text-sm/6 font-medium text-gray-900">Ville</label>
                   <div class="mt-2">
                     <input type="text" name="ville" value="{{ $getDepotInformation->ville }}" id="city" autocomplete="address-level2" class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6" />
                   </div>
                 </div>
 
-                <div class="sm:col-span-2">
+                <div class="sm:col-span-3">
                   <label for="region" class="block text-sm/6 font-medium text-gray-900">Etat / Province</label>
                   <div class="mt-2">
                     <input type="text" name="province" value="{{ $getDepotInformation->province }}" id="region" autocomplete="address-level1" class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6" />

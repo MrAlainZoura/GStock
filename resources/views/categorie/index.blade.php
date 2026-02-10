@@ -2,7 +2,7 @@
 @section('title', "Catégorie de produit")
 
 @section('header')
-  @include('composant.hearder', ['user_email'=>auth()->user()->id, 'user_name'=>auth()->user()->name])
+  @include('composant.hearder', ['user_email'=>auth()->user()->email, 'user_name'=>auth()->user()->name])
 @endsection
 
 @section('main')  

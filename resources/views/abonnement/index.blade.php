@@ -114,7 +114,7 @@
         </table>
     </div>
     @endsection
-@include('composant.sideBarAdmin',["user_id"=>auth::user()->id])
+@include('composant.sidebarAdmin',["user_id"=>auth::user()->id])
 
 @section('footer')
     @include('composant.footer')
