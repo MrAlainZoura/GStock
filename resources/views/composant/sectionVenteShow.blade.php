@@ -13,6 +13,7 @@ if($findVenteDetail->user != null){
     $image = null;
 }  
 $qtProduit = count($findVenteDetail->venteProduit);
+$produitList = "";
 @endphp
 <div class="alert-success hidden" id="alert">
     @include('composant.alert_suc', ['message'=>"Impression encours... et Lien copié avec succes, coller le pour le partager!"])
@@ -46,6 +47,13 @@ $qtProduit = count($findVenteDetail->venteProduit);
                         Imprimer
                         <img src="{{asset('svg/print.svg')}}" class="w-8 rounded" alt="">
                     </button>
+                    <a href="{{route('compCreate', ['depot'=>$findVenteDetail->depot->libele, 'vente_id'=>$findVenteDetail->id])}}" class="inline-flex items-center px-5 py-2.5 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                        Compassassion
+                        <svg class="w-6 h-6 text-white dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m14.304 4.844 2.852 2.852M7 7H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-4.5m2.409-9.91a2.017 2.017 0 0 1 0 2.853l-6.844 6.844L8 14l.713-3.565 6.844-6.844a2.015 2.015 0 0 1 2.852 0Z"/>
+                        </svg>
+                        <!-- <img src="{{asset('svg/pdf.svg')}}" class="w-6 rounded" alt=""> -->
+                    </a>
                     <a href="{{route('facturePDF',['vente'=>$findVenteDetail->id*56745264509, 'action'=>'download'])}}" class="inline-flex items-center px-5 py-2.5 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
                         PDF
                         <img src="{{asset('svg/pdf.svg')}}" class="w-6 rounded" alt="">
@@ -135,6 +143,9 @@ $qtProduit = count($findVenteDetail->venteProduit);
                                         </th>
                                         <td class="px-3 py-2">
                                         {{$item->quantite}} pc
+                                        @php
+                                            $produitList .="{$item->produit->marque->libele} {$item->produit->libele} {$item->quantite}{$item->produit->unite} - {$item->prixT} {$findVenteDetail->devise}...";
+                                        @endphp
                                         </td>
                                         <td class="px-3 py-2">
                                         @formaMille((float)$item->prixT)  {{$findVenteDetail->devise}}
@@ -223,6 +234,9 @@ $qtProduit = count($findVenteDetail->venteProduit);
                             </th>
                             <td class="px-3 py-2">
                             {{$item->quantite}} pc
+                             @php
+                                $produitList .="{$item->produit->marque->libele} {$item->produit->libele} {$item->quantite}{$item->produit->unite} - {$item->prixT} {$findVenteDetail->devise}...";
+                            @endphp
                             </td>
                             <td class="px-3 py-2">
                             @formaMille((float)$item->prixT)  {{$findVenteDetail->devise}}
@@ -277,7 +291,39 @@ $qtProduit = count($findVenteDetail->venteProduit);
                                 @endif
                             </div>
                         </div>
-                          @endforeach                          
+                        @endforeach  
+                        @if(Auth::user()->user_role->role->libele =='Administrateur' || Auth::user()->user_role->role->libele=='Super admin')
+                        
+                        <div class="grid grid-cols-4  py-5 text-sm text-gray-700 border-b border-gray-200 gap-x-3 dark:border-gray-700">
+                            
+                            <button title="Supprimer"
+                                role="button"
+                                type="button"
+                                data-item-name="{{ $produitList }}"
+                                data-delete-route="{{route('venteDelete', 56745264509*$findVenteDetail->id)}}"
+                                data-modal-target="popup-modal"
+                                data-modal-toggle="popup-modal"
+                                class="delete-button flex items-center justify-center text-red-600 col-span-full py-2 px-2 ms-3 text-sm font-medium text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm items-center text-center">
+                                <svg class="w-[26px] h-[26px] text-gray-800 text-white"
+                                    aria-hidden="true"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="24"
+                                    height="24"
+                                    fill="none"
+                                    viewBox="0 0 24 24">
+                                    <path stroke="currentColor"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="m15 9-6 6m0-6 6 6m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+                                </svg>
+                                Supprimer
+                            </button>
+
+                            @include('composant.modalDelete')
+                        </div>
+
+                        @endif
                     </div>
                 </div>
 
@@ -287,7 +333,6 @@ $qtProduit = count($findVenteDetail->venteProduit);
             </div>
         </div>
     </section>
-
     <script>
     // function imprimerPDF(url) {
     //     const fenetre = window.open(url, '_blank');
@@ -350,4 +395,29 @@ $qtProduit = count($findVenteDetail->venteProduit);
             console.error('Exception JS :', erreur.message);
         }
     }
+
+    // detete modal
+
+    
+    document.addEventListener("DOMContentLoaded", () => {
+        document.querySelectorAll(".delete-button").forEach(button => {
+            button.addEventListener("click", () => {
+
+                let itemName = button.dataset.itemName;
+                const deleteRoute = button.dataset.deleteRoute;
+
+                const formDelete = document.getElementById("deleteForm");
+                const message = document.getElementById("textDeleteItem");
+
+                if (formDelete) {
+                    formDelete.setAttribute("action", deleteRoute);
+                }
+
+                if (message) {
+                    message.textContent = `Etes-vous sûr de vouloir supprimer "${itemName}" ?`;
+                }
+
+            });
+        });
+    });
 </script>
