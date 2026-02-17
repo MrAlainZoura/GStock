@@ -109,7 +109,7 @@
                   @endif
             </ul>
          </li>
-         <!-- <li>
+         <li class="">
             <button type="button" class="flex items-center w-full p-2 text-base text-gray-900 transition duration-75 rounded-lg group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700" aria-controls="dropdown-exampleRSV" data-collapse-toggle="dropdown-exampleRSV">
                   <img src="{{asset('svg/reserv.svg')}}" class="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" aria-hidden="true" alt="">
                   <span class="flex-1 ms-3 text-left rtl:text-right whitespace-nowrap">Réservation</span>
@@ -124,13 +124,13 @@
                         Liste
                      </a>
                   </li>
-                  <li>
+                  <li class="hidden">
                      <a href="{{route('reservation.list',$depot_id*13)}}" class="flex items-center gap-2 w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
                      <img src="{{asset('svg/debt.svg')}}" class="flex-shrink-0 w-8 h-8 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" aria-hidden="true" alt="">
                         Créance client
                      </a>
                   </li>
-                  <li>
+                  <li class="hidden">
                      <a href="{{route('compList',["depot"=>$depot, 'id'=>$depot_id])}}" class="flex items-center gap-2 w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
                      <img src="{{asset('svg/comp.svg')}}" class="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" aria-hidden="true" alt="">
                         Compassassion
@@ -144,7 +144,7 @@
                      </a>
                   </li>
                    @if(Auth::user()->user_role->role->libele=='Administrateur' || Auth::user()->user_role->role->libele=='Super admin')
-                  <li>
+                  <li class="hidden">
                      <a href="{{route('venteTrashed',["depot_id"=>$depot_id*12,"depot"=>$depot])}}" class="flex items-center gap-2 w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
                      <img src="{{asset('svg/recycle.svg')}}" class="flex-shrink-0 w-4 h-4 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" aria-hidden="true" alt="">
                         Corbeille
@@ -152,7 +152,7 @@
                   </li>
                   @endif
             </ul>
-         </li> -->
+         </li> 
 
          <li>
             <button type="button" class="flex items-center w-full p-2 text-base text-gray-900 transition duration-75 rounded-lg group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"

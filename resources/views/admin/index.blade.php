@@ -91,7 +91,7 @@
     </div>
     @endsection
 
-@include('composant.sideBarAdmin')
+@include('composant.sidebarAdmin')
 
 @section('footer')
     @include('composant.footer')
