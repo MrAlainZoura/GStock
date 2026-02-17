@@ -40,7 +40,7 @@ class CompassassionController extends Controller
         $vente= Vente::find($vente_id);
         if($vente){
             $depot = $vente->depot;
-            $paiement = collect($vente->paiement)->sum('net');            ;
+            $paiement = collect($vente->paiement)->sum('avance');   
             $produit = ProduitDepot::where("depot_id",$depot->id)->with("produit.marque","produit.marque.categorie")->get();
             return view("compassassion.create", compact("depot","paiement","produit", 'vente'));
         }
