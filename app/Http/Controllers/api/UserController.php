@@ -14,12 +14,18 @@ use Illuminate\Support\Facades\Validator;
 class UserController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Display a listing of the resource.z
      */
+    protected $relation = [
+        'depot',
+        'depotUser.depot',
+        'souscription',
+        'user_role'
+    ];
     public function index()
     {
         // return 'ok';
-        $user = User::latest()->get();
+        $user = User::with($this->relation)->latest()->get();
         return response()->json(['success'=>true, 'data'=>$user]);
     }
 
@@ -75,7 +81,7 @@ class UserController extends Controller
      */
     public function show(string $id)
     {
-        $user = User::where("id",$id)->get();
+        $user = User::with($this->relation)->where("id",$id)->first();
         return response()->json(['success'=>true, 'data'=>$user]);
     }
 
@@ -131,33 +137,13 @@ class UserController extends Controller
      */
     public function destroy(string $id)
     {
-        $delete = User::where('id',$id)->delete();
+        $delete = User::where('id',$id)->get();
         if(!$delete){
             return response()->json(['success'=>true, 'data'=>'echec de suppression']);
         }
         return response()->json(['success'=>true, 'data'=>'Suppression reussie!']);
     }
 
-    public function login(Request $request){
-        $daliation = Validator::make($request->all(),[
-            'email'=>'required|email',
-            'password'=>'required|min:4'
-        ]);
-        if($daliation->fails()){
-            return back()->with('echec',$daliation->errors());
-        }
-        $data = ['email'=>$request->email, 'password'=>$request->password];
-        
-        if(Auth::attempt($data)){
-            $request->session()->regenerate();
-            return 'to_route("dashboard")';
-        }
-       return back()->with('echec','email ou mot de passe incorrect');
-    }
-    public function logout(){
-        Auth::logout();
-        return 'redirect(url("/"))';
-    }
     public function admin(Request $request){
         //creer user super admin
         $validateDate = Validator::make($request->all(),
