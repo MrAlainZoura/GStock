@@ -117,9 +117,20 @@ class SouscriptionController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Souscription $souscription)
+    public function destroy( $id)
     {
-        //
+        $id = $id/13;
+        $souscription = Souscription::find($id);
+        $user = $souscription?->user->id;
+        $isAdmin = Auth::user()->id == $user;
+        $isSuperAdmin = Auth::user()->user_role->role->libele == 'Super admin';
+        // dd('ok', $souscription);
+        $admin = ($isAdmin || $isSuperAdmin) ? true : false;
+        if ($souscription && $admin){
+            $souscription->delete();
+            return to_route("abonnement.list", $user*13)->with('success', "Souscription supprimée avec succès");
+        }
+        return back()->with('echec', "La suppression a echouée, une erreur s'est produite!");
     }
 
     public function ajouterMois($dateInitiale, $nombreDeMois) {
