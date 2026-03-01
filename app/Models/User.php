@@ -57,6 +57,12 @@ class User extends Authenticatable implements JWTSubject
     public function souscription(){
         return $this->hasMany(Souscription::class);
     }
+    public function maxDepot(){
+        $getNombre = $this->souscription()?->latest()->first()?->abonnement->max;
+        return ($getNombre)
+                ? $getNombre
+                : 3;
+    }
     public function presence(){
         return $this->hasMany(Presence::class);
 

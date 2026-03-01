@@ -68,6 +68,12 @@ class Depot extends Model
             })
             ->exists();
     }
+    public function hasNewAdmin()
+    {
+        $user = $this->user;
+        return $user && $user->created_at->between(now()->subDays(10), now());
+    }
+
 
     public function hasFullSouscription()
     {
@@ -80,7 +86,7 @@ class Depot extends Model
 
     public function abonnementCurrent()
     {
-        return $this->hasActiveSouscription() || $this->hasFullSouscription();
+        return $this->hasActiveSouscription() || $this->hasFullSouscription() || $this->hasNewAdmin();
     }
     
     public function getActiveSouscription()
@@ -91,7 +97,7 @@ class Depot extends Model
             })
             ->first();
     }
-        protected static function booted()
+    protected static function booted()
     {
         static::deleting(function ($depot) {
             // $depot->devise()->delete();
