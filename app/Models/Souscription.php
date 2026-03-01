@@ -32,4 +32,7 @@ class Souscription extends Model
     public function depotSouscription(){
         return $this->hasMany(DepotSouscription::class);
     }
+    public function paiement(){
+        return $this->hasMany(PaiementSouscription::class);  
+    }
 }
