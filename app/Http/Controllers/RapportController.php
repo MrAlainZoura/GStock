@@ -1075,7 +1075,7 @@ class RapportController extends Controller
             // dd($getDepot->user->email);
             // $to = "a.tshiyanze@gmail.com";
             $to = $getDepot->user->email;
-            $sendMailRapport = self::rapport_send_mail("a.tshiyanze@gmail.com",$getDepot, $periode, $today);
+            $sendMailRapport = self::rapport_send_mail($to,$getDepot, $periode, $today);
             if($sendMailRapport->getData()->status == true){
                 $rapportDwl= 'rapport_journalier_' . $today."_$getDepot->libele" . '.pdf';
                 return $pdf->download($rapportDwl); 
