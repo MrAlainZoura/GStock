@@ -3,13 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\Enum\AbonnementType;
-use DateTime;
-use Carbon\Carbon;
 use App\Models\Abonnement;
+use App\Models\Depot;
+use App\Models\DepotSouscription;
+use App\Models\PaiementSouscription;
 use App\Models\Souscription;
+use Carbon\Carbon;
+use DateTime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rules\Exists;
 
 class SouscriptionController extends Controller
 {
@@ -73,18 +78,20 @@ class SouscriptionController extends Controller
             "expired"=>$expire,
         ];
 
-        $exists = Souscription::where('expired', ">=", $expire)
+        $exists = Souscription::where('expired', "<=", $expire)
                 ->where('user_id', $request->user_id)
                 ->where('abonnement_id', $typeAb->id)
-                ->exists();
-
+                ->first();
+dd($exists);
         if ($exists) {
+            $notif = MailController::sendMail('a.tshiyanze@gmail.com',"Confirmation paiment",["code"=>$exists->code, "route"=>route("souscr.validate",  Crypt::encrypt($exists->id))]);
             return "Abonnement du meme type encours";
-            // return back()->with('echec', "Vous avez déjà une souscription active pour cet abonnement.");
+            // return back()->with('echec', "Vous avez déjà une souscription active pour cet abonnement.") </h6>;
         }
-
-        if(Souscription::create($data)){
-           return to_route("abonnement.list", (int)$data['user_id']*13);
+        $createSouscrption = Souscription::create($data);
+        if($createSouscrption){
+            $notif = MailController::sendMail('a.tshiyanze@gmail.com',"Confirmation paiment",["code"=>$createSouscrption->code, "route"=>route("souscr.validate", Crypt::encrypt($createSouscrption->id))]);
+            return to_route("abonnement.list", (int)$data['user_id']*13);
         }
         return back()->with('echec', "Une erreur inattendue s'est produite veuillez réessayer");
     }
@@ -148,5 +155,57 @@ class SouscriptionController extends Controller
         $first = $name[ rand(0, strlen($name)-1)];
         $second = $name[ rand(0, strlen($name)-1)];
         return strtoupper( $first.$second);
+    }
+
+    /**
+     * Validation paiement d'abonnement.
+     */
+    public function validate($id){
+        $id = decrypt($id);
+        $sousc = Souscription::find($id);
+        $isSuperAdmin = Auth::user()->user_role->role->libele == 'Super admin';
+        // dd($isSuperAdmin, $sousc, Depot::first());
+        if($sousc && $isSuperAdmin){
+            $dataPaiement = [
+                "souscription_id"=>$sousc->id,
+                "tranche"=>1,
+                "avance"=>$sousc->montant,
+                "solde"=>0,
+                "net"=>$sousc->montant,
+                "completed"=>true,
+                "moyen"=>'M-Pesa',
+                "reference"=>""
+            ];
+            $createPaiment = PaiementSouscription::create($dataPaiement);
+            $sousc->validate = true;
+            $sousc->save();
+            return response()->json( ["success"=>"Abonnement activé avec succès", "souscription"=>$sousc]);
+        }
+        return response()->json( ["echec"=>"Authorization denied"]);
+    }
+    /**
+     * Activation d'abonnement souscrit à un depot.
+     */
+    public function active($depot_id, Request $request){
+        $sousc = Souscription::where('code', $request->code)->first();
+        $depot = Depot::find($depot_id);
+        if($sousc && $depot){
+            $checkAdmin = $sousc->id == $depot->user->id;
+            if($checkAdmin && $sousc->validate && !$sousc->used && (int)$sousc->progres > 0){
+                $checkAffectationAbonnement = DepotSouscription::where('souscription_id', $sousc->id)
+                                            ->where('depot_id', $depot->id)
+                                            ->exists();
+                if(!$checkAffectationAbonnement){
+                    $createAffectation = DepotSouscription::firstOrCreate(['depot_id'=>$depot->id, 'souscription_id'=>$sousc->id]);
+                    ($sousc->progres == 1)? $sousc->used = true : null;
+                    $sousc->progres -= 1;
+                    $sousc->save();
+                    return back()->with('success', "Abonnement activé avec succès !");
+                }
+                return back()->with('echec', "Ce code a déjà été utilisé pour ce depot");
+            }
+            return back()->with('echec', "Ce code est invalide ou a déjà atteint le nombre d'activation maximal");
+        }
+        return back()->with('echec', "Ce code est invalide, entrer un code valide e réessayer");
     }
 }

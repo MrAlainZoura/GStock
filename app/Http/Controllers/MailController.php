@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Mail;
 
 class MailController extends Controller
 {
-    public function sendMail($to, $object, array $contenu){
+    static public function sendRapportMail($to, $object, array $contenu){
         // $to = "a.tshiyanze@gmail.com";
         // $object="Envoi des nudes à damso";
         // $contenu ="Bonjour mr Zoura nous vous esperons en bonne santé. Ceci est un rappl pour vous presenter au bureau demain à 8H pour une reunion d'affaire avec le DG de NolyCorp";
@@ -22,7 +22,7 @@ class MailController extends Controller
         
     }
 
-    public function sendRapportMail($to, $object, array $contenu){
+   static public function sendMail($to, $object, array $contenu){
         if (filter_var($to, FILTER_VALIDATE_EMAIL)) {
             $domain = substr(strrchr($to, "@"), 1); // extrait le domaine après @
 
