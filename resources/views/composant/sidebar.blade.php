@@ -228,6 +228,21 @@
                   <span class="inline-flex items-center justify-center w-3 h-3 p-3 ms-3 text-sm font-medium text-blue-800 bg-blue-100 rounded-full dark:bg-blue-900 dark:text-blue-300">3</span>
                </a>
             </li> -->
+         @else
+        
+            <div class="alert-echec">
+            <div id="alert-2" class="flex items-center p-4 mb-2 rounded-lg bg-green-100 dark:bg-gray-800 dark:text-red-400" role="alert">
+                <svg class="flex-shrink-0 w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
+                </svg>
+                <span class="sr-only">Info</span>
+                <div class="ms-3 text-sm font-medium">
+                    Vous n'avez plus d'abonnement, pensez à payer ou renouveller pour continuer à utiliser tous les services de la plateforme.
+                    Aller dans le paramètre vers le bas et activer le avec un code valide de paiement.
+                </div> 
+            </div>
+            </div>
+        
          @endif
          <li>
             <button type="button" class="flex items-center w-full p-2 text-base text-gray-900 transition duration-75 rounded-lg group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"

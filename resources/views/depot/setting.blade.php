@@ -190,37 +190,67 @@
     </dl>
   </div>
 </div>
-
-  <div class="cursor-pointer" data-modal-target="authentication-modal-abonnement" data-modal-toggle="authentication-modal-abonnement">
-          <div class="alert-echec">
-            <div id="alert-2" class="flex items-center p-4 mb-2 rounded-lg bg-green-100 dark:bg-gray-800 dark:text-red-400" role="alert">
-                <svg class="flex-shrink-0 w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
-                </svg>
-                <span class="sr-only">Info</span>
-                <div class="ms-3 text-sm font-medium">
-                    Activer l'abonnement de {{ $depotData->type }} << {{ $depotData->libele }} >>
-                    <input type="text" name="libele" value="{{ $depotData->libele}}" class="hidden bg-transparent border-gray-100 outline-none">
-                </div>
-              <button class="ms-auto -my-5 bg-red-50 text-red-500 rounded-lg focus:ring-2 focus:ring-red-400 p-1.5 hover:bg-red-200 inline-flex items-center justify-center h-8 w-8 dark:bg-gray-800 dark:text-red-400 dark:hover:bg-gray-700">
-                  <span class="sr-only">Close</span>
-
-                  <svg width="64px" height="64px" viewBox="0 0 64 64" data-name="Layer 1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" fill="#000000">
-                    <g id="SVGRepo_bgCarrier" stroke-width="0"/>
-                    <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"/>
-                    <g id="SVGRepo_iconCarrier">
-                      <defs>
-                      <style>.cls-1{fill:#0074ff;}.cls-2{fill:#00eb1b;}</style>
-                      </defs>
-                      <title/>
-                      <path class="cls-1" d="M41.78,57.13a7.12,7.12,0,0,1-4.2-1.39l-4.32-3.16a3.12,3.12,0,0,0-3.7,0l-4.32,3.16a7.14,7.14,0,0,1-11.31-6.53l.58-5.32a3.11,3.11,0,0,0-1.85-3.2L7.77,38.53a7.13,7.13,0,0,1,0-13.06l4.89-2.16a3.11,3.11,0,0,0,1.85-3.2l-.58-5.32A7.14,7.14,0,0,1,25.24,8.26l4.32,3.16a3.12,3.12,0,0,0,3.7,0l4.32-3.16A7,7,0,0,1,43,7a7.25,7.25,0,0,1,4.75,3.13,2,2,0,1,1-3.34,2.2,3.23,3.23,0,0,0-2.12-1.39,3,3,0,0,0-2.37.57l-4.32,3.16a7.13,7.13,0,0,1-8.43,0l-4.31-3.16a3.13,3.13,0,0,0-5,2.87l.58,5.31A7.11,7.11,0,0,1,14.28,27l-4.9,2.16a3.14,3.14,0,0,0,0,5.74L14.28,37a7.11,7.11,0,0,1,4.21,7.3l-.58,5.31a3.13,3.13,0,0,0,5,2.87l4.31-3.16a7.13,7.13,0,0,1,8.43,0l4.32,3.16a3.13,3.13,0,0,0,5-2.87l-.58-5.31A7.1,7.1,0,0,1,48.54,37l4.9-2.16a3.14,3.14,0,0,0,0-5.74L50.78,28a2,2,0,1,1,1.61-3.66l2.66,1.17a7.13,7.13,0,0,1,0,13.06l-4.89,2.16a3.13,3.13,0,0,0-1.86,3.2l.58,5.32a7,7,0,0,1-3.52,6.95A7.17,7.17,0,0,1,41.78,57.13Z"/>
-                      <path class="cls-2" d="M31.64,39a2,2,0,0,1-1.42-.59l-8.61-8.61A2,2,0,1,1,24.44,27l7.2,7.2L57.08,8.72a2,2,0,0,1,2.82,2.83L33.05,38.4A2,2,0,0,1,31.64,39Z"/>
-                    </g>
+  @if (depot($depotData->id)->hasFullSouscription())
+    <div >
+            <div class="alert-echec">
+              <div id="alert-2" class="flex items-center p-4 mb-2 rounded-lg bg-green-100 dark:bg-gray-800 dark:text-red-400" role="alert">
+                  <svg class="flex-shrink-0 w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
                   </svg>
-              </button>
+                  <span class="sr-only">Info</span>
+                  <div class="ms-3 text-sm font-medium">
+                      Vous avez un abonnement permanent pour {{ $depotData->type }} << {{ $depotData->libele }} >> 
+                  </div>
+              </div>
             </div>
-          </div>
-  </div>
+    </div>
+  @elseif(depot($depotData->id)->abonnementCurrent())
+    <div >
+            <div class="alert-echec">
+              <div id="alert-2" class="flex items-center p-4 mb-2 rounded-lg bg-green-100 dark:bg-gray-800 dark:text-red-400" role="alert">
+                  <svg class="flex-shrink-0 w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
+                  </svg>
+                  <span class="sr-only">Info</span>
+                  <div class="ms-3 text-sm font-medium">
+                      L'abonnement {{ depot($depotData->id)->getActiveSouscription()->souscription()->first()->abonnement->name }} de << {{ $depotData->type }} {{ $depotData->libele }} >> Expire le {{ depot($depotData->id)->getActiveSouscription()->souscription()->first()->expired }} à 00h00, penser à renouveller à cette date !
+                  </div>
+              </div>
+            </div>
+    </div>
+  @else
+    <div class="cursor-pointer" data-modal-target="authentication-modal-abonnement" data-modal-toggle="authentication-modal-abonnement">
+            <div class="alert-echec">
+              <div id="alert-2" class="flex items-center p-4 mb-2 rounded-lg bg-green-100 dark:bg-gray-800 dark:text-red-400" role="alert">
+                  <svg class="flex-shrink-0 w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
+                  </svg>
+                  <span class="sr-only">Info</span>
+                  <div class="ms-3 text-sm font-medium">
+                      Activer l'abonnement de {{ $depotData->type }} << {{ $depotData->libele }} >>
+                      <input type="text" name="libele" value="{{ $depotData->libele}}" class="hidden bg-transparent border-gray-100 outline-none">
+                  </div>
+                <button class="ms-auto -my-5 bg-red-50 text-red-500 rounded-lg focus:ring-2 focus:ring-red-400 p-1.5 hover:bg-red-200 inline-flex items-center justify-center h-8 w-8 dark:bg-gray-800 dark:text-red-400 dark:hover:bg-gray-700">
+                    <span class="sr-only">Close</span>
+
+                    <svg width="64px" height="64px" viewBox="0 0 64 64" data-name="Layer 1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" fill="#000000">
+                      <g id="SVGRepo_bgCarrier" stroke-width="0"/>
+                      <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"/>
+                      <g id="SVGRepo_iconCarrier">
+                        <defs>
+                        <style>.cls-1{fill:#0074ff;}.cls-2{fill:#00eb1b;}</style>
+                        </defs>
+                        <title/>
+                        <path class="cls-1" d="M41.78,57.13a7.12,7.12,0,0,1-4.2-1.39l-4.32-3.16a3.12,3.12,0,0,0-3.7,0l-4.32,3.16a7.14,7.14,0,0,1-11.31-6.53l.58-5.32a3.11,3.11,0,0,0-1.85-3.2L7.77,38.53a7.13,7.13,0,0,1,0-13.06l4.89-2.16a3.11,3.11,0,0,0,1.85-3.2l-.58-5.32A7.14,7.14,0,0,1,25.24,8.26l4.32,3.16a3.12,3.12,0,0,0,3.7,0l4.32-3.16A7,7,0,0,1,43,7a7.25,7.25,0,0,1,4.75,3.13,2,2,0,1,1-3.34,2.2,3.23,3.23,0,0,0-2.12-1.39,3,3,0,0,0-2.37.57l-4.32,3.16a7.13,7.13,0,0,1-8.43,0l-4.31-3.16a3.13,3.13,0,0,0-5,2.87l.58,5.31A7.11,7.11,0,0,1,14.28,27l-4.9,2.16a3.14,3.14,0,0,0,0,5.74L14.28,37a7.11,7.11,0,0,1,4.21,7.3l-.58,5.31a3.13,3.13,0,0,0,5,2.87l4.31-3.16a7.13,7.13,0,0,1,8.43,0l4.32,3.16a3.13,3.13,0,0,0,5-2.87l-.58-5.31A7.1,7.1,0,0,1,48.54,37l4.9-2.16a3.14,3.14,0,0,0,0-5.74L50.78,28a2,2,0,1,1,1.61-3.66l2.66,1.17a7.13,7.13,0,0,1,0,13.06l-4.89,2.16a3.13,3.13,0,0,0-1.86,3.2l.58,5.32a7,7,0,0,1-3.52,6.95A7.17,7.17,0,0,1,41.78,57.13Z"/>
+                        <path class="cls-2" d="M31.64,39a2,2,0,0,1-1.42-.59l-8.61-8.61A2,2,0,1,1,24.44,27l7.2,7.2L57.08,8.72a2,2,0,0,1,2.82,2.83L33.05,38.4A2,2,0,0,1,31.64,39Z"/>
+                      </g>
+                    </svg>
+                </button>
+              </div>
+            </div>
+    </div>
+  @endif
+
   <form action="{{ route('depot.destroy', $depotData->id*13) }}" method="post" id ="deleteForm">
           @csrf
           @method('delete')
