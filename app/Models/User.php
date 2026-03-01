@@ -7,8 +7,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 
-class User extends Authenticatable
+class User extends Authenticatable implements JWTSubject
+
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
@@ -35,6 +37,9 @@ class User extends Authenticatable
         'prenom',
         'image'
     ];
+    
+    // jwt guard
+    protected $guard_name = 'api';
 
     public function depot(){
         return $this->hasMany(Depot::class);
@@ -60,7 +65,20 @@ class User extends Authenticatable
     {
         return $this->hasOne(UserRole::class);
     }
+/**
+     * mehtod pour jwt
+     *
+     * @var list<string>
+     */
+     public function getJWTIdentifier()
+    {
+        return $this->getKey();
+    }
 
+    public function getJWTCustomClaims()
+    {
+        return [];
+    }
     /**
      * The attributes that should be hidden for serialization.
      *

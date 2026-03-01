@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Depot extends Model
 {
+    use SoftDeletes;
     protected $fillable = [
         'libele',
         'user_id',
@@ -56,12 +58,21 @@ class Depot extends Model
         protected static function booted()
     {
         static::deleting(function ($depot) {
-            $depot->devise()->delete();
-            $depot->depotUser()->delete();
-            $depot->transfert()->delete();
+            // $depot->devise()->delete();
+            // $depot->depotUser()->delete();
+            // $depot->transfert()->delete();
             $depot->vente()->delete();
-            $depot->produitDepot()->delete();
-            $depot->approvisionnement()->delete();
+            // $depot->produitDepot()->delete();
+            // $depot->approvisionnement()->delete();
+        });
+
+
+        static::restoring(function ($depot) {
+            $depot->vente()->onlyTrashed()->restore();
+        });
+
+        static::forceDeleting(function ($depot) {
+            $depot->vente()->withTrashed()->forceDelete();
         });
 
     }

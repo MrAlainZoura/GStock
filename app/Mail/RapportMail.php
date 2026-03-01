@@ -13,14 +13,14 @@ class RapportMail extends Mailable
 {
     use Queueable, SerializesModels;
     public $object;
-    // public $contenu;
+    public $contenu;
     /**
      * Create a new message instance.
      */
-    public function __construct($object)
+    public function __construct($object, $contenu)
     {
         $this->object= $object;
-        // $this->contenu= $contenu;
+        $this->contenu= $contenu;
     }
 
     /**
@@ -39,7 +39,11 @@ class RapportMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'mail.rapport',
+            view: 'mail.abonnement_confirmation',
+             with: [
+                'content' => $this->contenu,
+            ]
+
         );
     }
 

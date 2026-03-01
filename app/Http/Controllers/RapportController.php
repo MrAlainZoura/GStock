@@ -1069,6 +1069,7 @@ class RapportController extends Controller
         }
         $pdf = self::genererPDF($getDepot, 'today');
         $today = Carbon::now()->format('Y-m-d');
+        $today = "2026-02-28";
         // dd($getDepot, $depot_id);
         if($getDepot != null){
             // dd($getDepot->user->email);
@@ -1080,7 +1081,7 @@ class RapportController extends Controller
                 return $pdf->download($rapportDwl); 
             }
             // dd($sendMailRapport);
-            return back()->with('echec',"Email non envoyé, adresse mail invalide << $to >>!");
+            return back()->with('echec',"Email non envoyé, adresse mail invalide << $to >>!, code erreur : {$sendMailRapport->getData()->details}");
             // dd($sendMailRapport->getData()->details, 'echec');
         }
         return back()->with('echec',"Email non envoyé, renseignements fournient sont erronés !");

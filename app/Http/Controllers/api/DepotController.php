@@ -1,14 +1,24 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\api;
 
-use App\Models\User;
+use App\Http\Controllers\Controller;
 use App\Models\Depot;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class DepotController extends Controller
 {
+    protected $relation = [
+        "user",
+        "approvisionnement",
+        "produitDepot.produit",
+        "vente",
+        "reservation",
+        "transfert",
+        "depotUser",
+        "devise"
+    ];
     /**
      * Display a listing of the resource.
      */
@@ -55,7 +65,8 @@ class DepotController extends Controller
      */
     public function show(string $id)
     {
-        $depot = Depot::where("id",$id)->get();
+        // return "ok";
+        $depot = Depot::where("id",$id)->with($this->relation)->first();
         return response()->json(['success'=>true, 'data'=>$depot]);
     }
 
