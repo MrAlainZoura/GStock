@@ -1069,7 +1069,7 @@ class RapportController extends Controller
         }
         $pdf = self::genererPDF($getDepot, 'today');
         $today = Carbon::now()->format('Y-m-d');
-        $today = "2026-02-28";
+        // $today = "2026-02-28";
         // dd($getDepot, $depot_id);
         if($getDepot != null){
             // dd($getDepot->user->email);
