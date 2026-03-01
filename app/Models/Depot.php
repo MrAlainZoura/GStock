@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -54,7 +55,42 @@ class Depot extends Model
     public function devise(){
         return $this->hasMany(Devise::class);
     }
+   public function depotSouscriptions()
+    {
+        return $this->hasMany(DepotSouscription::class);
+    }
 
+    public function hasActiveSouscription()
+    {
+        return $this->depotSouscriptions()
+            ->whereHas('souscription', function ($query) {
+                $query->where('expired', '>', Carbon::now());
+            })
+            ->exists();
+    }
+
+    public function hasFullSouscription()
+    {
+        return $this->depotSouscriptions()
+            ->whereHas('souscription', function ($query) {
+                $query->where('fulltime', true);
+            })
+            ->exists();
+    }
+
+    public function abonnementCurrent()
+    {
+        return $this->hasActiveSouscription() || $this->hasFullSouscription();
+    }
+    
+    public function getActiveSouscription()
+    {
+        return $this->depotSouscriptions()
+            ->whereHas('souscription', function ($query) {
+                $query->where('expired', '>', Carbon::now());
+            })
+            ->first();
+    }
         protected static function booted()
     {
         static::deleting(function ($depot) {
