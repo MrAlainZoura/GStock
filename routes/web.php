@@ -115,6 +115,7 @@ Route::post('souscription/store', [SouscriptionController::class,'store'])->name
 Route::put('souscription/{id}', [SouscriptionController::class,'show'])->name('souscr.update')->middleware(AuthentifyMiddleware::class);
 Route::put('souscription/activation/depot/{depot_id}', [SouscriptionController::class,'active'])->name('souscr.active')->middleware(AuthentifyMiddleware::class);
 Route::get('souscription/validate/{id}', [SouscriptionController::class,'validate'])->name('souscr.validate')->middleware(AuthentifyMiddleware::class);
+Route::get('souscription/validate/{id}/fulltime', [SouscriptionController::class,'validateFulltime'])->name('souscr.fulltime')->middleware(AuthentifyMiddleware::class);
 
 Route::get('{depot}/parametre', [DepotController::class, 'depotSetting'])->name("depotSetting")->middleware(AuthentifyMiddleware::class);
 Route::get('{depot}/produits/{id}', [DepotController::class, 'showProduit'])->name("showProduit")->middleware(AuthentifyMiddleware::class);

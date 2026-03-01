@@ -3,10 +3,11 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
 class User extends Authenticatable implements JWTSubject
@@ -62,6 +63,11 @@ class User extends Authenticatable implements JWTSubject
         return ($getNombre)
                 ? $getNombre
                 : 3;
+    }
+    public function userCurrentSouscription(){
+        return $this->souscription()
+            ->where('expired', '>', Carbon::now())
+            ->exists();
     }
     public function presence(){
         return $this->hasMany(Presence::class);
