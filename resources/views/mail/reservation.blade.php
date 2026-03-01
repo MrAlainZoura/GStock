@@ -59,7 +59,7 @@
         $depotLibele = $rapport['depot']->libele;
     @endphp
   <h2>Rapport {{ $rapport['periode'] }}  {{ $depotLibele }} </h2>
-  <h2>Tableau de vente {{ $depotLibele }} </h2>
+  <h2>Tableau de Réservation {{ $depotLibele }} </h2>
   <table class="table-style">
     <thead>
       <tr class="header-row">
@@ -279,14 +279,14 @@
         @endif
     </tfoot>
   </table>        
-  <h2>Tableau Classement Vendeur du mois {{ $depotLibele }}</h2>
+  <h2>Tableau Classement Agent du mois {{ $depotLibele }}</h2>
 
   <table class="table-style">
     <thead>
       <tr class="header-row">
         <th>N°</th>
         <th>Nom complet</th>
-        <th>Vente</th>
+        <th>Réservation</th>
       </tr>
     </thead>
     <tbody>
@@ -302,13 +302,13 @@
   </table> 
 
   @if ((int)$rapport['showVente'] > 0)
-    <h2>Tableau de resumé de produit vendu {{ $depotLibele }}</h2>
+    <h2>Tableau de resumé de réservation {{ $depotLibele }}</h2>
     <table class="table-style">
       <thead>
         <tr class="header-row">
           <th>Categorie</th>
           <th>Marque</th>
-          <th>Pièce Vendue</th>
+          <th>Nombre</th>
         </tr>
       </thead>
       <tbody>
@@ -331,7 +331,7 @@
                 @endphp
               @endforeach
               <tr class="tb">
-                <td colspan="2" >Total vente {{$cat}}</td>
+                <td colspan="2" >Total Réservation {{$cat}}</td>
                 <td>{{$total}}</td>
               </tr>
           @endforeach        
@@ -345,5 +345,5 @@
 </body>
 </html>
 @php
-die();
+// die();
 @endphp

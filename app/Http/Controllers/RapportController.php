@@ -517,7 +517,7 @@ class RapportController extends Controller
             $compassassion = $queryDay['compassassion'];
             $avanceTotal = $queryDay['avanceTotal'];
         }else{
-            $queryOtherVente = self::queryDataOtherDateVente($dateFilter($val), $depot->id );
+            $queryOtherVente = self::queryDataOtherDateReservation($dateFilter($val), $depot->id );
             $venteJour = $queryOtherVente['venteJour'];
             $compassassion = $queryOtherVente['compassassion'];
             $avanceTotal = $queryOtherVente['avanceTotal'];
@@ -543,7 +543,7 @@ class RapportController extends Controller
             'venteTri'=>$queryProduct['ventesParCategorie'],
             'showVente'=>$queryProduct['ventesParCategorie']->count(),
         ];
-        dd($rapport);
+        // dd($rapport);
         return Pdf::loadView('mail.reservation', ['rapport' => $rapport]);
     }
     public static function genererPresencePDF(Depot $depot, $periode = 'today', $val = null)
@@ -783,7 +783,7 @@ class RapportController extends Controller
                 $query->where($dateFilter);
             })->wherenot($dateFilter)
             ->where('depot_id',$depot_id)
-            ->whereDoesntHave('compassassion')
+            // ->whereDoesntHave('compassassion')
             ->get();
             
             $avanceTotal = $restePaiementTranche->sum(function ($vente) {
@@ -1036,7 +1036,7 @@ class RapportController extends Controller
               Cas : fin de mois
              } else*/
             if (in_array($ajustVal, $finsDuMois)) {
-                $getDateMois = self::getDatePeriode($periode, $ajustVal,'_');
+                $getDateMois = self::getDatePeriode("mois", $ajustVal,'_');
                 $sendRapport('mois', $getDateMois, $getDateMois, $ajustVal);
                 $sendRapport('today', $getDate, $getDate, $ajustVal);
                 // dd('fin mois', $ajustVal, $periode, $getDate);
