@@ -75,42 +75,42 @@
     <tbody>
       @if (is_array($rapport['vente']) && array_key_exists('avant', $rapport['vente']))
           @foreach ($rapport['vente']['avant'] as $kV=>$vV)
-          @php
-            $restePaiementTrancheFcPT += (float)$vV->paiement->sortByDesc('created_at')->first()->solde * (float)$vV->updateTaux;
-          @endphp
-            @foreach ($vV->reservationProduit as $kP=>$vP )
-              <tr>
-                <td>
-                  {{$vP->reservation->code}} <br>
-                  {{$vP->reservation->created_at}}
-                </td>
-                <td>
-                  {{$vP->produit->marque->categorie->libele }} {{$vP->produit->marque->libele }} {{$vP->produit->libele }} 
-                </td>
-                <td>
-                  {{ $vP->duree }} 
-                </td>
-                <td>
-                  @php
-                      $recettePT +=(float)$vP->montant * (float)$vV->updateTaux;
-                  @endphp
-                @formaMille((float)$vV->updateTaux) Fc
-                </td>
-                <td>
-                  @formaMille((float)$vP->montant) {{ $vV->devise->libele }}
-                  <!-- {{$vV->updateTaux}}Fc -->
-                </td>
-                <td>
-                  @if($vV->user != null)
-                      {{$vV->user->name ." ".$vV->user->prenom}}
-                  @else
-                      Utilisateur Suspendu
-                  @endif
-                                    
-                </td>
-              </tr>
-            @endforeach
-        @endforeach 
+              @php
+                $restePaiementTrancheFcPT += (float)$vV->paiement->sortByDesc('created_at')->first()->solde * (float)$vV->updateTaux;
+              @endphp
+              @foreach ($vV->reservationProduit as $kP=>$vP )
+                <tr>
+                  <td>
+                    {{$vP->reservation->code}} <br>
+                    {{$vP->reservation->created_at}}
+                  </td>
+                  <td>
+                    {{$vP->produit->marque->categorie->libele }} {{$vP->produit->marque->libele }} {{$vP->produit->libele }} 
+                  </td>
+                  <td>
+                    {{ $vP->duree }} 
+                  </td>
+                  <td>
+                    @php
+                        $recettePT +=(float)$vP->montant * (float)$vV->updateTaux;
+                    @endphp
+                  @formaMille((float)$vV->updateTaux) Fc
+                  </td>
+                  <td>
+                    @formaMille((float)$vP->montant) {{ $vV->devise->libele }}
+                    <!-- {{$vV->updateTaux}}Fc -->
+                  </td>
+                  <td>
+                    @if($vV->user != null)
+                        {{$vV->user->name ." ".$vV->user->prenom}}
+                    @else
+                        Utilisateur Suspendu
+                    @endif
+                                      
+                  </td>
+                </tr>
+              @endforeach
+           @endforeach 
         <!-- debut -->
          
          <!-- fin -->
@@ -131,9 +131,9 @@
         </tr>
         @foreach ($rapport['vente']['apres'] as $kV=>$vV)
         
-          @php
-            $restePaiementTrancheFcDT += (float)$vV->paiement->sortByDesc('created_at')->first()->solde * (float)$vV->updateTaux;
-          @endphp
+            @php
+              $restePaiementTrancheFcDT += (float)$vV->paiement->sortByDesc('created_at')->first()->solde * (float)$vV->updateTaux;
+            @endphp
             @foreach ($vV->reservationProduit as $kP=>$vP )
               <tr>
                 <td>
@@ -345,5 +345,5 @@
 </body>
 </html>
 @php
-// die();
+die();
 @endphp
