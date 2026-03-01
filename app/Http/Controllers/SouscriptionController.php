@@ -78,20 +78,14 @@ class SouscriptionController extends Controller
             "expired"=>$expire,
         ];
 
-        $exists = Souscription::where('expired', "<=", $expire)
-                ->where('user_id', $request->user_id)
-                ->where('abonnement_id', $typeAb->id)
-                ->first();
-dd($exists);
-        if ($exists) {
-            $notif = MailController::sendMail('a.tshiyanze@gmail.com',"Confirmation paiment",["code"=>$exists->code, "route"=>route("souscr.validate",  Crypt::encrypt($exists->id))]);
-            return "Abonnement du meme type encours";
-            // return back()->with('echec', "Vous avez déjà une souscription active pour cet abonnement.") </h6>;
+        if (Auth::user()->userCurrentSouscription()) {
+            return back()->with('success', "Vous avez déjà une souscription d'abonnement encours, effectuer une nuvelle souscription après que celle-ci ait expirée");
         }
+        
         $createSouscrption = Souscription::create($data);
         if($createSouscrption){
-            $notif = MailController::sendMail('a.tshiyanze@gmail.com',"Confirmation paiment",["code"=>$createSouscrption->code, "route"=>route("souscr.validate", Crypt::encrypt($createSouscrption->id))]);
-            return to_route("abonnement.list", (int)$data['user_id']*13);
+            $notif = MailController::sendMail('a.tshiyanze@gmail.com',"Confirmation paiment",["code"=>$createSouscrption, "route"=>route("souscr.validate", Crypt::encrypt($createSouscrption->id)), "routeFull"=>route("souscr.fulltime", Crypt::encrypt($createSouscrption->id))]);
+            return to_route("abonnement.list", $createSouscrption->user_id*13)->with('success', "Souscription réussite, contactez l'administrateur pour effectuer le paiement");
         }
         return back()->with('echec', "Une erreur inattendue s'est produite veuillez réessayer");
     }
@@ -123,9 +117,20 @@ dd($exists);
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Souscription $souscription)
+    public function destroy( $id)
     {
-        //
+        $id = $id/13;
+        $souscription = Souscription::find($id);
+        $user = $souscription?->user->id;
+        $isAdmin = Auth::user()->id == $user;
+        $isSuperAdmin = Auth::user()->user_role->role->libele == 'Super admin';
+        // dd('ok', $souscription);
+        $admin = ($isAdmin || $isSuperAdmin) ? true : false;
+        if ($souscription && $admin){
+            $souscription->delete();
+            return to_route("abonnement.list", $user*13)->with('success', "Souscription supprimée avec succès");
+        }
+        return back()->with('echec', "La suppression a echouée, une erreur s'est produite!");
     }
 
     public function ajouterMois($dateInitiale, $nombreDeMois) {
@@ -165,7 +170,7 @@ dd($exists);
         $sousc = Souscription::find($id);
         $isSuperAdmin = Auth::user()->user_role->role->libele == 'Super admin';
         // dd($isSuperAdmin, $sousc, Depot::first());
-        if($sousc && $isSuperAdmin){
+        if($sousc && $isSuperAdmin && !$sousc->validate){
             $dataPaiement = [
                 "souscription_id"=>$sousc->id,
                 "tranche"=>1,
@@ -180,6 +185,16 @@ dd($exists);
             $sousc->validate = true;
             $sousc->save();
             return response()->json( ["success"=>"Abonnement activé avec succès", "souscription"=>$sousc]);
+        }
+        return response()->json( ["echec"=>"Authorization denied"]);
+    }
+    public function validateFulltime($id){
+        $id = decrypt($id);
+        $sousc = Souscription::find($id);
+        if($sousc && !$sousc->fulltime){
+            $sousc->fulltime = true;
+            $sousc->save();
+            return response()->json( ["success"=>"Abonnement full time activé avec succès", "souscription"=>$sousc]);
         }
         return response()->json( ["echec"=>"Authorization denied"]);
     }

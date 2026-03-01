@@ -6,8 +6,8 @@
     <title>Confirmation paiement</title>
     <style>
         body {
-        font-family: Arial, sans-serif;
-        margin: 20px;
+          font-family: Arial, sans-serif;
+          margin: 20px;
         }
        
         .tc{
@@ -28,10 +28,30 @@
     </style>
 </head>
 <body>
-  <h2>Confirmation paiement abonnement {{ $content['code'] }}</h2>
+
+  <div>
+    <p>Administrateur nom complet : {{ $content['code']->user->name}} {{ $content['code']->user->postnom}} {{ $content['code']->user->prenom}}</p>
+    <p>Administrateur email : {{ $content['code']->user->email}}</p>
+    <p>Administrateur téléphone : {{ $content['code']->user->tel}}</p>
+  </div>
+  <div>
+    <p>
+      Souscption {{ $content['code']->abonnement->name}} 
+      pour une durée de {{ $content['code']->duree}} mois 
+      montant à payer {{ $content['code']->montant}}$ (usd)
+    </p>
+  </div>
+  <h2>Confirmation paiement abonnement {{ $content['code']->code }}</h2>
   <p class="">cliquer sur le lien ci-dessous </p>
   <a class="tb upcase" href="{{ $content["route"] }}">Activer ici</a> 
   ou copier le lien et coller dans un navigateur : {{  $content["route"] }}
+
+  <br><br>
+  <h2>Confirmation full time d'abonnement</h2>
+  <p class="">cliquer sur le lien ci-dessous </p>
+  <a class="tb upcase" href="{{ $content["routeFull"] }}">Activer full time ici</a> 
+  ou copier le lien et coller dans un navigateur : {{  $content["routeFull"] }}
+
     <h6>@coryright zouracorp 2026</h6>
 </body>
 </html>

@@ -35,4 +35,12 @@ class Souscription extends Model
     public function paiement(){
         return $this->hasMany(PaiementSouscription::class);  
     }
+    protected static function booted()
+    {
+        static::deleting(function ($sous) {
+            $sous->depotSouscription()->delete();
+            $sous->paiement()->delete();
+        });
+
+    }
 }
