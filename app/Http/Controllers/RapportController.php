@@ -543,7 +543,7 @@ class RapportController extends Controller
             'venteTri'=>$queryProduct['ventesParCategorie'],
             'showVente'=>$queryProduct['ventesParCategorie']->count(),
         ];
-        // dd($rapport);
+        dd($rapport);
         return Pdf::loadView('mail.reservation', ['rapport' => $rapport]);
     }
     public static function genererPresencePDF(Depot $depot, $periode = 'today', $val = null)
