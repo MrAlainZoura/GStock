@@ -266,7 +266,8 @@
             <!-- Les marchandises vendue sont ni reprises ni échangées!<br> -->
             <!-- 1 mois de garentie et celle-ci n'inclut pas le display et chargeur! -->
         </p>
-        <p class="imprime"> Imprimer par {{Auth::user()->name ." ".Auth::user()->postnom ." ".Auth::user()->prenom}}</p>
+        <p class="imprime">Logiciel @copyright 2026 zouraCorp +243 812 995 373</p>
+        <!-- <p class="imprime"> Imprimer par {{Auth::user()->name ." ".Auth::user()->postnom ." ".Auth::user()->prenom}}</p> -->
     </div>
 </div>
 </body>
