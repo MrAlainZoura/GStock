@@ -1099,14 +1099,35 @@ class RapportController extends Controller
         if(in_array($periode, ['today','mois', 'annee'])){
             $ajustVal = self::getValVPeriode($periode, $val);
             $getDate = self::getDatePeriode($periode, $ajustVal,"_");
-            $pdf = ($table == "vente")
-                 ? self::genererPDF($getDepot   , $periode,$ajustVal) 
-                 : self::genererReservationPDF($getDepot   , $periode,$ajustVal);
+           switch($table){
+                case 'vente':
+                    $pdf = self::genererPDF($getDepot, $periode, $ajustVal);
+                    $pdfName = 'rapport_vente_'.$getDate."_$getDepot->libele" . '.pdf';
+                    break;
+
+                case 'presence':
+                    $pdf = self::genererPresencePDF($getDepot, $periode, $ajustVal);
+                    $pdfName = 'rapport_presence_'.$getDate."_$getDepot->libele" . '.pdf';
+                    break;
+
+                case 'reservation':
+                    $pdf = self::genererReservationPDF($getDepot, $periode, $ajustVal);
+                    $pdfName = 'rapport_reservation_'.$getDate."_$getDepot->libele" . '.pdf';
+                    break;
+
+                default:
+                    $pdf = self::genererPDF($getDepot, $periode, $ajustVal);
+                    $pdfName = 'rapport_vente_'.$getDate."_$getDepot->libele" . '.pdf';
+                    break;
+            }
+            // $pdf = ($table == "vente")
+            //      ? self::genererPDF($getDepot   , $periode,$ajustVal) 
+            //      : self::genererReservationPDF($getDepot   , $periode,$ajustVal);
            
             Log::info("memoire à la fin ". memory_get_usage(true). " octets");
-            $rapportDwl= ($table == "vente")? 'rapport_vente_'.$getDate."_$getDepot->libele" . '.pdf' : 'rapport_reservation_'.$getDate."_$getDepot->libele" . '.pdf';
+            // $rapportDwl= ($table == "vente")? 'rapport_vente_'.$getDate."_$getDepot->libele" . '.pdf' : 'rapport_reservation_'.$getDate."_$getDepot->libele" . '.pdf';
             
-           return ($table == "vente")? $pdf->download($rapportDwl)  : $pdf->download($rapportDwl);
+           return $pdf->download($pdfName);
         }
         return back()->with('echec', "Erreur, Intervalle invalide");
     }

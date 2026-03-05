@@ -205,8 +205,8 @@ class SouscriptionController extends Controller
         $sousc = Souscription::where('code', $request->code)->first();
         $depot = Depot::find($depot_id);
         if($sousc && $depot){
-            $checkAdmin = $sousc->id == $depot->user->id;
-            if($checkAdmin && $sousc->validate && !$sousc->used && (int)$sousc->progres > 0){
+            $checkAdmin = $sousc->user_id == $depot->user->id;
+            if($sousc->validate && !$sousc->used && (int)$sousc->progres > 0){
                 $checkAffectationAbonnement = DepotSouscription::where('souscription_id', $sousc->id)
                                             ->where('depot_id', $depot->id)
                                             ->exists();
