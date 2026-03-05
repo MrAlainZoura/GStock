@@ -25,9 +25,10 @@ class ApprovisionnementController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create($depot)
+    public function create($depot_id)
     {
-        $depot=Depot::where("libele",$depot)->first();
+        $id = $depot_id/13;
+        $depot=Depot::where("id",$id)->first();
         $user = auth()->user();
        // "produit.marque","produit.marque.categorie"
         $produit = ProduitDepot::where("depot_id",$depot->id)->with("produit.marque","produit.marque.categorie")->get();
@@ -86,9 +87,10 @@ class ApprovisionnementController extends Controller
     /**
      * Display the specified resource.
      */
-    public function showDepotAppro($depot)
+    public function showDepotAppro($depot_id)
     {
-        $depot=Depot::where("libele",$depot)->first();
+        $id =$depot_id/13;
+        $depot=Depot::where("id",$id)->first();
         $user = auth()->user();
         $appro = Approvisionnement::all()->count();
         return view("appro.index",compact("user","depot","appro"));
@@ -194,8 +196,40 @@ class ApprovisionnementController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Approvisionnement $approvisionnement)
+    public function destroy($approvisionnement)
     {
-        return back()->with('success',"Bientôt disponible"); 
+        $id = $approvisionnement/67;
+        $getAppro = Approvisionnement::find($id);
+        $depot_id = $getAppro->depot_id;
+        if($getAppro){
+
+            $soustraction = $getAppro->depot->produitDepot()->where('produit_id', $getAppro->produit_id)->first();
+            $soustraction->quantite -= $getAppro->quantite;
+            $soustraction->save();
+
+            $messageTransfert = null ;
+            if($getAppro->origine != null){
+
+                $transfert = Transfert::where("code", $getAppro->origine)->first();
+                $concerner = $transfert->produitTransfert()->where('produit_id', $getAppro->produit_id)->first();
+                
+                $restitution = $transfert->depot->produitDepot()->where('produit_id', $getAppro->produit_id)->first();
+                $restitution->quantite += $getAppro->quantite;
+                $restitution->save();
+                
+                if($transfert->produitTransfert->count() > 1){
+                    $concerner->delete();
+                    // dd("On restitut le stock avant de  supprimer que le produit concerné on appro", $concerner,$restitution, $transfert, $getAppro);
+                }else{
+                    $concerner->delete();
+                    $transfert->delete();
+                }
+                $messageTransfert ="y compris le transfert à l'origine";
+            }
+            $getAppro->delete();
+
+            return to_route('aproDepot',$depot_id*13)->with('success',"Approvisionnement supprimé avec succès $messageTransfert!"); 
+        }
+        return to_route('aproDepot',$depot_id*13)->with('echec',"Une erreur s'est produite, impossible de trouver l'approvisionnement."); 
     }
 }

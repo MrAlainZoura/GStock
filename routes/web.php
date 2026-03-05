@@ -44,13 +44,14 @@ Route::post('logout',[UserController::class, 'logout'])->name('logout')->middlew
 Route::put('update-password-user/{user}',[UserController::class, 'updataPass'])->name('updataPass')->middleware(AuthentifyMiddleware::class);
 Route::put('reset-password-user/{user}',[UserController::class, 'resetPass'])->name('resetPass')->middleware(AuthentifyMiddleware::class);
 
-Route::resource('user', UserController::class)->middleware(AuthentifyMiddleware::class);;
+Route::resource('user', UserController::class)->middleware(AuthentifyMiddleware::class);
 Route::get('approvisionnement/{depot}', [ApprovisionnementController::class,'showDepotAppro'])->name('aproDepot')->middleware( AuthentifyMiddleware::class);
 Route::get('approvisionnement/{depot}/create', [ApprovisionnementController::class,'create'])->name('approCreate')->middleware( AuthentifyMiddleware::class);
 Route::post('approvisionnement/{depot}/store', [ApprovisionnementController::class,'store'])->name('approStore')->middleware( AuthentifyMiddleware::class);
 Route::post('approvisionnement/{appro}/confirmation/{action}', [ApprovisionnementController::class,'confirm'])->name('approConfirm')->middleware( AuthentifyMiddleware::class);
 Route::get('approvisionnement/{appro}/show', [ApprovisionnementController::class,'show'])->name('approShow')->middleware( AuthentifyMiddleware::class);
 Route::get('approvisionnement/{appro}/edit', [ApprovisionnementController::class,'edit'])->name('approEdit')->middleware( AuthentifyMiddleware::class);
+Route::delete('approvisionnement/{appro}/delete', [ApprovisionnementController::class,'destroy'])->name('approDelete')->middleware( AuthentifyMiddleware::class);
 
 Route::get('transferts/{depot}/{id}', [TransfertController::class,'showDepotTrans'])->name('transDepot')->middleware( AuthentifyMiddleware::class);
 Route::get('transfert/{depot}/create/{id}', [TransfertController::class,'create'])->name('transCreate')->middleware( AuthentifyMiddleware::class);

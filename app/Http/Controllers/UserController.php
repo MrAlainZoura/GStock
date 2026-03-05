@@ -2,16 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Depot;
+use App\Models\DepotUser;
 use App\Models\Role;
 use App\Models\User;
-use App\Models\Depot;
 use App\Models\UserRole;
-use App\Models\DepotUser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
@@ -205,10 +206,18 @@ class UserController extends Controller
      */
     public function update(Request $request, string $user)
     {
+        $id =$user/652062511003;
+        $findUser = User::where('id', $id)->first();
+        
         $validateDate = Validator::make($request->all(),
         [
-            'name'=>'required',
-            'email'=>'required|email|max:255',
+                'name'=>'required',
+                'email' => [
+                'required',
+                'email',
+                'max:255',
+                Rule::unique('users')->ignore($findUser->id),
+            ],
             'image'=>'file|mimes:jpg,jpeg,png,gift,jfif',
             'genre'=>($request->genre)?'string':'',
             'naissance'=>($request->naissance)?'string':'',
@@ -224,8 +233,6 @@ class UserController extends Controller
         if($validateDate->fails()){
             return back()->with('echec',$validateDate->errors());
         }
-        $id =$user/652062511003;
-        $findUser = User::where('id', $id)->first();
         $image = $findUser->image;
 
         $dossier="users";

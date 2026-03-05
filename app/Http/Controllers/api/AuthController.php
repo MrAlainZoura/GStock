@@ -17,7 +17,7 @@ class AuthController extends Controller
         'depot',
         'depotUser.depot',
         'souscription',
-        'user_role'
+        'user_role.role'
     ];
     /**
      * Display a listing of the resource.
@@ -92,7 +92,7 @@ class AuthController extends Controller
         return response()->json([
             'user' => $user,
             'token' => $token,
-            // 'role_user'=>$user->user_role->role,
+            'role_user'=>$user->user_role->role,
             'token_type' => 'bearer',
             'expires_in' => JWTAuth::factory()->getTTL() * 60
         ]);
