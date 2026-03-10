@@ -18,7 +18,7 @@ $produitList = "";
 <div class="alert-success hidden" id="alert">
     @include('composant.alert_suc', ['message'=>"Impression encours... et Lien copié avec succes, coller le pour le partager!"])
 </div>
-<section class="bg-white py-10 sm:py-16">
+<section class="bg-white py-10 sm:py-16 flex items-center justify-center">
         <div class="mx-auto max-w-7xl px-6 lg:px-8">
             <div class="mx-auto max-w-2xl lg:mx-0">
                 <h2 class="text-4xl font-semibold tracking-tight text-pretty text-gray-900 sm:text-5xl">Vente {{$findVenteDetail->code}} Détails </h2>
@@ -99,9 +99,9 @@ $produitList = "";
             </div>
                 
             </div>
-            <div class="mx-auto mt-10 grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 border-t border-gray-200 pt-10 sm:mt-16 sm:pt-16 lg:mx-0 lg:max-w-none ">
+            <div class="mx-auto mt-10 w-full max-w-2xl grid grid-cols-1 gap-x-8 gap-y-16 border-t border-gray-200 pt-10 sm:mt-16 sm:pt-16 lg:mx-0 lg:max-w-none ">
             @if($findVenteDetail->compassassion->count() >0)
-                    <div class="relative max-w-md">
+                    <div class="relative w-full">
                         <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
                             <thead class="text-xs text-gray-700 uppercase bg-gray-100 dark:bg-gray-700 dark:text-gray-400">
                                 <tr>
@@ -155,7 +155,7 @@ $produitList = "";
                             </tr>
                             </tbody>
                             <tfoot>
-                                <tr class="font-semibold text-gray-900 dark:text-white">
+                                <tr class="font-semibold text-gray-900 dark:text-white border-t  border-gray-200">
                                     <th scope="row" class="px-4 py-3 text-base">Total</th>
                                     <td class="px-3 py-3">
                                       {{$quantite}}
@@ -209,7 +209,7 @@ $produitList = "";
                     </div>
             @else
 
-            <div class="relative max-w-md">
+            <div class="relative w-full">
                 <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
                     <thead class="text-xs text-gray-700 uppercase bg-gray-100 dark:bg-gray-700 dark:text-gray-400">
                         <tr>
@@ -245,7 +245,7 @@ $produitList = "";
                     @endforeach
                     </tbody>
                     <tfoot>
-                        <tr class="font-semibold text-gray-900 dark:text-white">
+                        <tr class="font-semibold text-gray-900 dark:text-white border border-gray-200">
                             <th scope="row" class="px-4 py-3 text-base">Total</th>
                             <td class="px-3 py-3">
                               {{$quantite}}
@@ -294,7 +294,7 @@ $produitList = "";
                         @endforeach  
                         @if(Auth::user()->user_role->role->libele =='Administrateur' || Auth::user()->user_role->role->libele=='Super admin')
                         
-                        <div class="grid grid-cols-4  py-5 text-sm text-gray-700 border-b border-gray-200 gap-x-3 dark:border-gray-700">
+                        <div class="flex itmes-center justify-center py-5 text-sm text-gray-700 border-b border-gray-200 gap-x-3 dark:border-gray-700">
                             
                             <button title="Supprimer"
                                 role="button"
@@ -303,7 +303,7 @@ $produitList = "";
                                 data-delete-route="{{route('venteDelete', 56745264509*$findVenteDetail->id)}}"
                                 data-modal-target="popup-modal"
                                 data-modal-toggle="popup-modal"
-                                class="delete-button flex items-center justify-center text-red-600 col-span-full py-2 px-2 ms-3 text-sm font-medium text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm items-center text-center">
+                                class="delete-button flex justify-center text-red-600 py-2 px-2 ms-3 text-sm font-medium text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm items-center text-center">
                                 <svg class="w-[26px] h-[26px] text-gray-800 text-white"
                                     aria-hidden="true"
                                     xmlns="http://www.w3.org/2000/svg"

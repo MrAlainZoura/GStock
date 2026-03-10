@@ -17,11 +17,11 @@ $qtProduit = count($findVenteDetail->reservationProduit);
 <div class="alert-success hidden" id="alert">
     @include('composant.alert_suc', ['message'=>"Impression encours... et Lien copié avec succes, coller le pour le partager!"])
 </div>
-<section class="bg-white py-10 sm:py-16">
+<section class="bg-white py-10 sm:py-16 flex items-center justify-center">
         <div class="mx-auto max-w-7xl px-6 lg:px-8">
             <div class="mx-auto max-w-2xl lg:mx-0">
-                <h2 class="text-4xl font-semibold tracking-tight text-pretty text-gray-900 sm:text-5xl">Reservation {{$findVenteDetail->code}} Détails </h2>
-                <p class="mt-2 text-lg/8 text-gray-600"> Description de la reservation : <br>
+                <h2 class="text-4xl font-semibold tracking-tight text-pretty text-gray-900 sm:text-5xl">Réservation {{$findVenteDetail->code}} Détails </h2>
+                <p class="mt-2 text-lg/8 text-gray-600"> Description de la réservation : <br>
                     Reservation numéro {{$findVenteDetail->code}} effectué par 
                     {{$user}} {{$postnom}} {{$prenom}}
                      pour le compte de {{$findVenteDetail->depot->libele}} en date du 
@@ -89,8 +89,8 @@ $qtProduit = count($findVenteDetail->reservationProduit);
             </div>
                 
             </div>
-            <div class="mx-auto mt-10 grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 border-t border-gray-200 pt-10 sm:mt-16 sm:pt-16 lg:mx-0 lg:max-w-none ">
-            <div class="relative max-w-md">
+            <div class="mx-auto mt-10 grid w-full grid-cols-1 gap-x-8 gap-y-16 border-t border-gray-200 pt-10 sm:mt-16 sm:pt-16 lg:mx-0 lg:max-w-none ">
+            <div class="relative w-full">
                 <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
                     <thead class="text-xs text-gray-700 uppercase bg-gray-100 dark:bg-gray-700 dark:text-gray-400">
                         <tr>
@@ -125,7 +125,7 @@ $qtProduit = count($findVenteDetail->reservationProduit);
                     @endforeach
                     </tbody>
                     <tfoot>
-                        <tr class="font-semibold text-gray-900 dark:text-white">
+                        <tr class="font-semibold text-gray-900 dark:text-white border border-t border-gray-200">
                             <th scope="row" class="px-4 py-3 text-base">Total</th>
                             <td class="px-3 py-3">
                               
