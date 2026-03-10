@@ -95,6 +95,8 @@ Route::prefix('reservation')->middleware(AuthentifyMiddleware::class)->group(fun
     Route::get('/{depot}/create', [ReservationController::class,'create'])->name('reservation.create');
     Route::get('/{reservation}/edit', [ReservationController::class,'edit'])->name('reservation.edit');
     Route::get('supprimer/all/{depot_id}', [ReservationController::class,'reservationTrashed'])->name('reservation.crash');
+    Route::put('/{resevation}/restore', [ReservationController::class,'restore'])->name('reservation.restore');
+    Route::delete('/{reservation}/delete-force', [ReservationController::class,'forcedelete'])->name('reservation.forcedelete');
     Route::delete('/{reservation}/delete', [ReservationController::class,'destroy'])->name('reservation.destroy');
 });
 

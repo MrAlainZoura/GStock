@@ -40,8 +40,8 @@ class Reservation extends Model
      protected static function booted()
     {
         static::forceDeleting(function ($reservation) {
-            $reservation->reservationProduit()->withTrashed()->forceDelete();
-            $reservation->paiement()->withTrashed()->forceDelete();
+            $reservation->reservationProduit()->delete();
+            $reservation->paiement()->delete();
         });
 
     }

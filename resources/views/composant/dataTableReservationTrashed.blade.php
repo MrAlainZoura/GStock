@@ -130,6 +130,38 @@
 
             <td>
                <!-- action -->
+                <div class="flex flex-wrap">
+                    <a title="Restorer cette réservation"
+                        href="{{route("admin.confirmDeleteItem", 
+                        ["id"=>$item->id*12,
+                        "message"=>"Réservaton déjà supprimée-{$item->deleted_at}-{$item->paiement->first()->net}{$item->devise->libele} ",
+                        "route"=>Crypt::encrypt("reservation.restore")])}}">
+                            <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+                            <svg width="26px" height="26px" viewBox="-20 -20 1040.00 1040.00" data-name="Layer 2" id="Layer_2" xmlns="http://www.w3.org/2000/svg" fill="#000000">
+                                <g id="SVGRepo_bgCarrier" stroke-width="0"/>
+                                <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"/>
+                                <g id="SVGRepo_iconCarrier">
+                                    <defs>
+                                        <style>.cls-1{fill:none;stroke:#020202;stroke-linecap:round;stroke-miterlimit:10;stroke-width:53;}</style>
+                                    </defs>
+                                    <path class="cls-1" d="M245.1,346.39c52-85.91,146.38-143.32,254.15-143.32,164,0,296.93,132.94,296.93,296.93,0,117.8-68.59,219.58-168,267.58"/>
+                                    <path class="cls-1" d="M203.82,529.92c15,149.94,141.54,267,295.43,267"/>
+                                    <line class="cls-1" x1="244.96" x2="244.96" y1="221.27" y2="346.39"/>
+                                    <line class="cls-1" x1="245.29" x2="369.28" y1="346.39" y2="346.39"/>
+                                    <line class="cls-1" x1="500" x2="500" y1="371.34" y2="498.86"/>
+                                    <line class="cls-1" x1="500.6" x2="585.98" y1="500" y2="594.72"/>
+                                </g>
+                            </svg>
+                    </a>
+                    <a title="Supprimer" role="button" href="{{route("admin.confirmDeleteItem", 
+            ["id"=>$item->id*12,
+                        "message"=>"Supprimer définitivement {$item->deleted_at}-{$item->paiement->first()->net}{$item->devise->libele}",
+                        "route"=>Crypt::encrypt("reservation.forcedelete")])}}">
+                        <svg class="w-[26px] h-[26px] text-red-600 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m15 9-6 6m0-6 6 6m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+                        </svg>
+                    </a>
+                </div>
             </td>
         </tr>
         @php

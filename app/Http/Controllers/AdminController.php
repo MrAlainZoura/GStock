@@ -158,7 +158,8 @@ class AdminController extends Controller
     {
         $action =Crypt::decrypt($route);
         $restore = false;
-        if($action=="restore"){
+        // dd($action);
+        if($action=="restore" || $action=="reservation.restore"){
             $restore = true;
         }
         $item = $message;

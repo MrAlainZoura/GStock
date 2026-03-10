@@ -332,7 +332,7 @@ class ReservationController extends Controller
         if($reservation){
             $depot = $reservation->depot;
             $reservation->restore();
-            return to_route('reservation.crash', [ "depot_id"=>$depot->id*12])->with("success","Vente restaurée avec succès !");
+            return to_route('reservation.crash', [ "depot_id"=>$depot->id*12])->with("success","Réservation restaurée avec succès !");
         }
         return back()->with('success', "Erreur, renseignement fourni incorrect !");
      }
@@ -368,7 +368,7 @@ class ReservationController extends Controller
         // dd($vente);
         if($reservation){
             $reservation->forceDelete();
-            return to_route('reservation.crash', ["depot_id"=>$depot->id*12])->with("success","Vente supprimée définitivement avec succès !");
+            return to_route('reservation.crash', ["depot_id"=>$depot->id*12])->with("success","Réservation supprimée définitivement avec succès !");
             // return back()->with('success', "Vente supprimée définitivement avec succès !");
         }
         return back()->with('echec', "Suppression échouée, erreur inattendue s'est produite!");
