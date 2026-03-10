@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ReservationPaiement;
 use App\Models\ResevationPaiement;
 use Illuminate\Http\Request;
 
@@ -26,9 +27,31 @@ class ResevationPaiementController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request, $reservation)
     {
-        //
+        $id = $reservation/89;
+        $getReservation = ReservationPaiement::where('reservation_id', $id)->latest()->first();
+        if(!$getReservation){
+            return back()->with('echec', "Impossible de trouver cette reservation");
+        }
+        $solde = $getReservation->solde;
+        $versement = $request->paiment;
+        $newSolde = $getReservation->solde - $versement;
+        $data = [
+            "reservation_id"=>$id,
+            "tranche"=>$getReservation->tranche+1,
+            "avance"=>$versement,
+            "solde"=>$newSolde,
+            "net"=>$getReservation->net,
+            "completed"=>($newSolde==0)?true:false
+        ];
+
+        if($versement <= $solde){
+            $createPaie= ReservationPaiement::create($data);
+            $routeParam = 56*$createPaie->reservation_id;
+            return to_route("reservation.show", $routeParam);
+        }
+        return back()->with('echec',"Une erreur s'est produite");    
     }
 
     /**

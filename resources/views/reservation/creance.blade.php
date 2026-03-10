@@ -114,7 +114,7 @@
         
                     <td>
                         @if($item['completed']!=true)
-                        <a data-modal-target="crud-modal" data-modal-toggle="crud-modal" devise="{{ $item['devise'] }}"  key="{{$vT}}" itemNet ="{{$item['net']}}" id="linkPaie" href="{{route('creanceStore', $key*8943)}}" class="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-teal-300 to-lime-300 group-hover:from-teal-300 group-hover:to-lime-300 dark:text-white dark:hover:text-gray-900 focus:ring-4 focus:outline-none focus:ring-lime-200 dark:focus:ring-lime-800">
+                        <a data-modal-target="crud-modal" data-modal-toggle="crud-modal" devise="{{ $item['devise'] }}"  key="{{$vT}}" itemNet ="{{$item['net']}}" id="linkPaie" href="{{route('reserPaieStore', $key*89)}}" class="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-teal-300 to-lime-300 group-hover:from-teal-300 group-hover:to-lime-300 dark:text-white dark:hover:text-gray-900 focus:ring-4 focus:outline-none focus:ring-lime-200 dark:focus:ring-lime-800">
                             <span class="flex relative p-1 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-transparent group-hover:dark:bg-transparent">
                                 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
                                 <!-- Uploaded to: SVG Repo, www.svgrepo.com, Transformed by: SVG Repo Mixer Tools -->

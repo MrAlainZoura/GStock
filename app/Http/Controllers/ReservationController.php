@@ -226,7 +226,7 @@ class ReservationController extends Controller
                 // dd($affectation,"pas d'acces dans ce depot");
                 return to_route('dashboard')->with('echec',"Vous n'avez pas accès à ce depot!"); 
             }
-            // dd($detailVente->venteProduit[0]->produit->image, $detailVente->taux, $detailVente->devise);
+            // dd($detailVente->reservationProduit[0]->produit->image, $detailVente->taux, $detailVente->devise);
             return view('reservation.show', compact('detailVente')) ;
         }
         if($userRole === $roleAutorises[0]){
@@ -242,6 +242,51 @@ class ReservationController extends Controller
         if($userRole === $roleAutorises[1]){
             return view('reservation.show', compact('detailVente')) ;
         }   
+    }
+
+     public function creance($depotId){
+        // dd($depot, $id, "creance");
+        // if(session('depot') === null){
+        //     return to_route('dashboard');
+        // }
+        $id = $depotId/13;
+
+        $depot = Depot::where('id', $id)->first();
+        $depotId = $depot->id;
+        $depotCreance = Reservation::with(['client', 'reservationProduit']) 
+                        ->whereHas('paiement', function ($query) {
+                            $query->where('completed', false);
+                        })
+                        ->where('depot_id', $depotId)
+                        ->get();
+        $tabSyntese=[];
+        foreach($depotCreance as $k=>$v){
+            if(!array_key_exists($v->vente_id, $tabSyntese)){
+                foreach($v->reservationProduit as $c=>$val){
+                    $prod[] = $val->produit->marque->libele.' '.$val->produit->libele;
+                }
+                foreach($v->paiement as $cl=>$vl){
+                    $tranche[]=$vl->avance. " - ".$vl->solde;
+                }
+                $dernierVersement = count($v->paiement)-1;
+                $completed = $v->paiement[$dernierVersement]->completed;
+                $tabSyntese[$v->id] = [
+                    'vendeur'=>$v->user->name." ".$v->user->postnom." ".$v->user->prenom,
+                    'client'=>['nom'=>$v->client->name.' '.$v->client->prenom.' '.$v->client->postnom,'tel'=> $v->client->tel,'date'=> $v->created_at] ,
+                    'prod'=>$prod, 
+                    'tranche'=>$tranche, 
+                    'net'=>$v->paiement[0]->net,
+                    'completed'=>$completed,
+                    'devise'=>$v->devise->libele
+                ];
+                $prod=[];
+                $tranche=[];
+            }
+    
+        }
+        $tabSyntese= array_reverse($tabSyntese, true);
+        // dd($tabSyntese, 'ok');
+        return view('reservation.creance', compact('tabSyntese',"depot"));
     }
 
     /**
@@ -263,10 +308,71 @@ class ReservationController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Reservation $resevation)
+    public function destroy($resevation)
     {
-        return back()->with( 'success',"Bientot disponible");
+        if(!in_array(Auth::user()->user_role->role->libele,  ['Administrateur', 'Super admin'])){
+            return back()->with("echec","Vous ne disposez pas de droit necessaire pour effectuer cette action");
+        }
+        $delete = Reservation::find($resevation);
+        if($delete){
+            $depotId = $delete->depot_id;
+            $delete->delete();
+            return to_route('reservation.list',$depotId*13)->with( 'success',"Réservation supprimée avec succès");
+        }
+        return back()->with( 'echec',"Impossible de trouver cette réservation, réessayer plus tard!");
     }
+
+     public function restore($reservationId){
+
+        if(!in_array(Auth::user()->user_role->role->libele,  ['Administrateur', 'Super admin'])){
+            return back()->with("echec","Vous ne disposez pas de droit necessaire pour effectuer cette action");
+        }
+        $id = $reservationId/12;
+        $reservation = Reservation::with(['reservationProduit', 'paiement'])->onlyTrashed()->find($id);
+        if($reservation){
+            $depot = $reservation->depot;
+            $reservation->restore();
+            return to_route('reservation.crash', [ "depot_id"=>$depot->id*12])->with("success","Réservation restaurée avec succès !");
+        }
+        return back()->with('success', "Erreur, renseignement fourni incorrect !");
+     }
+
+     public function reservationTrashed($depot){
+        // dd($depot/12);
+        if(!in_array(Auth::user()->user_role->role->libele,  ['Administrateur', 'Super admin'])){
+            return back()->with("echec","Vous ne disposez pas de droit necessaire pour effectuer cette action");
+        }
+        $depot_id = $depot/12;
+        $depot= Depot::where('id', $depot_id)->first();
+        if($depot){
+            // dd($depot->vente, $depot->devise);
+           $vente= Reservation::where('depot_id', $depot->id)
+           ->onlyTrashed()
+           ->orderBy('deleted_at', 'desc')
+           ->with([
+                'reservationProduit',
+                'paiement'
+            ])->get();
+            return view('reservation.trashed', compact('depot', 'vente')) ;
+        }else{
+            return back()->with("echec","Erreur demande introuvable");
+        }
+     }
+     public function forcedelete($reservationId){
+        if(!in_array(Auth::user()->user_role->role->libele,  ['Administrateur', 'Super admin'])){
+            return back()->with("echec","Vous ne disposez pas de droit necessaire pour effectuer cette action");
+        }
+        $id = $reservationId/12;
+        $reservation = Reservation::onlyTrashed()->find($id);
+        $depot= $reservation->depot;
+        // dd($vente);
+        if($reservation){
+            $reservation->forceDelete();
+            return to_route('reservation.crash', ["depot_id"=>$depot->id*12])->with("success","Réservation supprimée définitivement avec succès !");
+            // return back()->with('success', "Vente supprimée définitivement avec succès !");
+        }
+        return back()->with('echec', "Suppression échouée, erreur inattendue s'est produite!");
+     }
 
      public function initialNameAdmin(String $name=""){
         $name = ($name==null) ? "abcdefghijklmnopqrstuvwxyz" : $name;
