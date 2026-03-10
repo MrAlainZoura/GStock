@@ -19,6 +19,7 @@ use App\Http\Controllers\ApprovisionnementController;
 use App\Http\Controllers\SouscriptionController;
 use App\Http\Controllers\PresenceController;
 use App\Http\Controllers\ReservationController;
+use App\Http\Controllers\ResevationPaiementController;
 
 // Route::get('/', function () {
 //     return view('home');
@@ -90,9 +91,9 @@ Route::prefix('reservation')->middleware(AuthentifyMiddleware::class)->group(fun
     Route::post('/', [ReservationController::class,'store'])->name('reservation.store');
     Route::get('{reservation}/detail', [ReservationController::class,'show'])->name('reservation.show');
     Route::get('/list/{depot}/{tranche?}', [ReservationController::class,'index'])->name('reservation.list');
+    Route::get('/creance/{depotId}/list', [ReservationController::class,'creance'])->name('reservation.creance');
     Route::get('/{depot}/create', [ReservationController::class,'create'])->name('reservation.create');
     Route::get('/{reservation}/edit', [ReservationController::class,'edit'])->name('reservation.edit');
-    // Route::get('annuel/{depot}/list', [ReservationController::class,'presenceAnnuel'])->name('reservation.annee');
     Route::delete('/{reservation}/delete', [ReservationController::class,'destroy'])->name('reservation.destroy');
 });
 
@@ -129,6 +130,7 @@ Route::post('import_produit',[ ProduitController::class, 'importProduitExcel'])-
 Route::get('export_produit/{depot}',[ ProduitController::class, 'exportProduitExcel'])->name('export_prod_excel')->middleware(AuthentifyMiddleware::class);
 Route::get('vente/creances/{depot}/{depot_id}', [PaiementController::class,'creance'])->name('creanceDepot')->middleware( AuthentifyMiddleware::class);
 Route::post('vente/creances/{vente}', [PaiementController::class,'store'])->name('creanceStore')->middleware( AuthentifyMiddleware::class);
+Route::post('reservation/creances/{reservation}', [ResevationPaiementController::class,'store'])->name('reserPaieStore')->middleware( AuthentifyMiddleware::class);
 Route::resource('paiement',PaiementController::class)->middleware(AuthentifyMiddleware::class);
 Route::resource('depot', DepotController::class)->middleware(AuthentifyMiddleware::class);
 Route::resource('cat-pro', CategorieController::class)->middleware(AuthentifyMiddleware::class);

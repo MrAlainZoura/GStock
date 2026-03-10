@@ -226,7 +226,7 @@ class ReservationController extends Controller
                 // dd($affectation,"pas d'acces dans ce depot");
                 return to_route('dashboard')->with('echec',"Vous n'avez pas accès à ce depot!"); 
             }
-            // dd($detailVente->venteProduit[0]->produit->image, $detailVente->taux, $detailVente->devise);
+            // dd($detailVente->reservationProduit[0]->produit->image, $detailVente->taux, $detailVente->devise);
             return view('reservation.show', compact('detailVente')) ;
         }
         if($userRole === $roleAutorises[0]){
@@ -242,6 +242,51 @@ class ReservationController extends Controller
         if($userRole === $roleAutorises[1]){
             return view('reservation.show', compact('detailVente')) ;
         }   
+    }
+
+     public function creance($depotId){
+        // dd($depot, $id, "creance");
+        // if(session('depot') === null){
+        //     return to_route('dashboard');
+        // }
+        $id = $depotId/13;
+
+        $depot = Depot::where('id', $id)->first();
+        $depotId = $depot->id;
+        $depotCreance = Reservation::with(['client', 'reservationProduit']) 
+                        ->whereHas('paiement', function ($query) {
+                            $query->where('completed', false);
+                        })
+                        ->where('depot_id', $depotId)
+                        ->get();
+        $tabSyntese=[];
+        foreach($depotCreance as $k=>$v){
+            if(!array_key_exists($v->vente_id, $tabSyntese)){
+                foreach($v->reservationProduit as $c=>$val){
+                    $prod[] = $val->produit->marque->libele.' '.$val->produit->libele;
+                }
+                foreach($v->paiement as $cl=>$vl){
+                    $tranche[]=$vl->avance. " - ".$vl->solde;
+                }
+                $dernierVersement = count($v->paiement)-1;
+                $completed = $v->paiement[$dernierVersement]->completed;
+                $tabSyntese[$v->id] = [
+                    'vendeur'=>$v->user->name." ".$v->user->postnom." ".$v->user->prenom,
+                    'client'=>['nom'=>$v->client->name.' '.$v->client->prenom.' '.$v->client->postnom,'tel'=> $v->client->tel,'date'=> $v->created_at] ,
+                    'prod'=>$prod, 
+                    'tranche'=>$tranche, 
+                    'net'=>$v->paiement[0]->net,
+                    'completed'=>$completed,
+                    'devise'=>$v->devise->libele
+                ];
+                $prod=[];
+                $tranche=[];
+            }
+    
+        }
+        $tabSyntese= array_reverse($tabSyntese, true);
+        // dd($tabSyntese, 'ok');
+        return view('reservation.creance', compact('tabSyntese',"depot"));
     }
 
     /**
