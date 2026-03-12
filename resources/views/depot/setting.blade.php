@@ -213,7 +213,11 @@
                   </svg>
                   <span class="sr-only">Info</span>
                   <div class="ms-3 text-sm font-medium">
-                      L'abonnement {{ depot($depotData->id)->getActiveSouscription()->souscription()->first()->abonnement->name }} de << {{ $depotData->type }} {{ $depotData->libele }} >> Expire le {{ depot($depotData->id)->getActiveSouscription()->souscription()->first()->expired }} à 00h00, penser à renouveller à cette date !
+                    @if ( depot($depotData->id)->getActiveSouscription())
+                    L'abonnement {{ depot($depotData->id)->getActiveSouscription()->souscription()->first()->abonnement->name }} de << {{ $depotData->type }} {{ $depotData->libele }} >> Expire le {{ depot($depotData->id)->getActiveSouscription()->souscription()->first()->expired }} à 00h00, penser à renouveller à cette date !
+                    @else
+                    PERIODE D'ESSAIE EXIPER DANS 5 JOURS
+                    @endif
                   </div>
               </div>
             </div>

@@ -71,7 +71,7 @@ class Depot extends Model
     public function hasNewAdmin()
     {
         $user = $this->user;
-        return $user && $user->created_at->between(now()->subDays(10), now());
+        return $user && $user->created_at->between(now()->subDays(5), now());
     }
 
 
