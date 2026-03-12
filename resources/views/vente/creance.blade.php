@@ -210,7 +210,7 @@
             const dataTable = new simpleDatatables.DataTable("#search-table", {
                 searchable: true,
                 paging: true,
-                perPage: 5,
+                perPage: 20,
                 perPageSelect: [5, 10, 15, 20, 25, 50,100, 200, 300, 400, 500],
                 sortable: true
             });
