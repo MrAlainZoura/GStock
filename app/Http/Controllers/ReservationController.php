@@ -2,21 +2,22 @@
 
 namespace App\Http\Controllers;
 
-use Carbon\Carbon;
-use App\Models\Depot;
-use App\Models\Client;
-use App\Models\Devise;
 use App\Models\Categorie;
-use App\Models\Reservation;
+use App\Models\Client;
+use App\Models\Depot;
+use App\Models\Devise;
+use App\Models\Produit;
 use App\Models\ProduitDepot;
-use Illuminate\Http\Request;
-use function PHPSTORM_META\type;
-use App\Models\ReservationProduit;
-
+use App\Models\Reservation;
 use App\Models\ReservationPaiement;
+use App\Models\ReservationProduit;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+
+use function PHPSTORM_META\type;
 
 class ReservationController extends Controller
 {
@@ -87,9 +88,19 @@ class ReservationController extends Controller
         $netPayer = 0;
         foreach($request->reservations as $id => $reservation){
             $netPayer += $reservation['montant'];
+            $newDebut = Carbon::parse($reservation['startAt']);
+            $checkDateDebut = $newDebut >= Carbon::now()->subMinute(10);
+            if(!$checkDateDebut){
+                return back()->with(
+                    'echec',
+                    "La date de début " . Carbon::parse($newDebut)->format('d/m/Y H:i') .
+                           " ne peut pas être fixée dans le passé. L'heure actuelle est " . Carbon::now()->format('d/m/Y H:i:s')
+                );
+            }
+            dd($checkDateDebut);
             $booked = self::checkInterval($reservation['startAt'],$reservation['endAt'], $id);
            if($booked['disponible']){
-                return back()->with('echec', $booked['data'] ." sera disponible apres ".$booked['heure']);
+                return back()->with('echec', $booked['data'] ." ne sera pas disponible dans cet intervalle de ".$booked['heure']);
            } 
         }
 
@@ -382,25 +393,38 @@ class ReservationController extends Controller
     }
 
     public static function checkInterval($newDebut, $newFin, $id ){
-        $reservation = ReservationProduit::where(function ($query) use ($newDebut, $newFin) {
-                        $query->whereBetween('debut', [$newDebut, $newFin])
-                              ->orWhereBetween('fin', [$newDebut, $newFin])
-                              ->orWhere(function ($q) use ($newDebut, $newFin) {
-                                  $q->where('debut', '<=', $newDebut)
-                                    ->where('fin', '>=', $newFin);
-                              });
-                    })
-                    ->whereHas( "reservation")
-                    ->where( 'produit_id', $id)
-                    ->orderBy('fin', 'asc') // la plus proche qui se termine
-                    ->first();
 
-        if ($reservation) {
-            $disponibleApres = $reservation->fin;
+        $newDebut = Carbon::parse($newDebut);
+        $newFin   = Carbon::parse($newFin);        
+
+        $reservation = Reservation::whereHas('reservationProduit', function ($query) use ($newDebut, $newFin, $id) {
+            $query->where(function ($q) use ($newDebut, $newFin) {
+                $q->whereBetween('debut', [$newDebut, $newFin])   // début tombe dans l’intervalle
+                ->orWhereBetween('fin', [$newDebut, $newFin])   // fin tombe dans l’intervalle
+                ->orWhere(function ($sub) use ($newDebut, $newFin) {
+                    $sub->where('debut', '<=', $newDebut)       // intervalle existant englobe totalement le nouveau
+                        ->where('fin', '>=', $newFin);
+                });
+            })
+            ->where('produit_id', $id);
+        })
+        ->orderBy('fin', 'asc')
+        ->first();
+        $produit = Produit::find($id);
+        
+        $cat = $produit ?  $produit->marque->categorie->libele : null;
+        $marque = $produit ? $produit->marque->libele : null;
+        // (strtoupper($cat) == 'CHAMBRE'
+        // || !in_array(strtoupper($marque), ['SPORT', 'CONFERENCE', 'GYM','COURS'])
+        // )
+        if ($reservation &&  strtoupper($cat) == 'CHAMBRE')
+        {
+            $disponibleApres = $reservation->reservationProduit->first()->fin;
+            $disponibleAvant = $reservation->reservationProduit->first()->debut;
             return [
-                'heure' =>Carbon::parse( $disponibleApres)->format('Y-m-d H:i:s'),
+                'heure' =>Carbon::parse( $disponibleAvant)->format('Y-m-d H:i:s') .' - '. Carbon::parse( $disponibleApres)->format('Y-m-d H:i:s'),
                 'disponible' => true,
-                'data' => "{$reservation->produit->libele} ({$reservation->produit->marque->libele})"
+                'data' => "{$reservation->reservationProduit->first()->produit->libele} ({$reservation->reservationProduit->first()->produit->marque->libele})"
             ];
         }
         return [

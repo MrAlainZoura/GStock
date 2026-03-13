@@ -7,6 +7,7 @@ enum DepotType: string {
     case Bar = 'Bar';
     case BoiteDeNuit = 'Boite de nuit';
     case Boutique = 'Boutique';
+    case Coiffure = 'Coiffure';
     case Entrepot = 'Entrepot';
     case Hotel = 'Hotel';
     case Restaurant = 'Restaurant';
@@ -24,6 +25,7 @@ enum DepotType: string {
             self::BoiteDeNuit => 'Boite de nuit',
             self::Boutique => 'Boutique',
             self::Entrepot => 'Entrepôt',
+            self::Coiffure => 'Coiffure',
             self::Hotel => 'Hôtel',
             self::Restaurant => 'Restaurant',
             self::SalleDeSport => 'Salle de Sport',

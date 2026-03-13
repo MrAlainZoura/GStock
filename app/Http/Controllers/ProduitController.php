@@ -231,7 +231,7 @@ class ProduitController extends Controller
                         // dd($findProdExist, $dataProduit);
                         ($findProdExist!=null)?$produitId=$findProdExist->id:$produitId = Produit::firstOrcreate($dataProduit)->id;
                         
-                            if($v['quantite']!= null){
+                            if($v['quantite']!= null && (int)$v['quantite'] > 0){
                                 $dataApro = [
                                     'user_id'=>auth()->user()->id,
                                     'depot_id'=>$request->depot_id,
