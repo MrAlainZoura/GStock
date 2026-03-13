@@ -204,31 +204,53 @@ class ApprovisionnementController extends Controller
         if($getAppro){
 
             $soustraction = $getAppro->depot->produitDepot()->where('produit_id', $getAppro->produit_id)->first();
-            $soustraction->quantite -= $getAppro->quantite;
+            if( $soustraction->quantite >= $getAppro->quantite){
+                $differnceQTE = $soustraction->quantite -  $getAppro->quantite;
+                //on peut tout effacer et restituer à l'origine
+                $positifDIFF = true;
+            }else{
+                $differnceQTE = $soustraction->quantite;
+                $getAppro->quantite -=$differnceQTE;
+                $getAppro->save();
+                $positifDIFF = false;
+                //on restitue seulement ce qui reste on grade tout on change de quantite
+            }
+            $soustraction->quantite -= $differnceQTE;
+            // ($soustraction->quantite < 0 )
+            //     ? $soustraction->quantite = 0
+            //     : null;
             $soustraction->save();
 
             $messageTransfert = null ;
+           
             if($getAppro->origine != null){
 
                 $transfert = Transfert::where("code", $getAppro->origine)->first();
                 $concerner = $transfert->produitTransfert()->where('produit_id', $getAppro->produit_id)->first();
                 
                 $restitution = $transfert->depot->produitDepot()->where('produit_id', $getAppro->produit_id)->first();
-                $restitution->quantite += $getAppro->quantite;
+                $restitution->quantite += $differnceQTE;
+                // $restitution->quantite += $getAppro->quantite;
                 $restitution->save();
-                
-                if($transfert->produitTransfert->count() > 1){
-                    $concerner->delete();
-                    // dd("On restitut le stock avant de  supprimer que le produit concerné on appro", $concerner,$restitution, $transfert, $getAppro);
-                }else{
-                    $concerner->delete();
-                    $transfert->delete();
-                }
+                 if($positifDIFF){
+                     if($transfert->produitTransfert->count() > 1){
+                         $concerner->delete();
+                         // dd("On restitut le stock avant de  supprimer que le produit concerné on appro", $concerner,$restitution, $transfert, $getAppro);
+                     }else{
+                         $concerner->delete();
+                         $transfert->delete();
+                     }
+                 }else{
+                    $concerner->quantite -=$differnceQTE;
+                    $concerner->save();
+                 }
                 $messageTransfert ="y compris le transfert à l'origine";
             }
-            $getAppro->delete();
+            $positifDIFF ? $getAppro->delete() : null;
+            $positifDIFF ? $message = "Approvisionnement supprimé avec succès $messageTransfert!"
+                         : $message = "Approvisionnement mis à jour à la place de suppression car la quantité actuelle est inférieure à la quantité de l'approvisionnement";
 
-            return to_route('aproDepot',$depot_id*13)->with('success',"Approvisionnement supprimé avec succès $messageTransfert!"); 
+            return to_route('aproDepot',$depot_id*13)->with('success',$message); 
         }
         return to_route('aproDepot',$depot_id*13)->with('echec',"Une erreur s'est produite, impossible de trouver l'approvisionnement."); 
     }

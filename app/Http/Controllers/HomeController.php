@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Depot;
 use App\Enum\DepotType;
 use App\Models\Produit;
+use App\Models\ProduitDepot;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -13,6 +14,7 @@ class HomeController extends Controller
         //depot
         Depot::where('type',"")->update(['type'=>"Shop"]);
         Produit::where('unite',"")->update(['unite'=>"pc"]);
+        ProduitDepot::where('quantite',"<",0)->update(['quantite'=>0]);
         $depot = Depot::latest()->get();
         $depotType = DepotType::cases();
         $user = auth()->user();
