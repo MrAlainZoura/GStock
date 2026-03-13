@@ -390,6 +390,7 @@ class ReservationController extends Controller
                                     ->where('fin', '>=', $newFin);
                               });
                     })
+                    ->whereHas( "reservation")
                     ->where( 'produit_id', $id)
                     ->orderBy('fin', 'asc') // la plus proche qui se termine
                     ->first();

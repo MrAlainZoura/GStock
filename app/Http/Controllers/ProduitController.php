@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use App\Exports\ProduitExport;
 use App\Imports\ProduitImport;
 use App\Models\Approvisionnement;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -156,7 +157,7 @@ class ProduitController extends Controller
     }
 
     public function importProduitExcel(Request $request){
-        // dd($request->all());
+        // dd(Approvisionnement::whereDate('created_at',Carbon::now())->delete());
         $array = Excel::toArray(new ProduitImport, $request->file('prodExcel'));
         $modelExcel =  ["libele" => "",
                         "marque" => "",
@@ -243,7 +244,7 @@ class ProduitController extends Controller
                             }
                         $dataProD = ['depot_id'=>$request->depot_id,
                                     'produit_id'=>$produitId,
-                                    'quantite'=>$v['quantite']
+                                    'quantite'=>(int) $v['quantite'] 
                                 ];
                         $getProdDepot = ProduitDepot::where('produit_id', $produitId)
                             ->where('depot_id', $request->depot_id)
