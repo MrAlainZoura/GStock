@@ -49,7 +49,7 @@
 </head>
 <body>
     @php
-      $depotLibele = $rapport['depot']->libele;
+       $depotLibele = $rapport['depot']->type.' '. $rapport['depot']->libele;
        $numerotation = 1;
     @endphp
   <h2>Rapport {{ $rapport['periode'] }}  {{ $depotLibele }} </h2>

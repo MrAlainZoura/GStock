@@ -13,7 +13,7 @@
     </div>
     @endif
     <div class="alert-success">
-      @include('composant.alert_suc', ['message'=>"Vous effectuer cette vente pour le compte de ".$depot->libele])
+      @include('composant.alert_suc', ['message'=>"Vous effectuer cette vente pour le compte de (d') ".$depot->type." ".$depot->libele])
     </div>
       <div class="alert-echec-submit hidden" id="submitErreur">
           @include('composant.alert_echec', ['message'=>"Actualiser la page et réessayer si c'était par erreur que vous avez cliqué sur Ajouter"])

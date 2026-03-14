@@ -13,7 +13,7 @@
     </div>
     @endif
     <div class="alert-success">
-      @include('composant.alert_suc', ['message'=>"Vous effectuer cette reservation pour le compte de ".$depot->libele])
+      @include('composant.alert_suc', ['message'=>"Vous effectuer cette réservation pour le compte de ".$depot->libele." ".$depot->type])
     </div>
       <div class="alert-echec-submit hidden" id="submitErreur">
           @include('composant.alert_echec', ['message'=>"Actualiser la page et réessayer si c'était par erreur que vous avez cliqué sur Ajouter"])
@@ -34,7 +34,7 @@
         <h3 class="text-lg font-medium">Erreur, réservation impossible</h3>
       </div>
       <div class="mt-2 mb-4 text-sm">
-          Veuillez au moins choisir un produit pour effectuer cette vente, sinon elle n'aura pas de sens!
+          Veuillez au moins choisir un produit pour effectuer cette résevation, sinon elle n'aura pas de sens!
       </div>
       <div class="flex item-center justify-center">
         <button type="button" onclick="alertErreurProduitSend('hide')" class="text-red-800 bg-transparent border border-red-800 hover:bg-red-900 hover:text-white focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-xs px-3 py-1.5 text-center dark:hover:bg-red-600 dark:border-red-600 dark:text-red-500 dark:hover:text-white dark:focus:ring-red-800">

@@ -21,7 +21,7 @@
 
     <section class="p-10 gap-5 w-full">
         <div class="py-4 px-2 mx-auto max-w-screen-xl text-left lg:py-4">
-            <h1 class="mb-4 text-2xl font-extrabold tracking-tight leading-none text-gray-900 md:text-3xl lg:text-4xl dark:text-white">Rapport Annuel  {{session('depot')}} {{ $year }} </h1>
+            <h1 class="mb-4 text-2xl font-extrabold tracking-tight leading-none text-gray-900 md:text-3xl lg:text-4xl dark:text-white">Rapport Annuel {{ $depot->type }}  {{ $depot->libele}} {{ $year }} </h1>
         </div>
         <div class="flex justify-end m-5 gap-4">
             <div class="flex items-center">

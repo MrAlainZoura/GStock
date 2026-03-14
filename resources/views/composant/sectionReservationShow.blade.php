@@ -24,7 +24,7 @@ $qtProduit = count($findVenteDetail->reservationProduit);
                 <p class="mt-2 text-lg/8 text-gray-600"> Description de la réservation : <br>
                     Reservation numéro {{$findVenteDetail->code}} effectué par 
                     {{$user}} {{$postnom}} {{$prenom}}
-                     pour le compte de {{$findVenteDetail->depot->libele}} en date du 
+                     pour le compte de (d') {{$findVenteDetail->depot->type}} {{$findVenteDetail->depot->libele}} en date du 
                      {{$findVenteDetail->created_at}} au client {{$findVenteDetail->client->name}} {{$findVenteDetail->client->prenom}} qui a reservé 
                      {{$qtProduit}}
                      service{{ ($qtProduit > 1)?"s":""}} voir le tableau en bas 
