@@ -32,13 +32,18 @@ class PaiementController extends Controller
      */
     public function store(Request $request, $vente)
     {
-        $id = $vente/8943;
+        $id = $vente;
         $getVente = Paiement::where('vente_id', $id)->latest()->first();
+        
         if(!$getVente){
             return back()->with('echec', "Impossible de trouver cette vente");
         }
+        $cdfPrime = $getVente->vente->depot->use_cdf;
+        $taux = $getVente->vente->updateTaux;
         $solde = $getVente->solde;
-        $versement = $request->paiment;
+        $versement = ($cdfPrime) 
+            ? $request->paiment 
+            : $request->paiment * $taux;
         $newSolde = $getVente->solde - $versement;
         $data = [
             "vente_id"=>$id,
@@ -46,9 +51,8 @@ class PaiementController extends Controller
             "avance"=>$versement,
             "solde"=>$newSolde,
             "net"=>$getVente->net,
-            "completed"=>($newSolde==0)?true:false
+            "completed"=>($newSolde == 0)? true : false
         ];
-
         if($versement <= $solde){
             $createPaie= Paiement::create($data);
             $routeParam = 56745264509*$createPaie->vente_id;
@@ -112,7 +116,9 @@ class PaiementController extends Controller
                     $prod[] = $val->produit->marque->libele.' '.$val->produit->libele;
                 }
                 foreach($v->paiement as $cl=>$vl){
-                    $tranche[]=$vl->avance. " - ".$vl->solde;
+                    $tranche[]=($depot->use_cdf) 
+                        ? $vl->avance. " - ".$vl->solde 
+                        : $vl->avance/$v->updateTaux ." - ".$vl->solde/$v->updateTaux;
                 }
                 $dernierVersement = count($v->paiement)-1;
                 $completed = $v->paiement[$dernierVersement]->completed;
@@ -121,9 +127,10 @@ class PaiementController extends Controller
                     'client'=>['nom'=>$v->client->name.' '.$v->client->prenom.' '.$v->client->postnom,'tel'=> $v->client->tel,'date'=> $v->created_at] ,
                     'prod'=>$prod, 
                     'tranche'=>$tranche, 
-                    'net'=>$v->paiement[0]->net,
+                    'net'=>($depot->use_cdf)? $v->paiement[0]->net : $v->paiement[0]->net/$v->updateTaux,
                     'completed'=>$completed,
-                    'devise'=>$v->devise->libele
+                    'devise'=>($depot->use_cdf)? "cdf" : $v->devise->libele,
+                    'taux'=>$v->updateTaux
                 ];
                 $prod=[];
                 $tranche=[];

@@ -117,7 +117,7 @@
         
                     <td>
                         @if($item['completed']!=true)
-                        <a data-modal-target="crud-modal" data-modal-toggle="crud-modal" devise="{{ $item['devise'] }}"  key="{{$vT}}" itemNet ="{{$item['net']}}" id="linkPaie" href="{{route('creanceStore', $key*8943)}}" class="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-teal-300 to-lime-300 group-hover:from-teal-300 group-hover:to-lime-300 dark:text-white dark:hover:text-gray-900 focus:ring-4 focus:outline-none focus:ring-lime-200 dark:focus:ring-lime-800">
+                        <a data-modal-target="crud-modal" data-modal-toggle="crud-modal" devise="{{ $item['devise'] }}"  key="{{$vT}}" itemNet ="{{$item['net']}}" id="linkPaie" href="{{route('creanceStore', $key)}}" class="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-teal-300 to-lime-300 group-hover:from-teal-300 group-hover:to-lime-300 dark:text-white dark:hover:text-gray-900 focus:ring-4 focus:outline-none focus:ring-lime-200 dark:focus:ring-lime-800">
                             <span class="flex relative p-1 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-transparent group-hover:dark:bg-transparent">
                                 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
                                 <!-- Uploaded to: SVG Repo, www.svgrepo.com, Transformed by: SVG Repo Mixer Tools -->
@@ -213,7 +213,7 @@
             const dataTable = new simpleDatatables.DataTable("#search-table", {
                 searchable: true,
                 paging: true,
-                perPage: 20,
+                perPage: 100,
                 perPageSelect: [5, 10, 15, 20, 25, 50,100, 200, 300, 400, 500],
                 sortable: true
             });
@@ -236,11 +236,13 @@
                       
 
                 const paiementBrut = event.currentTarget.getAttribute('key') ;
-                const devise = event.currentTarget.getAttribute('devise') ;
-                const [avance, solde] = paiementBrut.trim().split(" - ").map(Number);
-                
+                const cdfPrime = event.currentTarget.getAttribute('cdfPrime');
+                const taux = event.currentTarget.getAttribute('taux');
+                const devise = event.currentTarget.getAttribute('devise');
+                const [avance, solde] =  paiementBrut.trim().split(" - ").map(Number);
+                    
                 labelNet.textContent= `Total net à payer ${itemNet} ${devise}`;
-                labelDernierV.textContent = `Dernier versement ${parseInt(event.currentTarget.getAttribute('key'))} ${devise}`;
+                labelDernierV.textContent = `Dernier versement ${parseFloat(avance)} ${devise}`;
                 labelsolde.textContent = `Solde à payer ${solde} ${devise}`;
                 newPaie.max = `${solde}`;
                 paieNow.textContent =`Paiement actuel en ${devise}`
