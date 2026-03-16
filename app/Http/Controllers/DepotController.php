@@ -3,19 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Enum\DepotType;
-use Exception;
-use Carbon\Carbon;
-use App\Models\User;
+use App\Models\Approvisionnement;
+use App\Models\Categorie;
 use App\Models\Depot;
-use App\Models\Vente;
 use App\Models\Devise;
 use App\Models\Produit;
-use App\Models\Categorie;
-use App\Models\Transfert;
 use App\Models\ProduitDepot;
+use App\Models\Transfert;
+use App\Models\User;
+use App\Models\Vente;
+use Carbon\Carbon;
+use Exception;
 use Illuminate\Http\Request;
-use App\Models\Approvisionnement;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -89,6 +90,16 @@ class DepotController extends Controller
         if(!$depot){
             return to_route('dashboard')->with('echec',"Choisissez un dépôt pour effectuer vos opérations!"); 
         }
+        /**
+         * mise à jour de prix en cdf et devise dans depotproduit de produit en fonction de depot
+         * prix de vente precedente en cdf et ajout reference devise
+         */
+        $taux = $depot->devise()->first()->taux;
+        $depotId=$depot->id;
+       
+        self::updateAllVente($depotId);
+        self::updatePrixProduit($depotId, $taux);
+        // dd(Vente::with('paiement','venteProduit')-> where('depot_id', $depotId)->latest()->first());
         session(['depot' => $depot->libele]);
         session(['depot_id' => $depot->id]);
         $user = Auth::user();
@@ -363,5 +374,61 @@ class DepotController extends Controller
                     "error"=> "!Position automatique a échoué"
                 ];
         }
+    }
+
+
+    static public function updateAllVente($depotId){
+        $allVente = Vente::with('venteProduit','paiement')
+                    ->withTrashed()
+                    ->where('depot_id',$depotId)
+                    ->whereDate('created_at','>',Carbon::parse("2026-03-01"))
+                    ->get();
+        if($allVente){
+            foreach ($allVente as $vente) {
+                    $tauxVente = $vente->updateTaux;
+                    // Update paiements
+                    $vente->paiement->each(function ($paiementV) use ($tauxVente) {
+                        $paiementV->reference_devise = $paiementV->net;
+                        $paiementV->avance *= $tauxVente;
+                        $paiementV->solde  *= $tauxVente;
+                        $paiementV->net    *= $tauxVente;
+                        $paiementV->save();
+                    });
+    
+                    // Update produits
+                    $vente->venteProduit->each(function ($prodVendu) use ($tauxVente) {
+                        $prodVendu->prixT *= $tauxVente;
+                        $prodVendu->prixU *= $tauxVente;
+                        $prodVendu->save();
+                    });
+    
+            } 
+        }
+        return true;
+    }
+    static public function updatePrixProduit($depotId, $taux){
+         $produits = Produit::with('produitDepot')
+        ->whereHas('produitDepot', function($q) use($depotId) {
+            $q->where('depot_id', $depotId);
+            })
+            ->get();
+        
+        if($produits) {
+            foreach ($produits as $produit) {
+                $depotProd = $produit->produitDepot()
+                            ->where('depot_id', $depotId)
+                            ->where('cdf_prix', null)
+                            ->where('produit_id', $produit->id)
+                            ->first();
+                  
+                if($depotProd && $depotProd->count() > 0){
+                    $depotProd->update([
+                        'cdf_prix'    => $produit->prix * $taux,
+                        'devise_prix' => $produit->prix,
+                    ]);
+                }
+            }
+        }  
+        return true;
     }
 }

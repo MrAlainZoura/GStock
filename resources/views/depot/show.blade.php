@@ -158,10 +158,10 @@
     <section class="p-10">
 
     <div class="title"> 
-       <h1 class="mb-4 text-3xl font-extrabold text-gray-900 dark:text-white md:text-5xl lg:text-6xl"><span class="text-transparent bg-clip-text bg-gradient-to-r to-orange-600 from-blue-400">Liste de produit de {{$depot->libele}}</span></h1>
+       <h1 class="mb-4 text-3xl font-extrabold text-gray-900 dark:text-white md:text-5xl lg:text-6xl"><span class="text-transparent bg-clip-text bg-gradient-to-r to-orange-600 from-blue-400">Liste de produit {{$depot->type}} {{$depot->libele}}</span></h1>
     </div> 
    
-    @include('composant.dataTable',['data'=>$depot->produitDepot])
+    @include('composant.dataTable',['data'=>$depot->produitDepot, 'depot'=>$depot])
     @include('composant.sidebar',['depot'=> $depot->libele, 'depot_id'=>$depot->id])
 
    </section>

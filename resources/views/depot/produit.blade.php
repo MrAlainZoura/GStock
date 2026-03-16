@@ -31,7 +31,7 @@
          </a>
      </div>
     @endif
-    @include('composant.dataTable',['data'=>$prodDepot])
+    @include('composant.dataTable',['data'=>$prodDepot,'depot'=>$depotData])
    </section>
    <section >        
         @include('composant.modal_prod',['libele'=>'Produit', 'action'=>"prod.store",'depot_id'=> $depotData->id, 'tab'=>$cat ]) 

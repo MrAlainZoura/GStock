@@ -65,17 +65,18 @@
                 {{$item->produit->marque->libele}}
             </td>
             <td>
-                
-            {{$item->quantite}} 
+            {{(int)$item->quantite}} 
                     @if($item->quantite >=2 )
                     {{$item->produit->unite}}s
-                    @elseif ($item->quantite==null) 
-                    0 {{$item->produit->unite}}
                     @else
                     {{$item->produit->unite}}
                     @endif
                     <br/>
-                {{$item->produit->prix}} $
+                @if ($depot->use_cdf)
+                    {{(int) $item->cdf_prix}} cdf
+                @else
+                    {{(int) $item->cdf_prix/(int) $depot->devise()->latest()->first()->taux}} {{ $depot->devise()->latest()->first()->libele }}
+                @endif
             </td>
             <td > 
                 <div class="max-w-sm bg-red-100">

@@ -27,7 +27,8 @@ class Depot extends Model
         'remboursement_delay',
         'lon',
         'lat',
-        'type'
+        'type',
+        'use_cdf'
     ];
 
     public function user(){
