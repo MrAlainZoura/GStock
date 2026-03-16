@@ -21,7 +21,7 @@
 
     <section class="p-10 gap-5 w-full">
         <div class="py-4 px-2 mx-auto max-w-screen-xl text-left lg:py-4">
-            <h1 class="mb-4 text-4xl font-extrabold tracking-tight leading-none text-gray-900 md:text-3xl lg:text-4xl dark:text-white">Liste de Reservation de {{$depot->libele}} </h1>
+            <h1 class="mb-4 text-4xl font-extrabold tracking-tight leading-none text-gray-900 md:text-3xl lg:text-4xl dark:text-white">Liste de Reservation {{$depot->type}} {{$depot->libele}} </h1>
         </div>
         <div class="w-full flex justify-end m-5 gap-5">
             <div class="">

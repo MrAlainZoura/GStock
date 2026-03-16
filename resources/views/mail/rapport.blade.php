@@ -56,7 +56,7 @@
         $restePaiementTrancheFc=0;
         $restePaiementTrancheFcPT=0;
         $restePaiementTrancheFcDT=0;
-        $depotLibele = $rapport['depot']->libele;
+        $depotLibele = $rapport['depot']->type.' '.$rapport['depot']->libele;
     @endphp
   <h2>Rapport {{ $rapport['periode'] }}  {{ $depotLibele }} </h2>
   <h2>Tableau de vente {{ $depotLibele }} </h2>

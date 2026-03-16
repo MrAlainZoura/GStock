@@ -25,7 +25,7 @@ $produitList = "";
                 <p class="mt-2 text-lg/8 text-gray-600"> Description de la vente : <br>
                     Vente numero {{$findVenteDetail->code}} effectué par 
                     {{$user}} {{$postnom}} {{$prenom}}
-                     pour le compte de {{$findVenteDetail->depot->libele}} en date du 
+                     pour le compte de (d') {{$findVenteDetail->depot->type}} {{$findVenteDetail->depot->libele}} en date du 
                      {{$findVenteDetail->created_at}} au client {{$findVenteDetail->client->name}} {{$findVenteDetail->client->prenom}} qui a acheté 
                      {{$qtProduit}}
                      produit{{ ($qtProduit > 1)?"s":""}} dont 
