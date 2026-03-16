@@ -101,6 +101,8 @@
     @php
         $quantite = 0;
         $netPaye = 0;
+        $cdfPrime = $findVenteDetail->depot->use_cdf;
+        $monnaie = ($cdfPrime) ? "cdf": $findVenteDetail->devise;
     @endphp
 
         <div class="container">
@@ -171,6 +173,7 @@
                         @php
                             $quantite +=(float)$item->quantite;
                             $netPaye+=(float) $item->prixT;
+                            $netPaye = $netPaye /(float) $findVenteDetail->updateTaux;
                         @endphp
                         <tr class="tdDashed">
                             <th class="left pad">
@@ -207,6 +210,7 @@
                          @php
                             $quantite +=(float) $item->quantite;
                             $netPaye+=(float) $item->prixT;
+                            $netPaye = $netPaye /(float) $findVenteDetail->updateTaux;
                         @endphp
                         <tr class="tdDashed">
                             <th class="left pad">
@@ -218,7 +222,7 @@
                                 {{$item->quantite}}
                             </td>
                             <td >
-                                @formaMille((float)$item->prixT *(float)$findVenteDetail->taux ) cdf
+                                @formaMille((float)$item->prixT) cdf
                             </td>
                         </tr>
                     @endforeach
@@ -238,21 +242,21 @@
                     @foreach($findVenteDetail->paiement as $cle=>$valeur)
                         <tr>
                             <td class="left">{{$valeur->created_at}}</td>
-                            <td colspan="2" class="center">@formaMille((float)$valeur->avance * (float)$findVenteDetail->taux ) cdf</td>
+                            <td colspan="2" class="center">@formaMille((float)$valeur->avance) cdf</td>
                         </tr>
                     @endforeach
 
                     @if($valeur->solde > 0)
                     <tr>
                         <th class="left">Reste</th>
-                        <th colspan="2" >@formaMille((float)$valeur->solde *(float)$findVenteDetail->taux) cdf</th>
+                        <th colspan="2" >@formaMille((float)$valeur->solde) cdf</th>
                     </tr>
                     @endif
                 @endif
                 <tr class="footer-row trHead">
                     <th class="footer-cell" >Total</th>
                     <th class="footer-cell" colspan="2">
-                        (cdf) @formaMille((float)$netPaye * (float)$findVenteDetail->taux)<br>
+                        (cdf) @formaMille((float)$netPaye * $findVenteDetail->updateTaux)<br>
                         ({{ $findVenteDetail->devise }}) @formaMille((float)$netPaye)
                     </th>
                 </tr>

@@ -18,7 +18,7 @@
     </div>
     @endif
     
-    @include('composant.sectionVenteShow',['findVenteDetail'=>$detailVente])
+    @include('composant.sectionVenteShow',['findVenteDetail'=>$detailVente, 'depot'=>$detailVente->depot])
 
     @include('composant.sidebar',['depot'=> $detailVente->depot->libele, 'depot_id'=>$detailVente->depot->id])
     @endsection

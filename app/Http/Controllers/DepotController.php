@@ -97,8 +97,10 @@ class DepotController extends Controller
         $taux = $depot->devise()->first()->taux;
         $depotId=$depot->id;
        
-        self::updateAllVente($depotId);
-        self::updatePrixProduit($depotId, $taux);
+        // $getStatusVenteUpdate= self::updateAllVente($depotId);
+        // $getStatusProdUpdate =self::updatePrixProduit($depotId, $taux);
+        
+        // dd($getStatusProdUpdate, $getStatusVenteUpdate);
         // dd(Vente::with('paiement','venteProduit')-> where('depot_id', $depotId)->latest()->first());
         session(['depot' => $depot->libele]);
         session(['depot_id' => $depot->id]);
@@ -389,21 +391,22 @@ class DepotController extends Controller
                     // Update paiements
                     $vente->paiement->each(function ($paiementV) use ($tauxVente) {
                         $paiementV->reference_devise = $paiementV->net;
-                        $paiementV->avance *= $tauxVente;
-                        $paiementV->solde  *= $tauxVente;
-                        $paiementV->net    *= $tauxVente;
+                        $paiementV->avance =$paiementV->avance * $tauxVente;
+                        $paiementV->solde  = $paiementV->solde * $tauxVente;
+                        $paiementV->net   = $paiementV->net * $tauxVente;
                         $paiementV->save();
                     });
     
                     // Update produits
                     $vente->venteProduit->each(function ($prodVendu) use ($tauxVente) {
-                        $prodVendu->prixT *= $tauxVente;
-                        $prodVendu->prixU *= $tauxVente;
+                        $prodVendu->prixT = $prodVendu->prixT * $tauxVente;
+                        $prodVendu->prixU = $prodVendu->prixU * $tauxVente;
                         $prodVendu->save();
                     });
     
             } 
         }
+        // dd($allVente);
         return true;
     }
     static public function updatePrixProduit($depotId, $taux){

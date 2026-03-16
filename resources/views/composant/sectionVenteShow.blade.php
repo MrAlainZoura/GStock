@@ -13,6 +13,8 @@ if($findVenteDetail->user != null){
     $image = null;
 }  
 $qtProduit = count($findVenteDetail->venteProduit);
+$cdfPrime = $depot->use_cdf;
+$monnaie = ($cdfPrime) ? "cdf": $findVenteDetail->devise;
 $produitList = "";
 @endphp
 <div class="alert-success hidden" id="alert">
@@ -37,9 +39,10 @@ $produitList = "";
                         @php
                             $quantite +=(float)$val->quantite;
                             $netPaye+=(float)$val->prixT;
+                            $netPaye = ($cdfPrime) ? $netPaye : $netPaye / $findVenteDetail->updateTaux;
                         @endphp
                     @endforeach
-                     {{$quantite}} pc{{ ($quantite > 1)?"s":"" }} au total et le prix net payé @formaMille((float)$netPaye) {{  $findVenteDetail->devise }} au taux d'échange de {{  $findVenteDetail->taux }} pour la monnaie locale.
+                     {{$quantite}} pc{{ ($quantite > 1)?"s":"" }} au total et le prix net à payer @formaMille((float)$netPaye){{ $monnaie }} au taux d'échange de {{  $findVenteDetail->taux }} pour la monnaie locale.
                 </p>
                 <div class="flex flex-col justify-between sm:flex gap-2 sm:flex-row sm:flex-1">
                                         
@@ -128,7 +131,7 @@ $produitList = "";
                                     {{$item->quantite}} {{($val->quantite> 1 )?$item->produit->unite."s":$item->produit->unite }}
                                     </td>
                                     <td class="px-3 py-2">
-                                    @formaMille((float)$item->prixT)  {{$findVenteDetail->devise}}
+                                    @formaMille($cdfPrime ? (float)$item->prixT : (float)$item->prixT / (float)$findVenteDetail->updateTaux)  {{$monnaie}}
                                     </td>
                                 </tr>
                             @endforeach
@@ -148,7 +151,8 @@ $produitList = "";
                                         @endphp
                                         </td>
                                         <td class="px-3 py-2">
-                                        @formaMille((float)$item->prixT)  {{$findVenteDetail->devise}}
+                                        <!-- @formaMille((float)$item->prixT)  {{$findVenteDetail->devise}} -->
+                                        @formaMille($cdfPrime ? (float)$item->prixT : (float)$item->prixT / (float)$findVenteDetail->updateTaux)  {{$monnaie}}
                                         </td>
                                     </tr>
                                 @endforeach
@@ -184,10 +188,10 @@ $produitList = "";
                                 <div class="grid grid-cols-4  py-5 text-sm text-gray-700 border-b border-gray-200 gap-x-3 dark:border-gray-700">
                                     <div class="text-gray-500 dark:text-gray-400">{{$val->created_at}}</div>
                                     <div>
-                                       {{$val->avance}}
+                                       {{$val->avance}} cdf
                                     </div>
                                     <div>
-                                        {{$val->solde}}
+                                        {{$val->solde}} cdf
                                     </div>
                                     <div>
                                         @if($val->completed==false)
@@ -239,7 +243,11 @@ $produitList = "";
                             @endphp
                             </td>
                             <td class="px-3 py-2">
-                            @formaMille((float)$item->prixT)  {{$findVenteDetail->devise}}
+                                @if ($cdfPrime)
+                                    @formaMille((float)$item->prixT) {{ $monnaie }}
+                                @else
+                                    @formaMille((float)$item->prixT /(float)$findVenteDetail->updateTaux)  {{$monnaie}}
+                                @endif
                             </td>
                         </tr>
                     @endforeach
@@ -251,8 +259,11 @@ $produitList = "";
                               {{$quantite}}
                                pc
                             </td>
-                            <td class="px-3 py-3">({{$findVenteDetail->devise}}) @formaMille((float)$netPaye) <br>
-                                (cdf) @formaMille((float)$netPaye *(float)$findVenteDetail->taux)
+                            <td class="px-3 py-3">
+                                ({{$findVenteDetail->devise}}) @formaMille($cdfPrime ? (float)$netPaye/$findVenteDetail->updateTaux : (float)$netPaye) <br>
+                                <!-- (cdf) @formaMille((float)$netPaye *(float)$findVenteDetail->taux) -->
+                               (cdf) @formaMille($cdfPrime ? (float)$netPaye : (float)$netPaye*(float)$findVenteDetail->updateTaux)
+
                             </td>
                         </tr>
                         
@@ -274,10 +285,13 @@ $produitList = "";
                         <div class="grid grid-cols-4  py-5 text-sm text-gray-700 border-b border-gray-200 gap-x-3 dark:border-gray-700">
                             <div class="text-gray-500 dark:text-gray-400">{{$val->created_at}}</div>
                             <div>
-                               {{$val->avance}}
+                               <!-- {{$val->avance}} cdf -->
+                                @formaMille($cdfPrime ? (float)$val->avance : (float)$val->avance / (float)$findVenteDetail->updateTaux)  {{$monnaie}}
+
                             </div>
                             <div>
-                                {{$val->solde}}
+                                <!-- {{$val->solde}}cdf -->
+                                @formaMille($cdfPrime ? (float)$val->solde : (float)$val->solde / (float)$findVenteDetail->updateTaux)  {{$monnaie}}
                             </div>
                             <div>
                                 @if($val->completed==false)

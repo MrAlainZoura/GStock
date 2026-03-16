@@ -126,17 +126,20 @@
                                 $paiment += (float) $prix;
                             }
                         @endphp
-                        <label for="" class="block"> {{$val->produit->libele}} : {{$val->quantite}} {{( $val->quantite>1)?$val->produit->unite."s":$val->produit->unite}}</label>
+                        <label for="" class="block">{{$val->produit->marque->libele}} {{$val->produit->libele}} : {{$val->quantite}} {{( $val->quantite>1)?$val->produit->unite."s":$val->produit->unite}}</label>
                     @endforeach
                    
                 @endif
             </td>
             <td >
-                @formaMille($paiment)
-                @if($item->devise) 
-                    {{ $item->devise->libele }} 
+                @if ($depot->use_cdf)
+                    @formaMille($paiment) cdf
+                @else
+                    @formaMille($paiment/$item->updateTaux)
+                    @if($item->devise) 
+                        {{ $item->devise->libele }} 
+                    @endif
                 @endif
-                <input type="text" class="hidden totalPaie"  value="{{ $paiment *$item->updateTaux }}">
             </td>
 
             <td>

@@ -39,7 +39,7 @@
                 <img src="{{asset('svg/pdf.svg')}}" class="w-6 rounded" alt="">
             </a>
         </div>
-        @include('composant.dataTableVente',["data"=>$vente, 'deviseList'=>$depot->devise])
+        @include('composant.dataTableVente',["data"=>$vente, 'deviseList'=>$depot->devise, 'depot'=>$depot])
     </section>
     
 
