@@ -1,4 +1,6 @@
-
+@php
+$cdfPrime = !$depot->use_cdf;
+@endphp
 
 <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
     <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
@@ -36,7 +38,7 @@
             @endphp
         @foreach ($data as $key=>$item )
         @php
-            $restePaiementTrancheFc += (float) $item->paiement->sortByDesc('created_at')->first()->solde * (float)$item->updateTaux;
+            $restePaiementTrancheFc += (float) $item->paiement->sortByDesc('created_at')->first()->solde;
             $restePaiementTranche = (float) $item->paiement->sortByDesc('created_at')->first()->solde;
         @endphp
         @foreach ($item->venteProduit as $k=>$v )
@@ -53,12 +55,12 @@
                 <td class="px-6 py-4">
                     @php
                         $recette +=(float)$v->prixT;
-                        $recetteFc += (float)$v->prixT * (float)$item->updateTaux;
+                        $recetteFc += (float)$v->prixT;
                     @endphp
-                @formaMille((float)$v->prixT) {{ $item->devise->libele }}
+                @formaMille($cdfPrime ? (float)$v->prixT : (float)$v->prixT /(float)$item->updateTaux) {{ $cdfPrime ? "cdf" : $item->devise->libele }}
                 </td>
                 <td class="px-6 py-4">
-                    {{$item->updateTaux}}Fc
+                    {{$item->updateTaux}} cdf
                 </td>
                 <td class="px-6 py-4">
                     {{$v->vente->type}}
@@ -92,7 +94,7 @@
                                 <li>
                                     {{ $comp->produit->libele }} {{ $comp->quantite }} pc 
                                     <span class="text-xl text-gray-600">→</span>
-                                    {{ $comp->prixT }} {{ $v->devise->libele }}</li>
+                                    {{$cdfPrime ? $comp->prixT :  $comp->prixT / $v->updateTaux}} {{ $cdfPrime ? "dcf" : $v->devise->libele }}</li>
                             @endforeach
                         </ol>
                            <br> 
@@ -102,7 +104,7 @@
                            <li>
                                 {{ $anV->produit->libele }} {{ $anV->quantite }}pc 
                                 <span class="text-xl text-gray-600">→</span>
-                                {{ $anV->prixT }} {{ $v->devise->libele }}
+                                {{$cdfPrime ? $anV->prixT : $anV->prixT/$v->updateTaux }} {{$cdfPrime ? "cdf" : $v->devise->libele }}
                             </li>
                            @endforeach 
                         </ol>
@@ -111,10 +113,10 @@
                          @php
                             $ajout =(float) $v->paiement->sortByDesc('created_at')->first()->net - (float) $v->paiement->sortBy('created_at')->first()->net;
                             $recette +=(float) $ajout;
-                            $recetteFc += (float)$ajout* (float)$v->updateTaux;
+                            $recetteFc += (float) $ajout;
                         @endphp
                         {{ $v->paiement->sortBy('created_at')->first()->net}} + {{ $ajout}}<br>
-                        {{ $v->paiement->sortByDesc('created_at')->first()->net }} {{ $v->devise->libele }}
+                        {{ $v->paiement->sortByDesc('created_at')->first()->net }} cdf
                     </td>
                     <td class="px-6 py-4">
                         {{$v->updateTaux}}Fc
@@ -144,7 +146,7 @@
                      @php
                         $recetteFc -= (float)$restePaiementTrancheFc;
                      @endphp
-                    @formaMille( (float)$recetteFc) Fc<br>
+                    @formaMille( (float)$recetteFc) cdf<br>
                     @if (count($data) >0)
                         @foreach ($data[0]->depot->devise as $cle=>$dev )
                             @formaMille((float) $recetteFc/ (float)$dev->taux ) {{ $dev->libele }} ({{ $dev->taux }}) <br>

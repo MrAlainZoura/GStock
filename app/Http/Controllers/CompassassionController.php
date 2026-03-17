@@ -40,20 +40,25 @@ class CompassassionController extends Controller
         $vente= Vente::find($vente_id);
         if($vente){
             $depot = $vente->depot;
-            $paiement = collect($vente->paiement)->sum('avance');   
+            $cdfPrime = $depot->use_cdf;
+            $paiement = collect($vente->paiement)->sum('avance'); 
+            $paiement = $cdfPrime ? $paiement : $paiement/$vente->updateTaux;
+            $devise = $cdfPrime ? "cdf" : $vente->devise->libele;
             $produit = ProduitDepot::where("depot_id",$depot->id)->with("produit.marque","produit.marque.categorie")->get();
-            return view("compassassion.create", compact("depot","paiement","produit", 'vente'));
+            return view("compassassion.create", compact("depot","paiement","produit", 'vente', 'devise', 'cdfPrime'));
         }
         return back()->with('echec', "Demande mal formulée, veuillez réessayez !");
     }
 
     public function store(Request $request){
-        // dd($request->all(), Compassassion::all());
+        // dd($request->all());
         $vente = Vente::find($request->vente_id);
         if($vente){
             if($vente->compassassion->count() > 0){
                 return back()->with('echec', "Echec, Vous avez déjà effectué une compassassion pour cette vente");
             }
+
+            
             // dd($vente->paiement);
             $ancVenteIdQt = [];
             $stockUpdate = [];

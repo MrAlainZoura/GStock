@@ -4,6 +4,9 @@
 @section('header')
   @include('composant.hearder', ['user_email'=>Auth::user()->email, 'user_name'=>Auth::user()->name])
 @endsection
+@php
+  $client = $vente->client;
+@endphp
 
 @section('main')  
 
@@ -68,7 +71,7 @@
                             <svg class="w-3.5 h-3.5 me-2 text-green-500 dark:text-green-400 shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
                                 <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z"/>
                             </svg>
-                            {{ $pro->produit->marque->libele }} {{ $pro->produit->libele }} {{ $pro->quantite }} {{($pro->quantite> 1 )?$pro->produit->unite."s":$pro->produit->unite }} {{ $pro->prixT }} {{ $vente->devise->libele }}
+                            {{ $pro->produit->marque->libele }} {{ $pro->produit->libele }} {{ $pro->quantite }} {{($pro->quantite> 1 )?$pro->produit->unite."s":$pro->produit->unite }} {{ $cdfPrime ? $pro->prixT : (float) $pro->prixT / (float) $vente->updateTaux }} {{ $devise }}
                         </li>
                           @endforeach
                           <li>
@@ -79,7 +82,33 @@
                                       <svg class="shrink-0 w-3.5 h-3.5 text-green-500 dark:text-green-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 12">
                                           <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5.917 5.724 10.5 15 1.5"/>
                                       </svg>
-                                      <span>{{ $paiement }} {{ $vente->devise->libele }}</span>
+                                      <span>{{ $paiement }} {{ $devise }}</span>
+                                  </li>
+                                </ul>
+                             
+                            </h2>
+                          </li>
+                          <li>
+                            <h2 class="mb-2 text-lg font-semibold text-gray-900 dark:text-white">
+                              Client : 
+                                <ul>
+                                  <li class="flex items-center space-x-3 rtl:space-x-reverse">
+                                      <svg class="shrink-0 w-3.5 h-3.5 text-green-500 dark:text-green-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 12">
+                                          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5.917 5.724 10.5 15 1.5"/>
+                                      </svg>
+                                      <span>{{ $client->name }} {{ $client->prenom }} {{ $client->tel }}</span>
+                                  </li>
+                                  <li class="flex items-center space-x-3 rtl:space-x-reverse">
+                                      <svg class="shrink-0 w-3.5 h-3.5 text-green-500 dark:text-green-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 12">
+                                          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5.917 5.724 10.5 15 1.5"/>
+                                      </svg>
+                                      <span>Contact : {{ $client->tel }}</span>
+                                  </li>
+                                  <li class="flex items-center space-x-3 rtl:space-x-reverse">
+                                      <svg class="shrink-0 w-3.5 h-3.5 text-green-500 dark:text-green-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 12">
+                                          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5.917 5.724 10.5 15 1.5"/>
+                                      </svg>
+                                      <span>Adresse : {{ $client->adresse }}</span>
                                   </li>
                                 </ul>
                              
@@ -114,9 +143,9 @@
                             <div class="hidden w-full sm:col-span-2" >
                                 <input type="number" disabled required min="1" name="updateDevise" id="updateDevise" value="{{ $vente->updateTaux }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="1000" >
                             </div>
-                            <div class="flex items-center hidden">
-                                <input id="venteFC" type="checkbox" value="false" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                                <label for="venteFC" id="venteFC" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Vendre en CDF</label>
+                            <div class="flex items-center">
+                                <input id="venteFC" type="checkbox" disabled {{ $cdfPrime ? "checked": "" }} value="{{ $cdfPrime }}" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                <label for="venteFC" id="venteFC" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Cette opération est effectuée en {{ $devise }}</label>
                             </div>
                             <div class="flex items-center">
                                 <label id="" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Nouveau Produit</label>
@@ -538,9 +567,9 @@ const submitMyForm = ()=>{
       }
       if(compteurSubmit == 0){
         if(!valeur()){
-          input.value = totalEntier;
+          input.value = totalEntier*updateDevise;
         }else{
-          input.value = (parseFloat(totalEntier)/updateDevise).toFixed(2);
+          input.value = parseFloat(totalEntier);
         }
       }
       // console.log(input.value, paiementFc.value, updateDevise);

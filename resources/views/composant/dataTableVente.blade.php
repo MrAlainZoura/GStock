@@ -148,7 +148,7 @@
         </tr>
         @php
             $recette +=$paiment;
-            $recetteFc +=$paiment *$item->updateTaux ;
+            $recetteFc +=$paiment  ;
         @endphp
         @endforeach
     </tbody>
