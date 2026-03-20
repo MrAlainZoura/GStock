@@ -1,5 +1,5 @@
 @extends('base')
-@section('title', "Ventes ")
+@section('title', "Ventes compassassions")
 
 @section('header')
   @include('composant.hearder', ['user_email'=>Auth::user()->email, 'user_name'=>Auth::user()->name])
@@ -16,7 +16,7 @@
     </div>
     @endif
     <div class="alert-success">
-      @include('composant.alert_suc', ['message'=>"Vous effectuer cette compassassion pour le compte de ".$depot->libele])
+      @include('composant.alert_suc', ['message'=>"Vous effectuer cette compassassion pour le compte de (l') {$depot->type} {$depot->libele}"])
     </div>
       <div class="alert-echec-submit hidden" id="submitErreur">
           @include('composant.alert_echec', ['message'=>"Actualiser la page et réessayer si c'était par erreur que vous avez cliqué sur Ajouter"])
@@ -42,6 +42,23 @@
       <div class="flex item-center justify-center">
         <button type="button" onclick="alertErreurProduitSend('hide')" class="text-red-800 bg-transparent border border-red-800 hover:bg-red-900 hover:text-white focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-xs px-3 py-1.5 text-center dark:hover:bg-red-600 dark:border-red-600 dark:text-red-500 dark:hover:text-white dark:focus:ring-red-800">
           Reprennez
+        </button>
+      </div>
+    </div>
+    <div id="submitErreurMontant" class="hidden p-4 mb-4 text-red-800 border border-red-300 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400 dark:border-red-800" role="alert">
+      <div class="flex items-center">
+        <svg class="shrink-0 w-4 h-4 me-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+          <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
+        </svg>
+        <span class="sr-only">Info</span>
+        <h3 class="text-lg font-medium">Erreur, compassassion impossible</h3>
+      </div>
+      <div class="mt-2 mb-4 text-sm">
+          Le montant net à payer doit être supérieur ou égal au montant de la vente pécédente !
+      </div>
+      <div class="flex item-center justify-center">
+        <button type="button" onclick="alertErreurProduitSend('hide')" class="text-red-800 bg-transparent border border-red-800 hover:bg-red-900 hover:text-white focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-xs px-3 py-1.5 text-center dark:hover:bg-red-600 dark:border-red-600 dark:text-red-500 dark:hover:text-white dark:focus:ring-red-800">
+         Actualisez et Reprennez
         </button>
       </div>
     </div>
@@ -178,11 +195,9 @@
                         </div>
                           </div> 
                     </div>
-                    
-
               </div>
               
-              <div class="flex justify-center m-5">
+              <div class="flex justify-center m-5 hidden" id="ajouteCompassassion">
                 <button type="submit"  class="btn-primary w-1/2 px-3 py-2 text-xs font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Ajouter</button>
             </div>
           </form>
@@ -201,6 +216,7 @@
 
 const devise = [@json($vente->devise)];
 const venteProduit = @json($vente->venteProduit);
+const paiementPrecedent = @json($paiement);
 function removeObjectByIndex(tableau, index) {
   return [
     ...tableau.slice(0, index),
@@ -445,6 +461,8 @@ const setTotal = (inputQte, inputPx, showT) => {
     let somme = 0;
     const inputs = document.querySelectorAll('.putainDesabled');
     const updateDevise = document.getElementById('updateDevise').value.trim();
+    const btnJaouter = document.getElementById('ajouteCompassassion');
+          
 
     inputs.forEach((input)=>{
       const total = input.value.split(" ");
@@ -462,11 +480,19 @@ const setTotal = (inputQte, inputPx, showT) => {
     });
     //recupere paiement en franc
     if(valeur()){
+      //cdfP
+      (parseFloat(somme) >= parseFloat(paiementPrecedent))
+        ? btnJaouter.classList.remove("hidden")
+        : btnJaouter.classList.add("hidden");
       const sommeFormater = somme.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
       let sommeDevise =(somme / updateDevise).toFixed(2);
       sommeDevise = sommeDevise.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
       net.textContent = `Montant net à payer ${sommeDevise} ${getDevise} / ${somme} cdf`;
     }else{
+      //devise
+      (parseFloat(somme) >= parseFloat(paiementPrecedent))
+        ? btnJaouter.classList.remove("hidden")
+        : btnJaouter.classList.add("hidden");
       const sommeFormater = somme.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
       let sommeFc =somme * updateDevise;
       sommeFc =sommeFc.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
@@ -539,12 +565,22 @@ const alertErreurProduitSend = (action)=>{
       divErreur.classList.remove("hidden");
     }
 }
+const alertErreurPaiement = (action)=>{
+  const divErreur = document.getElementById('submitErreurMontant')
+  if(action=='hide'){
+      divErreur.classList.add('hidden');
+    }
+    if(action=="show"){
+      divErreur.classList.remove("hidden");
+    }
+}
 let compteurSubmit = 0;
 const submitMyForm = ()=>{
 
   const myFormVente =document.getElementById('myFormVente');
   myFormVente.addEventListener('submit', (event)=>{
     event.preventDefault();
+    let newPaiement = 0;
     const paiementFc = document.getElementById('venteFC');
     let updateDevise = document.getElementById('updateDevise').value.trim();
     const valeur = ()=>  {paiementFc.addEventListener('change', function (){
@@ -568,8 +604,10 @@ const submitMyForm = ()=>{
       if(compteurSubmit == 0){
         if(!valeur()){
           input.value = totalEntier*updateDevise;
+          newPaiement +=parseFloat(totalEntier)*parseFloat(updateDevise);
         }else{
           input.value = parseFloat(totalEntier);
+          newPaiement += parseFloat(totalEntier);
         }
       }
       // console.log(input.value, paiementFc.value, updateDevise);
