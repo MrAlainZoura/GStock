@@ -24,6 +24,12 @@ $produitList = "";
         <div class="mx-auto max-w-7xl px-6 lg:px-8">
             <div class="mx-auto max-w-2xl lg:mx-0">
                 <h2 class="text-4xl font-semibold tracking-tight text-pretty text-gray-900 sm:text-5xl">Vente {{$findVenteDetail->code}} Détails </h2>
+                
+                <p class="text-body text-blue-600 m-1"><a href="{{route('venteDepot',["depot"=>$depot->libele, "depot_id"=>$depot->id])}}" class="border border-gray-100 rounded-lg max-w-md p-2 inline-flex items-center font-medium text-fg-brand text-lg hover:underline">
+                    Retour à la liste
+                    <svg class="w-5 h-5 ms-1 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 12H5m14 0-4 4m4-4-4-4"/></svg>
+                    </a>
+                </p>
                 <p class="mt-2 text-lg/8 text-gray-600"> Description de la vente : <br>
                     Vente numero {{$findVenteDetail->code}} effectué par 
                     {{$user}} {{$postnom}} {{$prenom}}

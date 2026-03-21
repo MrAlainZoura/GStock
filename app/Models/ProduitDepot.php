@@ -9,7 +9,7 @@ class ProduitDepot extends Model
     protected $fillable = ['depot_id',
     'produit_id',
     'cdf_prix',
-    'devise_prix',
+    // 'devise_prix',
     'quantite'];
 
     public function produit(){

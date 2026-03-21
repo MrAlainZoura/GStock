@@ -51,7 +51,7 @@
                   <select required name="destination" required id="destination" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                       <option selected value="">Choisir une destinantion</option>
                       @foreach($depotList as $k=>$v)
-                      <option value="{{$v->libele}}">{{$v->libele}}</option>
+                      <option value="{{$v->id}}">{{$v->type}} {{$v->libele}}</option>
                       @endforeach
                   </select>
               </div>
@@ -219,8 +219,9 @@ function removeObjectByIndex(users, index) {
 
   selectdDestination.addEventListener('change', function() {
       const selectedValue = this.value;
-      btnSubmit.textContent = "Transferer produit à " +selectedValue;
-      title.textContent = `Transfert Produit ${depotName} vers ${selectedValue}`
+      const selectedText = this.options[this.selectedIndex].text;
+      btnSubmit.textContent = "Transferer produit à " +selectedText;
+      title.textContent = `Transfert Produit ${depotName} vers ${selectedText}`
   });
  }
 

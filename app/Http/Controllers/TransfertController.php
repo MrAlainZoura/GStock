@@ -64,14 +64,15 @@ class TransfertController extends Controller
         $numero = Transfert::where("user_id", Auth::user()->id)->where("created_at",'like','%'.Carbon::now()->format('Y-m-d').'%')->count()+1;
         // dd(Transfert::all(),$numero);
         $code =$initialUser. Carbon::now()->format('Ymd')."N$numero";
+        $depotDestinatin = Depot::find($request->destination);
         $dataTrans = [ 
             "user_id"=>Auth::user()->id,
-            "destination"=>$request->destination,
+            "destination"=>"$depotDestinatin->type $depotDestinatin->libele",
             "code"=>$code,
             "depot_id"=>$request->depot_id,
             "description"=>$request->description
         ];
-        $depotDestinatin = Depot::where("libele", $request->destination)->first();
+
         $verifTransData =[];
         foreach($request->produits as $ke => $val){
             $findProduit = ProduitDepot::where('produit_id',$ke)->where('depot_id',$request->depot_id)->first();
@@ -107,9 +108,12 @@ class TransfertController extends Controller
                         $setQt =$value + $findDepotProduit->quantite;
                         $findDepotProduit->update(['quantite'=> $setQt, 'updated_at'=>$today]);
                     }else{
-                        $dataDepotProduit = ['depot_id'=>$depotDestinatin->id,
-                                            'produit_id'=>$key,
-                                            'quantite'=>$value] ;
+                        $dataDepotProduit = [
+                            'depot_id'=>$depotDestinatin->id,
+                            'produit_id'=>$key,
+                            'quantite'=>$value,
+                            'cdf_prix'=>$findDepotProduitOrigine->cdf_prix
+                        ] ;
                         $createProduit = ProduitDepot::createOrFirst($dataDepotProduit);
                     }
     
@@ -119,7 +123,7 @@ class TransfertController extends Controller
 
             return back()->with('echec',"Une erreur inattendue s'est produite : quantité 0, veuillez réessayer");
         }
-        return back()->with('success',"Transfert effectué avec succcès");
+        return back()->with('success',"Transfert effectué avec succcès vers {$depotDestinatin->type} {$depotDestinatin->libele}");
     
     }
 
