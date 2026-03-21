@@ -17,7 +17,9 @@
         @include('composant.alert_echec', ['message'=>session('echec')])
     </div>
     @endif
-    
+    @php
+        $cdfPrime = $depot->use_cdf;
+    @endphp
 
     <section class="p-10 gap-5 w-full">
         <div class="py-4 px-2 mx-auto max-w-screen-xl text-left lg:py-4">
@@ -150,11 +152,13 @@
                             @endforeach
                     </td>
                     <td >
-                        @formaMille($paiment)
-                        @if($item->devise) 
+                        @formaMille($cdfPrime ? $paiment : $paiment/$item->updateTaux)
+                        @if($item->devise && !$cdfPrime) 
                             {{ $item->devise->libele }} 
+                        @else 
+                        cdf
                         @endif
-                        <input type="text" class="hidden totalPaie"  value="{{ $paiment *$item->updateTaux }}">
+                        <!-- <input type="text" class="hidden totalPaie"  value="{{ $paiment *$item->updateTaux }}"> -->
                     </td>
 
                     <td>

@@ -108,7 +108,7 @@
                     @endphp
                         <label class="block"> 
                             @if($comp->produit)
-                            {{$comp->produit->libele}} : {{$comp->quantite}} pc
+                               {{ $comp->produit->marque->libele }} {{$comp->produit->libele}} : {{$comp->quantite}} pc
                             @else 
                                 Produit retiré : {{$comp->quantite}} pc
                             @endif   

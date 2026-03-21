@@ -22,7 +22,7 @@ class ProduitExport implements FromCollection, WithHeadings
 
     public function collection()
     {
-        return ProduitDepot::with('produit.marque.categorie')
+        return ProduitDepot::with('produit.marque.categorie','depot.devise')
         ->where('depot_id', $this->depotId)
         ->get()
         ->sortBy(function ($affectation) {
@@ -36,7 +36,8 @@ class ProduitExport implements FromCollection, WithHeadings
                 'marque' => $produit->marque->libele ?? '',
                 'categorie' => $produit->marque->categorie->libele ?? '',
                 'quantite' => $affectation->quantite,
-                'prix' => $produit->prix,
+                'prix' => $affectation->cdf_prix,
+                'prix_devise' => $affectation->cdf_prix / $affectation->depot->devise()->latest()->first()->taux,
                 'etat' => $produit->etat,
                 'description' => $produit->description,
             ];
@@ -46,7 +47,7 @@ class ProduitExport implements FromCollection, WithHeadings
 
     public function headings(): array
     {
-        return ['Libele', 'Marque', 'Categorie', 'Quantite', 'Prix', 'Etat', 'Description'];
+        return ['Libele', 'Marque', 'Categorie', 'Quantite', 'Prix CDF', 'Prix Devise', 'Etat', 'Description'];
     }
 
 }

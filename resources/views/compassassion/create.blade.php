@@ -229,7 +229,7 @@ const nettoyageProduitVente=()=>{
     venteProduit.forEach((produit)=>{
         const indexOrigin = users.findIndex(o => o.produit.id === produit.produit_id);
         const original = users.find(o => o.produit.id === produit.produit_id);
-        console.log(produit.quantite);
+        // console.log(produit.quantite);
         if(parseInt(produit.quantite)==1){
           users = removeObjectByIndex(users, parseInt(indexOrigin));
         }

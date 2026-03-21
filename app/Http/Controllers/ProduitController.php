@@ -74,13 +74,16 @@ class ProduitController extends Controller
         $fichier = $request->file('image');
         $type =($request->file('image')!=null)? $fichier->getClientOriginalExtension():'';
         $depotId= $request->depot_id;
+        $depot = Depot::find($depotId);
+        $taux = $depot->devise()->latest()->first()->taux;
+        $prix = $depot->use_cdf ? $request->prix : (float) $request->prix * (float) $taux;
         $data = [
             'marque_id'=>$request->marque_id,
             'libele'=>$request->libele,
-            'description'=>$request->description,
-            'prix'=>$request->prix,
+            'description'=>$request->description ?? "RAS",
+            'prix'=>$prix,
             'etat'=>$request->etat,
-            'image'=>($request->file('image')!=null)? "$request->libele.$type":null,
+            // 'image'=>($request->file('image')!=null)? "$request->libele.$type":null,
         ];
 // dd($data);
         $produit = null;
@@ -106,7 +109,9 @@ class ProduitController extends Controller
         if($produit !== null){
             $dataProD =['depot_id'=>$request->depot_id,
                         'produit_id'=>$produit->id,
-                        'quantite'=>($request->quantite!=null)?$request->quantite:0];
+                        'quantite'=>($request->quantite!=null)?$request->quantite:0,
+                        'cdf_prix'=>$prix
+                        ];
             $produitDepot = ProduitDepot::create($dataProD);
             if($request->quantite != null && $request->quantite > 0 ){
                 $dataApro = [
@@ -132,7 +137,9 @@ class ProduitController extends Controller
                 // dd('affection');
                 $dataProD =['depot_id'=>$request->depot_id,
                                 'produit_id'=>$getProduit->id,
-                                'quantite'=>($request->quantite!=null)?$request->quantite:0];
+                                'quantite'=>($request->quantite!=null)?$request->quantite:0,
+                                'cdf_prix'=>$prix
+                                ];
                 $produitDepot = ProduitDepot::create($dataProD);
                 if($request->quantite != null && $request->quantite >0){
                     $dataApro = [
@@ -173,7 +180,8 @@ class ProduitController extends Controller
                     'prix'=>'nullable',
                     'etat'=>'',
                 ];
-       
+        $depot = Depot::find($request->depot_id);
+        $taux = $depot->devise()->latest()->first()->taux;
         $dataCategorie = ['libele'=>''];
         $dataMarque = ['libele'=>'','categorie_id'=>''];
         $dataFormExcel = $array[0];
@@ -185,14 +193,19 @@ class ProduitController extends Controller
                     $dataProduit['libele']=$v['libele'];
                     $dataProduit['description']=$v['description'];
                     $dataProduit['etat']=($v['categorie']=='ordinateur')?'Reconditionnée':'Neuf';
-                    $dataProduit['prix']=$v['prix'];
+                    $dataProduit['prix']=$depot->use_cdf ? $v['prix'] : (float) $v['prix']*(float) $taux;
                     $nomCategorie = $v['categorie'];
                     $nomMarque = $v['marque'];
 
-                    $categorie = Categorie::where('libele', $nomCategorie)
+                    // $categorie = Categorie::where('libele', $nomCategorie)
+                    //         ->with(['marque' => function ($query) use ($nomMarque) {
+                    //             $query->where('libele', $nomMarque);
+                    //         }])->first();
+                    $categorie = Categorie::whereRaw('LOWER(libele) = ?', [strtolower($nomCategorie)])
                             ->with(['marque' => function ($query) use ($nomMarque) {
-                                $query->where('libele', $nomMarque);
-                            }])->first();
+                                $query->whereRaw('LOWER(libele) = ?', [strtolower($nomMarque)]);
+                            }])
+                            ->first();
                     
                     if (!$categorie) {
                         //on cree la categorie si non nulle
@@ -244,7 +257,8 @@ class ProduitController extends Controller
                             }
                         $dataProD = ['depot_id'=>$request->depot_id,
                                     'produit_id'=>$produitId,
-                                    'quantite'=>(int) $v['quantite'] 
+                                    'quantite'=>(int) $v['quantite'],
+                                    'cdf_prix'=>$depot->use_cdf ? $v['prix'] : (float) $v['prix'] * (float) $taux
                                 ];
                         $getProdDepot = ProduitDepot::where('produit_id', $produitId)
                             ->where('depot_id', $request->depot_id)
@@ -301,8 +315,11 @@ class ProduitController extends Controller
         $produit = Produit::where('id',$id)->first();
         if($produit != null){
             $tab = Categorie::orderby('libele')->with('marque')->get();
-            $depot_id = Depot::where('libele',session('depot'))->where('id',session('depot_id'))->first()->id;
-            return view('produit.edit', compact('tab','depot_id','produit'));
+            $depot = Depot::where('libele',session('depot'))->where('id',session('depot_id'))->first();
+            $prixCdf = $produit->produitDepot()->where('depot_id', $depot->id)->first()->cdf_prix;
+            $prix = $depot->use_cdf  ? $prixCdf : $prixCdf / $depot->devise()->latest()->first()->taux;
+            $monnaie = $depot->use_cdf  ? "cdf" : $depot->devise()->latest()->first()->libele;
+            return view('produit.edit', compact('tab','depot','produit','monnaie','prix'));
         }
         return back()->with('echec', 'Produit introuvable');
     }
@@ -325,18 +342,24 @@ class ProduitController extends Controller
         $id = $getId/220;
         $dataUpdate=[ 
             "marque_id" =>$request->marque_id ,
-            "depot_id" => $request->depot_id,
+            //"depot_id" => $request->depot_id,
             "libele" =>$request-> libele,
             "prix" => $request->prix,
             "etat" => $request->etat,
             "unite" => $request->unite,
             "description" =>$request->description
         ];
+        $depot = Depot::find($request->depot_id);
+        $taux = $depot->devise()->latest()->first()->taux;
+        $prix = $depot->use_cdf ? $request->prix : (float) $request->prix * (float) $taux;
         $data = array_filter($dataUpdate, function($val){return !is_null($val);});
 
         $produit = Produit::find($id);
 
         if ($produit && $produit->update($data)) {
+            $updateCdfPrix = ProduitDepot::where('depot_id', $depot->id)
+                ->where('produit_id', $id)
+                ->update(['cdf_prix'=>$prix]);
             return back()->with('success','Produit mis à jour avec success !');
         }
         return back()->with('echec', "Mis à jour de produit échouée, certaines données incorrectes !");
@@ -365,10 +388,10 @@ class ProduitController extends Controller
 
                 if($prodVente == 0 ){
                     // dd($depotLink, $prodVente, $prodTrans, "apres analyse on peut effacer");
-                    $prod->produitDepot()->delete();
-                    $prod->venteProduit()->delete();
-                    $prod->produitTransfert()->delete();
-                    $prod->approvisionnement()->delete();
+                    $prod->produitDepot()->where('depot_id',session('depot_id'))->delete();
+                    // $prod->venteProduit()->where('depot_id',session('depot_id'))->delete();
+                    // $prod->produitTransfert()->where('depot_id',session('depot_id'))->delete();
+                    // $prod->approvisionnement()->where('depot_id',session('depot_id'))->delete();
                     $prod->delete();
 
                     return to_route('showProduit',["depot"=>session('depot'), "id"=>session('depot_id')*12])->with("success","Produit supprimé avec succès !");
