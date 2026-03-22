@@ -1,4 +1,6 @@
-
+@php
+    $cdfPrime = $depot->use_cdf;
+@endphp
 <table id="search-table" class="w-70">
     <thead>
         <tr>
@@ -110,10 +112,15 @@
                                
             </td>
             <td >
-                @formaMille($paiment)
-                @if($item->devise) 
-                    {{ $item->devise->libele }} 
+                @if ($cdfPrime)
+                    @formaMille($paiment) cdf
+                @else
+                    @formaMille($paiment/$item->updateTaux)
+                    @if($item->devise) 
+                        {{ $item->devise->libele }} 
+                    @endif
                 @endif
+                
                 <input type="text" class="hidden totalPaie"  value="{{ $paiment *$item->updateTaux }}">
             </td>
 
@@ -123,7 +130,7 @@
         </tr>
         @php
             $recette +=$paiment;
-            $recetteFc +=$paiment *$item->updateTaux ;
+            $recetteFc +=$paiment;
         @endphp
         @endforeach
     </tbody>

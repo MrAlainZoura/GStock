@@ -28,7 +28,8 @@ class Depot extends Model
         'lon',
         'lat',
         'type',
-        'use_cdf'
+        'use_cdf',
+        'global_update'
     ];
 
     public function user(){

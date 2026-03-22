@@ -139,7 +139,7 @@
                 @endif
             </p>
             <p class="left">Date : {{ $findVenteDetail->created_at }}, {{ $findVenteDetail->depot->ville }}</p>
-            <p class="left">Client : {{ $findVenteDetail->client->name }} {{ $findVenteDetail->client->tel }}</p>
+            <p class="left">Client : {{ $findVenteDetail->client->name }} {{ $findVenteDetail->client->prenom }} {{ $findVenteDetail->client->tel }}</p>
             <p class="left">Numéro de Facture : {{ $findVenteDetail->code }}</p>
         </div>
     </div>
@@ -174,7 +174,7 @@
                             {{$item->duree}}
                         </td>
                         <td >
-                            @formaMille((float)$item->montant *(float)$findVenteDetail->taux ) cdf
+                            @formaMille((float)$item->montant) cdf
                         </td>
 
                     </tr>
@@ -198,22 +198,22 @@
                     @foreach($findVenteDetail->paiement as $cle=>$valeur)
                         <tr>
                             <td class="left">{{$valeur->created_at}}</td>
-                            <td colspan="2" class="right">@formaMille((float)$valeur->avance * (float)$findVenteDetail->taux ) cdf</td>
+                            <td colspan="2" class="right">@formaMille((float)$valeur->avance) cdf</td>
                         </tr>
                     @endforeach
 
                     @if($valeur->solde > 0)
                     <tr>
                         <th class="left">Reste</th>
-                        <th colspan="2" >@formaMille((float)$valeur->solde *(float)$findVenteDetail->taux) cdf</th>
+                        <th colspan="2" class="right" >@formaMille((float)$valeur->solde) cdf</th>
                     </tr>
                     @endif
                 @endif
                 <tr class="footer-row trHead">
                     <th class="footer-cell" >Total</th>
                     <th class="footer-cell right" colspan="2">
-                        (cdf) @formaMille((float)$netPaye * (float)$findVenteDetail->taux)<br>
-                        ({{ $findVenteDetail->devise }}) @formaMille((float)$netPaye)
+                        (cdf) @formaMille((float)$netPaye)<br>
+                        ({{ $findVenteDetail->devise }}) @formaMille((float)$netPaye/(float)$findVenteDetail->taux )
                     </th>
                 </tr>
             </tfoot>
@@ -221,7 +221,7 @@
     </div>
     <div class="invoice-footer">
         <p>
-            Merci pour votre achat ! <br>
+            Merci pour votre réservation ! <br>
             {{ $findVenteDetail->depot->autres}}
         </p>
         <p class="imprime">Logiciel @copyright 2026 zouraCorp +243 812 995 373</p>

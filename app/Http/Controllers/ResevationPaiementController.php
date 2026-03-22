@@ -34,8 +34,12 @@ class ResevationPaiementController extends Controller
         if(!$getReservation){
             return back()->with('echec', "Impossible de trouver cette reservation");
         }
+        $cdfPrime = $getReservation->reservation->depot->use_cdf;
+        $taux = $getReservation->reservation->updateTaux;
         $solde = $getReservation->solde;
-        $versement = $request->paiment;
+        $versement = ($cdfPrime) 
+            ? $request->paiment 
+            : $request->paiment * $taux;
         $newSolde = $getReservation->solde - $versement;
         $data = [
             "reservation_id"=>$id,

@@ -94,10 +94,10 @@ class ReservationController extends Controller
                 return back()->with(
                     'echec',
                     "La date de début " . Carbon::parse($newDebut)->format('d/m/Y H:i') .
-                           " ne peut pas être fixée dans le passé. L'heure actuelle est " . Carbon::now()->format('d/m/Y H:i:s')
+                    " ne peut pas être fixée dans le passé. L'heure actuelle est " . Carbon::now()->format('d/m/Y H:i:s')
                 );
             }
-            dd($checkDateDebut);
+            // dd($checkDateDebut);
             $booked = self::checkInterval($reservation['startAt'],$reservation['endAt'], $id);
            if($booked['disponible']){
                 return back()->with('echec', $booked['data'] ." ne sera pas disponible dans cet intervalle de ".$booked['heure']);
@@ -174,7 +174,7 @@ class ReservationController extends Controller
                 'statut'=>"Encours", 
                 'devise_id'=>$devise_id,
                 'user_id'=>Auth::user()->id,
-                'depot_id'=>$request->depot_id/98123,
+                'depot_id'=>$request->depot_id,
                 'updateTaux'=>$request->updateDevise
             ];
             $reservationCreate = Reservation::create($dataReservation);
@@ -200,6 +200,7 @@ class ReservationController extends Controller
             "avance"=>($checkTranche==true) ? (float)$request->trancheP : $netPayer,
             "solde"=>($checkTranche==true) ? (float)$netPayer - (float)$request->trancheP:0,
             "net"=>$netPayer,
+            "reference_devise"=>$netPayer/$reservationCreate->updateTaux,
             "completed"=>($checkTranche == true ) ? false : true
         ];
         $createPaiement = ReservationPaiement::create($dataPaiement);
@@ -277,7 +278,9 @@ class ReservationController extends Controller
                     $prod[] = $val->produit->marque->libele.' '.$val->produit->libele;
                 }
                 foreach($v->paiement as $cl=>$vl){
-                    $tranche[]=$vl->avance. " - ".$vl->solde;
+                    $tranche[]=($depot->use_cdf) 
+                        ? $vl->avance. " - ".$vl->solde 
+                        : $vl->avance/$v->updateTaux ." - ".$vl->solde/$v->updateTaux;
                 }
                 $dernierVersement = count($v->paiement)-1;
                 $completed = $v->paiement[$dernierVersement]->completed;
@@ -286,9 +289,10 @@ class ReservationController extends Controller
                     'client'=>['nom'=>$v->client->name.' '.$v->client->prenom.' '.$v->client->postnom,'tel'=> $v->client->tel,'date'=> $v->created_at] ,
                     'prod'=>$prod, 
                     'tranche'=>$tranche, 
-                    'net'=>$v->paiement[0]->net,
+                    'net'=>($depot->use_cdf)? $v->paiement[0]->net : $v->paiement[0]->net/$v->updateTaux,
                     'completed'=>$completed,
-                    'devise'=>$v->devise->libele
+                    'devise'=>($depot->use_cdf)? "cdf" : $v->devise->libele,
+                    'taux'=>$v->updateTaux
                 ];
                 $prod=[];
                 $tranche=[];

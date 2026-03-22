@@ -11,9 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('depots', function (Blueprint $table) {
-            $table->boolean('use_cdf')->nullable()->default(false);
-            $table->boolean('global_update')->nullable();
+        Schema::table('reservation_paiements', function (Blueprint $table) {
+            $table->double('reference_devise')->nullable();
         });
     }
 
@@ -22,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('depots', function (Blueprint $table) {
-            //
+        Schema::table('reservation_paiements', function (Blueprint $table) {
+            
         });
     }
 };

@@ -48,7 +48,7 @@
         <form id="myFormVente" action="{{route('reservation.store')}}" method="post" enctype="multipart/form-data">
             @csrf
             @method('post')
-            <input type="hidden" name="depot_id" value="{{$depot->id*98123}}">
+            <input type="hidden" name="depot_id" value="{{$depot->id}}">
               <div class="grid gap-4 sm:grid-cols-2 sm:gap-6">
                 <div>
                     <div class="sm:col-span-2 mb-2">
@@ -134,8 +134,8 @@
                             <div class="w-full sm:col-span-2" >
                                 <input type="number" required min="1" name="updateDevise" id="updateDevise" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="1000" >
                             </div>
-                            <div class="flex items-center">
-                                <input id="venteFC" type="checkbox" value="false" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                           <div class="flex items-center">
+                                <input id="venteFC" type="checkbox" {{ $depot->use_cdf ? 'checked' : ""}} value="{{ $depot->use_cdf }}" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
                                 <label for="venteFC" id="venteFC" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Vendre en CDF</label>
                             </div>
                             <div class="w-full sm:col-span-2" onclick="event.stopImmediatePropagation();">
@@ -555,16 +555,27 @@ const submitMyForm = ()=>{
       });
       return paiementFc.checked;
     }
+    const inputs = document.querySelectorAll('.getMontant');
+   inputs.forEach((input)=>{
+      if(compteurSubmit == 0){
+        if(!valeur()){
+          input.value *= parseFloat(updateDevise);
+        }
+      }
+    });
 
    compteurSubmit++;
    const errreMessage = document.getElementById('submitErreur');
    (compteurSubmit > 0)?errreMessage.classList.remove('hidden'):"";
    
    const maxTranchePaie = document.getElementById('tranche');
-   if(valeur() && maxTranchePaie && !isNaN(updateDevise) && updateDevise !== 0)
-    {
-        maxTranchePaie.value=(parseFloat(maxTranchePaie.value)/updateDevise).toFixed(2);
-    }
+    if(valeur() && maxTranchePaie && !isNaN(updateDevise) && updateDevise !== 0)
+      {
+        maxTranchePaie.value = parseFloat(maxTranchePaie.value).toFixed(2);
+      }else{
+        maxTranchePaie.value *= updateDevise;
+      }
+
    // console.log(prodListTab.length, inputs, paiementFc.value);
    (prodListTab.length==0) ? alertErreurProduitSend('show') : myFormVente.submit();
     // myFormVente.submit();

@@ -14,7 +14,8 @@ class Paiement extends Model
         "avance",
         "solde",
         "net",
-        "completed"
+        "completed",
+        "reference_devise"
     ] ;
 
     public function vente(){

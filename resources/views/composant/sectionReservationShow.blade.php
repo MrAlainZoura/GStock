@@ -13,6 +13,7 @@ if($findVenteDetail->user != null){
     $image = null;
 }  
 $qtProduit = count($findVenteDetail->reservationProduit);
+$cdfPrime = $findVenteDetail->depot->use_cdf;
 @endphp
 <div class="alert-success hidden" id="alert">
     @include('composant.alert_suc', ['message'=>"Impression encours... et Lien copié avec succes, coller le pour le partager!"])
@@ -36,7 +37,7 @@ $qtProduit = count($findVenteDetail->reservationProduit);
                             $netPaye+=(float)$val->montant;
                         @endphp
                     @endforeach
-                       et le prix net payé @formaMille((float)$netPaye) {{  $findVenteDetail->devise }} au taux d'échange de {{  $findVenteDetail->taux }} pour la monnaie locale.
+                       et le prix net payé @formaMille((float)$netPaye) cdf / @formaMille((float)$netPaye/$findVenteDetail->updateTaux) {{  $findVenteDetail->devise }} au taux d'échange de {{  $findVenteDetail->taux }} pour la monnaie locale.
                 </p>
                 <div class="flex flex-col justify-between sm:flex gap-2 sm:flex-row sm:flex-1">
                                         
@@ -113,13 +114,13 @@ $qtProduit = count($findVenteDetail->reservationProduit);
                                 {{$item->produit->libele}}<br>
                                 {{$item->produit->etat}}
                             </th>
-                            <td class="px-3 py-2">
+                            <td class="px-3 py-2 max-w-sm">
                                 {{$item->duree}} de
                                 {{$item->debut}} à
                                 {{$item->fin}}
                             </td>
                             <td class="px-3 py-2">
-                            @formaMille((float)$item->montant)  {{$findVenteDetail->devise}}
+                                @formaMille($cdfPrime ? (float)$item->montant : (float)$item->montant/$findVenteDetail->updateTaux)  {{$cdfPrime ? "cdf" : $findVenteDetail->devise}}
                             </td>
                         </tr>
                     @endforeach
@@ -127,12 +128,9 @@ $qtProduit = count($findVenteDetail->reservationProduit);
                     <tfoot>
                         <tr class="font-semibold text-gray-900 dark:text-white border border-t border-gray-200">
                             <th scope="row" class="px-4 py-3 text-base">Total</th>
-                            <td class="px-3 py-3">
-                              
-                               
-                            </td>
-                            <td class="px-3 py-3">({{$findVenteDetail->devise}}) @formaMille((float)$netPaye) <br>
-                                (cdf) @formaMille((float)$netPaye *(float)$findVenteDetail->taux)
+                            <td colspan="2" class="px-3 py-3 flex justify-end">
+                                ({{$findVenteDetail->devise}}) @formaMille((float)$netPaye/$findVenteDetail->updateTaux) <br>
+                                (cdf) @formaMille((float)$netPaye )
                             </td>
                         </tr>
                         
@@ -154,10 +152,10 @@ $qtProduit = count($findVenteDetail->reservationProduit);
                         <div class="grid grid-cols-4  py-5 text-sm text-gray-700 border-b border-gray-200 gap-x-3 dark:border-gray-700">
                             <div class="text-gray-500 dark:text-gray-400">{{$val->created_at}}</div>
                             <div>
-                               {{$val->avance}}
+                               {{$cdfPrime ? $val->avance : $val->avance/$findVenteDetail->updateTaux}} {{ $cdfPrime ? "cdf" : $findVenteDetail->devise }}
                             </div>
                             <div>
-                                {{$val->solde}}
+                                {{$cdfPrime ? $val->solde : $val->solde/$findVenteDetail->updateTaux}} {{ $cdfPrime ? "cdf" : $findVenteDetail->devise }}
                             </div>
                             <div>
                                 @if($val->completed==false)
