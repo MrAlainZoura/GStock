@@ -6,6 +6,9 @@
 @endsection
 @php
   $client = $vente->client;
+  $nullRefeDevise = $vente->paiement->first()->reference_devise == null;
+  $taux = $vente->updateTaux;
+  // dump($nullRefeDevise, $taux);
 @endphp
 
 @section('main')  
@@ -88,7 +91,10 @@
                             <svg class="w-3.5 h-3.5 me-2 text-green-500 dark:text-green-400 shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
                                 <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z"/>
                             </svg>
-                            {{ $pro->produit->marque->libele }} {{ $pro->produit->libele }} {{ $pro->quantite }} {{($pro->quantite> 1 )?$pro->produit->unite."s":$pro->produit->unite }} {{ $cdfPrime ? $pro->prixT : (float) $pro->prixT / (float) $vente->updateTaux }} {{ $devise }}
+                            @php
+                              $prixProduit = $nullRefeDevise ? (float) $pro->prixT*(float)$taux : (float) $pro->prixT; 
+                            @endphp
+                            {{ $pro->produit->marque->libele }} {{ $pro->produit->libele }} {{ $pro->quantite }} {{($pro->quantite> 1 )?$pro->produit->unite."s":$pro->produit->unite }} {{ $cdfPrime ? $prixProduit : (float) $prixProduit / (float) $taux }} {{ $devise }}
                         </li>
                           @endforeach
                           <li>
@@ -113,18 +119,18 @@
                                       <svg class="shrink-0 w-3.5 h-3.5 text-green-500 dark:text-green-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 12">
                                           <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5.917 5.724 10.5 15 1.5"/>
                                       </svg>
-                                      <span>{{ $client->name }} {{ $client->prenom }} {{ $client->tel }}</span>
+                                      <span>{{ $client->name }} {{ $client->prenom }}</span>
                                   </li>
                                   <li class="flex items-center space-x-3 rtl:space-x-reverse">
-                                      <svg class="shrink-0 w-3.5 h-3.5 text-green-500 dark:text-green-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 12">
+                                      <!-- <svg class="shrink-0 w-3.5 h-3.5 text-green-500 dark:text-green-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 12">
                                           <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5.917 5.724 10.5 15 1.5"/>
-                                      </svg>
+                                      </svg> -->
                                       <span>Contact : {{ $client->tel }}</span>
                                   </li>
                                   <li class="flex items-center space-x-3 rtl:space-x-reverse">
-                                      <svg class="shrink-0 w-3.5 h-3.5 text-green-500 dark:text-green-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 12">
+                                      <!-- <svg class="shrink-0 w-3.5 h-3.5 text-green-500 dark:text-green-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 12">
                                           <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5.917 5.724 10.5 15 1.5"/>
-                                      </svg>
+                                      </svg> -->
                                       <span>Adresse : {{ $client->adresse }}</span>
                                   </li>
                                 </ul>

@@ -57,8 +57,9 @@
         $restePaiementTrancheFcPT=0;
         $restePaiementTrancheFcDT=0;
         $depotLibele = $rapport['depot']->type.' '.$rapport['depot']->libele;
+        $cdfPrime = $rapport['depot']->use_cdf;
     @endphp
-  <h2>Rapport {{ $rapport['periode'] }}  {{ $depotLibele }} </h2>
+  <h2>Rapport {{ $rapport['periode'] }}  {{ $depotLibele }}</h2>
   <h2>Tableau de vente {{ $depotLibele }} </h2>
   <table class="table-style">
     <thead>
@@ -75,9 +76,12 @@
     <tbody>
       @if (is_array($rapport['vente']) && array_key_exists('avant', $rapport['vente']))
           @foreach ($rapport['vente']['avant'] as $kV=>$vV)
-          @php
-            $restePaiementTrancheFcPT += (float)$vV->paiement->sortByDesc('created_at')->first()->solde * (float)$vV->updateTaux;
-          @endphp
+            @php
+              $resteSolde = ($vV->paiement[0]->reference_devise == null)
+                          ? (float)$vV->paiement->sortByDesc('created_at')->first()->solde * (float)$vV->updateTaux
+                          : (float)$vV->paiement->sortByDesc('created_at')->first()->solde;
+              $restePaiementTrancheFcPT += $resteSolde ;
+            @endphp
             @foreach ($vV->venteProduit as $kP=>$vP )
               <tr>
                 <td>
@@ -92,13 +96,17 @@
                 </td>
                 <td>
                   @php
-                      $recettePT +=(float)$vP->prixT * (float)$vV->updateTaux;
+                      $prixT = ($vV->paiement[0]->reference_devise == null)
+                              ? (float)$vP->prixT * (float)$vV->updateTaux
+                              : (float)$vP->prixT;
+                      $recettePT +=$prixT;
+                      $prixShow = $cdfPrime ? $prixT : $prixT / $vV->updateTaux;
+                      $monnaie = $cdfPrime ? "CDF" : $vV->devise->libele;
                   @endphp
-                @formaMille((float)$vV->updateTaux) Fc
+                @formaMille((float)$vV->updateTaux) CDF
                 </td>
                 <td>
-                  @formaMille((float)$vP->prixT) {{ $vV->devise->libele }}
-                  <!-- {{$vV->updateTaux}}Fc -->
+                  @formaMille($prixShow) {{ $monnaie }}
                 </td>
                 <td>
                   @if($vV->user != null)
@@ -126,8 +134,14 @@
                     <td colspan="2">
                       <ol>
                         @foreach ($vcomp->compassassion as $kc=>$vc)
+                        @php
+                          $prixComp =($vcomp->paiement[0]->reference_devise == null)
+                                      ? (float)$vc->prixT * (float)$vcomp->updateTaux
+                                      : $vc->prixT ;
+                          $monnaieComp = $cdfPrime ? 'CDF' : $vcomp->devise->libele;
+                        @endphp
                         <li>
-                          {{ $vc->produit->libele }} {{ $vc->quantite }}pc <span>→</span> {{ $vc->prixT }} {{ $vcomp->devise->libele }}
+                          {{ $vc->produit->libele }} {{ $vc->quantite }}pc <span>→</span> {{ $cdfPrime ? $prixComp : $prixComp/$vcomp->updateTaux }} {{ $monnaieComp }}
                         </li> 
                         @endforeach
 
@@ -135,23 +149,48 @@
                       <p style="font-weight: bold;">Contre (ancien article)</p>
                       <ol>
                         @foreach ($vcomp->venteProduit as $cvp)
+                        @php
+                          $prixCvp =($vcomp->paiement[0]->reference_devise == null)
+                                      ? $cvp->prixT * $vcomp->updateTaux
+                                      : $cvp->prixT ;
+                          $monnaieCvp = $cdfPrime ? "CDF" : $vcomp->devise->libele;
+                          // dump($vcomp->paiement[0]->reference_devise, $prixComp);
+                        @endphp
                         <li>
-                          {{ $cvp->produit->libele}} {{ $cvp->quantite}}pc <span>→</span> {{ $cvp->prixT }} {{ $vcomp->devise->libele }}
+                          {{ $cvp->produit->libele}} {{ $cvp->quantite}}pc <span>→</span> {{$cdfPrime ? $prixCvp : $prixCvp /$vcomp->updateTaux}} {{ $monnaieCvp }}
                         </li> 
                         @endforeach
                     </td>
                     
                     <td>
-                    @formaMille((float)$vcomp->updateTaux) Fc
+                    @formaMille((float)$vcomp->updateTaux) CDF
                     </td>
                     <td>
                       @php
-                          $ajout = (float) $vcomp->paiement->sortByDesc('created_at')->first()->net - (float)$vcomp->paiement->sortBy('created_at')->first()->net;
-                          $recette +=(float) $ajout;
-                          $recetteFc +=(float) $ajout * (float) $vcomp->updateTaux;
+                          // $newNet = ($vcomp->paiement->sortByDesc('created_at')->first()->reference_devise == null)
+                          //           // ? $vcomp->paiement->sortByDesc('created_at')->first()->net * $vcomp->updateTaux
+                          //           ? 10
+                          //           : $vcomp->paiement->sortByDesc('created_at')->first()->net;
+                          // $oldNet = ($vcomp->paiement->sortBy('created_at')->first()->reference_devise == null)
+                          //           ? $vcomp->paiement->sortBy('created_at')->first()->net * $vcomp->updateTaux
+                          //           : $vcomp->paiement->sortBy('created_at')->first()->net;
+                        $paiementComp =0;
+                        foreach ($vcomp->paiement as $key => $val) {
+                            $avance = ( $val->reference_devise == null)
+                                      ? (float) $val->avance * (float) $vcomp->updateTaux
+                                      : (float) $val->avance;
+                            $paiementComp +=$avance;
+                        }
+                        
+                          $ajout = $cdfPrime ? $avance : $avance/(float) $vcomp->updateTaux;//(float) $vcomp->paiement->sortByDesc('created_at')->first()->avance - (float)$vcomp->paiement->sortBy('created_at')->first()->net;
+
+                          $recette +=(float)$avance;
+                          $recetteFc += $avance; // $cdfPrime ? (float) $ajout : (float)$ajout / (float) $vcomp->updateTaux;
+                          $monnaie = $cdfPrime ? "CDF" : $vcomp->devise->libele;
+                          $showDetailPaiment = $paiementComp - $avance;
                         @endphp
-                      {{ $vcomp->paiement->sortBy('created_at')->first()->net}} + {{ $ajout }}<br>
-                      <br>{{ $vcomp->paiement->sortByDesc('created_at')->first()->net }} {{ $vcomp->devise->libele }}     
+                      {{ $cdfPrime ? $showDetailPaiment : $showDetailPaiment / (float) $vcomp->updateTaux}} + {{$ajout}} <br>
+                      <br>{{$cdfPrime ? $paiementComp : $paiementComp/(float) $vcomp->updateTaux}} {{ $monnaie }}    
                     </td>
                     <td>
                       @if($vcomp->user != null)
@@ -173,7 +212,7 @@
                 $recettePT = (float) $recettePT - (float)$restePaiementTrancheFcPT;
                 $restePaiementTrancheFc +=(float)$restePaiementTrancheFcPT;
             @endphp
-             @formaMille((float) $recettePT ) Fc
+             @formaMille((float) $recettePT ) CDF
           </td>
           <td colspan="2" class="tb">
               @foreach ($rapport['depot']->devise as $cle=>$dev )
@@ -184,7 +223,10 @@
         @foreach ($rapport['vente']['apres'] as $kV=>$vV)
         
           @php
-            $restePaiementTrancheFcDT += (float)$vV->paiement->sortByDesc('created_at')->first()->solde * (float)$vV->updateTaux;
+            $resteSoldeDT = ($vV->paiement[0]->reference_devise == null)
+                          ? (float)$vV->paiement->sortByDesc('created_at')->first()->solde * (float)$vV->updateTaux
+                          : (float)$vV->paiement->sortByDesc('created_at')->first()->solde;
+            $restePaiementTrancheFcDT += $resteSoldeDT;
           @endphp
             @foreach ($vV->venteProduit as $kP=>$vP )
               <tr>
@@ -200,13 +242,20 @@
                 </td>
                 <td>
                   @php
-                      $recette +=(float) $vP->prixT;
-                      $recetteDT +=(float)$vP->prixT * (float)$vV->updateTaux;
+                       $prixDT = ($vV->paiement[0]->reference_devise == null)
+                              ? (float)$vP->prixT * (float)$vV->updateTaux
+                              : (float)$vP->prixT;
+                      $recetteDT +=$prixDT;
+                      $prixShowDT = $cdfPrime ? $prixDT : $prixDT / $vV->updateTaux;
+                      $monnaieDT = $cdfPrime ? "CDF" : $vV->devise->libele;
+                 
+                      // $recette +=(float) $vP->prixT;
+                      // $recetteDT +=(float)$vP->prixT * (float)$vV->updateTaux;
                   @endphp
-                @formaMille((float)$vV->updateTaux) Fc
+                @formaMille((float)$vV->updateTaux) CDF
                 </td>
                 <td>
-                  @formaMille((float)$vP->prixT) {{ $vV->devise->libele }}
+                  @formaMille($cdfPrime ? (float)$prixDT : $prixDT /$vV->updateTaux) {{ $monnaieDT }}
                   <!-- {{$vV->updateTaux}}Fc -->
                 </td>
                 <td>
@@ -236,7 +285,12 @@
                       <ol>
                         @foreach ($vcomp->compassassion as $kc=>$vc)
                         <li>
-                          {{ $vc->produit->libele }} {{ $vc->quantite }}pc <span>→</span> {{ $vc->prixT }} {{ $vcomp->devise->libele }}
+                          @php
+                            $prix = ($vcomp->paiement()->latest()->first()->reference_devise == null)
+                                            ? (float)$vc->prixT * $vcomp->updateTaux
+                                            : (float)$vc->prixT;
+                          @endphp
+                          {{ $vc->produit->libele }} {{ $vc->quantite }}pc <span>→</span> {{$cdfPrime ? $prix : $prix/$vcomp->updateTaux}} {{ $cdfPrime ? "cdf" : $vcomp->devise->libele }}
                         </li> 
                         @endforeach
 
@@ -244,23 +298,41 @@
                       <p style="font-weight: bold;">Contre (ancien article)</p>
                       <ol>
                         @foreach ($vcomp->venteProduit as $cvp)
+                        @php
+                            $prix = ($vcomp->paiement()->first()->reference_devise == null)
+                                            ? (float)$cvp->prixT * $vcomp->updateTaux
+                                            : (float)$cvp->prixT;
+                          @endphp
                         <li>
-                          {{ $cvp->produit->libele}} {{ $cvp->quantite}}pc <span>→</span> {{ $cvp->prixT }} {{ $vcomp->devise->libele }}
+                          {{ $cvp->produit->libele}} {{ $cvp->quantite}}pc <span>→</span> {{ $cdfPrime ? $prix : $prix/$vcomp->updateTaux}} {{ $cdfPrime ? "cdf" : $vcomp->devise->libele }}
                         </li> 
                         @endforeach
                     </td>
                     
                     <td>
-                    @formaMille((float)$vcomp->updateTaux) Fc
+                    @formaMille((float)$vcomp->updateTaux) CDF
                     </td>
                     <td>
                       @php
-                          $ajout = (float) $vcomp->paiement->sortByDesc('created_at')->first()->net - (float)$vcomp->paiement->sortBy('created_at')->first()->net;
-                          $recette +=(float) $ajout;
-                          $recetteDT +=(float) $ajout * (float) $vcomp->updateTaux;
+                        
+                        $test =0;
+                        foreach ($vcomp->paiement as $key => $val) {
+                            $avance = ( $val->reference_devise == null)
+                                      ? (float) $val->avance * (float) $vcomp->updateTaux
+                                      : (float) $val->avance;
+                            $test +=$avance;
+                        }
+                        // dump($test, $avance);
+                        // dump($vcomp->paiement);
+                          $ajout = $cdfPrime ? $avance : $avance/(float) $vcomp->updateTaux;//(float) $vcomp->paiement->sortByDesc('created_at')->first()->avance - (float)$vcomp->paiement->sortBy('created_at')->first()->net;
+
+                          $recette +=(float) $avance;
+                          $recetteDT +=(float) $avance;
+                          $showDetail = $test - $avance;
+                          // $recetteDT +=(float) $ajout * (float) $vcomp->updateTaux;
                         @endphp
-                      {{ $vcomp->paiement->sortBy('created_at')->first()->net}} + {{ $ajout }}<br>
-                      <br>{{ $vcomp->paiement->sortByDesc('created_at')->first()->net }} {{ $vcomp->devise->libele }}     
+                      {{ $cdfPrime ? $showDetail : $showDetail /(float) $vcomp->updateTaux }} + {{ $ajout }}<br>
+                      <br>{{$cdfPrime ? $test : $test /(float) $vcomp->updateTaux }} {{ $vcomp->devise->libele }}     
                     </td>
                     <td>
                       @if($vcomp->user != null)
@@ -282,7 +354,7 @@
                 $recetteDT = (float) $recetteDT - (float)$restePaiementTrancheFcDT;
                 $restePaiementTrancheFc +=(float)$restePaiementTrancheFcDT;
             @endphp
-            @formaMille((float) $recetteDT) Fc
+            @formaMille((float) $recetteDT) CDF
             </td>
           <td colspan="2" class="tb">
             @foreach ($rapport['depot']->devise as $cle=>$dev )
@@ -315,7 +387,7 @@
                     $recette +=(float) $vP->prixT;
                     $recetteFc +=(float)$vP->prixT * (float)$vV->updateTaux;
                 @endphp
-              @formaMille((float)$vV->updateTaux) Fc
+              @formaMille((float)$vV->updateTaux) CDF
               </td>
               <td>
                 @formaMille((float)$vP->prixT) {{ $vV->devise->libele }}
@@ -368,7 +440,7 @@
                       </td>
                       
                       <td>
-                      @formaMille((float)$vcomp->updateTaux) Fc
+                      @formaMille((float)$vcomp->updateTaux) CDF
                       </td>
                       <td>
                         @php
@@ -401,7 +473,7 @@
               @php
                 $recetteFc += (float)$rapport['avanceTotal'];
               @endphp
-                @formaMille( (float)$recetteFc) Fc
+                @formaMille( (float)$recetteFc) CDF
             </td>
               <td colspan="3">
                 @foreach ($rapport['depot']->devise as $cle=>$dev )
@@ -413,7 +485,7 @@
             <tr class="footer-row">
                 <td colspan="2"><strong>Reçu P-Tranche Vente Antérieur</strong></td>
                 <td colspan="2">
-                    @formaMille( (float)$rapport ['avanceTotal']) Fc
+                    @formaMille( (float)$rapport ['avanceTotal']) CDF
                 </td>
                   <td colspan="3">
                       @foreach ($rapport['depot']->devise as $cle=>$dev )
@@ -426,7 +498,7 @@
           <tr class="footer-row">
               <td colspan="2"><strong>Reste P-Tranche</strong></td>
               <td colspan="2">
-                  @formaMille( (float)$restePaiementTrancheFc) Fc
+                  @formaMille( (float)$restePaiementTrancheFc) CDF
               </td>
                 <td colspan="3">
                     @foreach ($rapport['depot']->devise as $cle=>$dev )

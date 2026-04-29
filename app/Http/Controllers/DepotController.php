@@ -9,6 +9,7 @@ use App\Models\Depot;
 use App\Models\Devise;
 use App\Models\Produit;
 use App\Models\ProduitDepot;
+use App\Models\Reservation;
 use App\Models\Transfert;
 use App\Models\User;
 use App\Models\Vente;
@@ -92,16 +93,35 @@ class DepotController extends Controller
         }
         /**
          * mise à jour de prix en cdf et devise dans depotproduit de produit en fonction de depot
-         * prix de vente precedente en cdf et ajout reference devise
+         * prix de vente precedente en cdf et ajout reference devise,
+         * meme chose pour reservation
          */
         $taux = $depot->devise()->first()->taux;
         $depotId=$depot->id;
-       
-        // $getStatusVenteUpdate= self::updateAllVente($depotId);
-        // $getStatusProdUpdate =self::updatePrixProduit($depotId, $taux);
-        
-        // dd($getStatusProdUpdate, $getStatusVenteUpdate);
-        // dd(Vente::with('paiement','venteProduit')-> where('depot_id', $depotId)->latest()->first());
+        $checkJourUpdate = $this->jours(Carbon::now());
+        // $checkJourUpdate = $this->jours(Carbon::parse("2026-03-29"));
+        $getStatusProdUpdate = self::updatePrixProduit($depotId, $taux);
+        // if( $checkJourUpdate != null){
+        //     if($depot->day_update == null){
+        //         // $getStatusVenteUpdate = self::updateAllVente($depotId, $checkJourUpdate);
+        //         // $getStatusReservationUpdate = self::updateAllReservation($depotId,$checkJourUpdate);
+        //         $getStatusProdUpdate = self::updatePrixProduit($depotId, $taux);
+        //         // $depot->day_update = Carbon::now();
+        //         // $depot->save();
+        //         // dd('premiere fois', $this->jours(Carbon::now()));
+        //     }else{
+        //         // dd('on TEST LES DATES');
+        //         if(Carbon::parse( $depot->day_update)->format('Y-m-d') != $checkJourUpdate){
+        //             // dd('on lance', $checkJourUpdate);
+        //             $getStatusVenteUpdate = self::updateAllVente($depotId, $checkJourUpdate);
+        //             $depot->day_update = $checkJourUpdate;
+        //             $depot->save();
+        //             dd("on vient de faire la maj auj");
+        //         }
+        //     }
+        // }
+        // dd("Cest fait aujourdi", $checkJourUpdate, $depot);
+
         session(['depot' => $depot->libele]);
         session(['depot_id' => $depot->id]);
         $user = Auth::user();
@@ -379,28 +399,33 @@ class DepotController extends Controller
     }
 
 
-    static public function updateAllVente($depotId){
+    /*static public function updateAllVente($depotId, $monthYear){
+        $mois = Carbon::parse($monthYear)->format('m');
+        $year ="20".Carbon::parse($monthYear)->format('y');
         $allVente = Vente::with('venteProduit','paiement')
                     ->withTrashed()
                     ->where('depot_id',$depotId)
-                    ->whereDate('created_at','>',Carbon::parse("2026-03-01"))
+                    ->whereMonth('created_at',$mois)
+                    ->whereYear('created_at', $year)
                     ->get();
+                // dd($allVente, $mois, $year);
+
         if($allVente){
             foreach ($allVente as $vente) {
                     $tauxVente = $vente->updateTaux;
                     // Update paiements
                     $vente->paiement->each(function ($paiementV) use ($tauxVente) {
                         $paiementV->reference_devise = $paiementV->net;
-                        $paiementV->avance =$paiementV->avance * $tauxVente;
-                        $paiementV->solde  = $paiementV->solde * $tauxVente;
-                        $paiementV->net   = $paiementV->net * $tauxVente;
+                        $paiementV->avance = (float)$paiementV->avance * (float)$tauxVente;
+                        $paiementV->solde  = (float)$paiementV->solde * (float)$tauxVente;
+                        $paiementV->net   = (float)$paiementV->net * (float)$tauxVente;
                         $paiementV->save();
                     });
     
                     // Update produits
                     $vente->venteProduit->each(function ($prodVendu) use ($tauxVente) {
-                        $prodVendu->prixT = $prodVendu->prixT * $tauxVente;
-                        $prodVendu->prixU = $prodVendu->prixU * $tauxVente;
+                        $prodVendu->prixT = (float)$prodVendu->prixT * (float)$tauxVente;
+                        $prodVendu->prixU = (float)$prodVendu->prixU * (float)$tauxVente;
                         $prodVendu->save();
                     });
     
@@ -408,30 +433,221 @@ class DepotController extends Controller
         }
         // dd($allVente);
         return true;
-    }
-    static public function updatePrixProduit($depotId, $taux){
-         $produits = Produit::with('produitDepot')
-        ->whereHas('produitDepot', function($q) use($depotId) {
-            $q->where('depot_id', $depotId);
-            })
-            ->get();
-        
-        if($produits) {
-            foreach ($produits as $produit) {
-                $depotProd = $produit->produitDepot()
+    }*/
+
+        static public function updateAllVente($depotId, $monthYear)
+        {
+            $mois = Carbon::parse($monthYear)->format('m');
+            $year = "20".Carbon::parse($monthYear)->format('y');
+
+            $ventes = Vente::withTrashed()
+                ->where('depot_id', $depotId)
+                ->whereMonth('created_at', $mois)
+                ->whereYear('created_at', $year)
+                ->limit(500)
+                ->get(['id', 'updateTaux']);
+
+           foreach ($ventes as $vente) {
+                $taux = $vente->updateTaux;
+
+                DB::transaction(function () use ($vente, $taux) {
+                    // Update paiements
+                    DB::table('paiements')
+                        ->where('vente_id', $vente->id)
+                        ->whereNull('reference_devise')
+                        ->update([
+                            'reference_devise' => DB::raw('net'),
+                            'avance' => DB::raw('avance * '.$taux),
+                            'solde'  => DB::raw('solde * '.$taux),
+                            'net'    => DB::raw('net * '.$taux),
+                        ]);
+
+                    // Update produits
+                    DB::table('vente_produits')
+                        ->where('vente_id', $vente->id)
+                        ->update([
+                            'prixT' => DB::raw('prixT * '.$taux),
+                            'prixU' => DB::raw('prixU * '.$taux),
+                        ]);
+                });
+            }
+            return true;
+        }
+        // static public function updateAllVente($depotId, $monthYear)
+        // {
+        //     $mois = Carbon::parse($monthYear)->format('m');
+        //     $year = "20".Carbon::parse($monthYear)->format('y');
+
+        //     Vente::with(['venteProduit','paiement' => function($q) {
+        //             $q->whereNull('reference_devise'); // ne prendre que ceux non encore mis à jour
+        //         }])
+        //         ->withTrashed()
+        //         ->where('depot_id', $depotId)
+        //         ->whereMonth('created_at', $mois)
+        //         ->whereYear('created_at', $year)
+        //         ->chunk(200, function ($ventes) {
+        //             foreach ($ventes as $vente) {
+        //                 $tauxVente = $vente->updateTaux;
+
+        //                 // Update paiements uniquement si reference_devise est null
+        //                 $vente->paiement->each(function ($paiementV) use ($tauxVente) {
+        //                     $paiementV->reference_devise = $paiementV->net;
+        //                     $paiementV->avance = (float)$paiementV->avance * (float)$tauxVente;
+        //                     $paiementV->solde  = (float)$paiementV->solde * (float)$tauxVente;
+        //                     $paiementV->net    = (float)$paiementV->net * (float)$tauxVente;
+        //                     $paiementV->save();
+        //                 });
+
+        //                 // Update produits
+        //                 $vente->venteProduit->each(function ($prodVendu) use ($tauxVente) {
+        //                     $prodVendu->prixT = (float)$prodVendu->prixT * (float)$tauxVente;
+        //                     $prodVendu->prixU = (float)$prodVendu->prixU * (float)$tauxVente;
+        //                     $prodVendu->save();
+        //                 });
+        //             }
+        //         });
+
+        //     return true;
+        // }
+
+        static public function updateAllReservation($depotId, $monthYear)
+        {
+            $mois = Carbon::parse($monthYear)->format('m');
+            $year = "20".Carbon::parse($monthYear)->format('y');
+
+            // Récupérer les réservations concernées
+            $reservations = Reservation::withTrashed()
+                ->where('depot_id', $depotId)
+                ->whereMonth('created_at', $mois)
+                ->whereYear('created_at', $year)
+                ->get(['id', 'updateTaux']); // seulement les colonnes utiles
+
+            foreach ($reservations as $reservation) {
+                $taux = $reservation->updateTaux;
+
+                // Update paiements en masse (uniquement ceux non traités)
+                DB::table('paiements')
+                    ->where('reservation_id', $reservation->id)
+                    ->whereNull('reference_devise')
+                    ->update([
+                        'reference_devise' => DB::raw('net'),
+                        'avance' => DB::raw('avance * '.$taux),
+                        'solde'  => DB::raw('solde * '.$taux),
+                        'net'    => DB::raw('net * '.$taux),
+                    ]);
+
+                // Update produits en masse
+                DB::table('reservation_produits')
+                    ->where('reservation_id', $reservation->id)
+                    ->update([
+                        'montant' => DB::raw('montant * '.$taux),
+                    ]);
+            }
+
+            return true;
+        }
+    /*static public function updateAllReservation($depotId, $monthYear){
+        $mois = Carbon::parse($monthYear)->format('m');
+        $year ="20".Carbon::parse($monthYear)->format('y');
+        $allVente = Reservation::with('reservationProduit','paiement')
+                    ->withTrashed()
+                    ->where('depot_id',$depotId)
+                    ->whereMonth('created_at',$mois)
+                    ->whereYear('created_at', $year)
+                    ->get();
+        // return true;
+        // dd($allVente, $mois, $year);
+        if($allVente){
+            foreach ($allVente as $vente) {
+                    $tauxVente = $vente->updateTaux;
+                    // Update paiements
+                    $vente->paiement->each(function ($paiementV) use ($tauxVente) {
+                        $paiementV->reference_devise = $paiementV->net;
+                        $paiementV->avance = (float)$paiementV->avance * (float)$tauxVente;
+                        $paiementV->solde  = (float)$paiementV->solde * (float)$tauxVente;
+                        $paiementV->net   = (float)$paiementV->net * (float)$tauxVente;
+                        $paiementV->save();
+                    });
+                    // Update produits
+                    $vente->reservationProduit->each(function ($prodVendu) use ($tauxVente) {
+                        $prodVendu->montant = (float)$prodVendu->montant * (float)$tauxVente;
+                        $prodVendu->save();
+                    });
+    
+            } 
+        }
+        // dd($allVente);
+        return true;
+    }*/
+
+        static public function updatePrixProduit($depotId, $taux)
+        {
+            Produit::whereHas('produitDepot', function($q) use($depotId) {
+                    $q->where('depot_id', $depotId);
+                })
+                ->chunk(200, function ($produits) use ($depotId, $taux) {
+                    foreach ($produits as $produit) {
+                        $depotProd = $produit->produitDepot()
                             ->where('depot_id', $depotId)
-                            ->where('cdf_prix', null)
+                            ->whereNull('cdf_prix') // éviter de retraiter
                             ->where('produit_id', $produit->id)
                             ->first();
+
+                        if ($depotProd) {
+                            $depotProd->update([
+                                'cdf_prix'    => (float)$produit->prix * (float)$taux,
+                                'devise_prix' => (float)$produit->prix,
+                            ]);
+                        }
+                    }
+                });
+
+            return true;
+        }
+    // static public function updatePrixProduit($depotId, $taux){
+    //      $produits = Produit::with('produitDepot')
+    //     ->whereHas('produitDepot', function($q) use($depotId) {
+    //         $q->where('depot_id', $depotId);
+    //         })
+    //         ->get();
+        
+    //     if($produits) {
+    //         foreach ($produits as $produit) {
+    //             $depotProd = $produit->produitDepot()
+    //                         ->where('depot_id', $depotId)
+    //                         ->where('cdf_prix', null)
+    //                         ->where('produit_id', $produit->id)
+    //                         ->first();
                   
-                if($depotProd && $depotProd->count() > 0){
-                    $depotProd->update([
-                        'cdf_prix'    => $produit->prix * $taux,
-                        'devise_prix' => $produit->prix,
-                    ]);
-                }
-            }
-        }  
-        return true;
+    //             if($depotProd && $depotProd->count() > 0){
+    //                 $depotProd->update([
+    //                     'cdf_prix'    => (float)$produit->prix * (float)$taux,
+    //                     'devise_prix' => (float)$produit->prix,
+    //                 ]);
+    //             }
+    //         }
+    //     }  
+    //     return true;
+    // }
+
+    public function jours ($today){
+        $start = Carbon::parse('2026-03-24'); // aujourd'hui : 23/03/2026
+        $monthsBack = 9;        // nombre de mois à générer
+        $table = [];
+    
+
+        for ($i = 0; $i < $monthsBack; $i++) {
+            $day   = $start->copy()->addDays($i)->format('Y-m-d'); // chaque jour +i
+            $value = $start->copy()->subMonths($i)->format('Y-m-d'); // mois correspondant -i
+            $table[$day] = $value;
+        }
+        // Vérifier si aujourd'hui est dans le tableau
+        $todayKey = $today->format('Y-m-d');
+        if (array_key_exists($todayKey, $table)) {
+            $currentDate = $table[$todayKey];
+            return $currentDate;
+        }
+        // dd($table);
+        return null;
     }
 }

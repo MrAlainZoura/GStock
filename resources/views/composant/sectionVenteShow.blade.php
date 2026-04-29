@@ -15,6 +15,8 @@ if($findVenteDetail->user != null){
 $qtProduit = count($findVenteDetail->venteProduit);
 $cdfPrime = $depot->use_cdf;
 $monnaie = ($cdfPrime) ? "cdf": $findVenteDetail->devise;
+$taux = $findVenteDetail->updateTaux;
+$devise = $findVenteDetail->devise;
 $produitList = "";
 @endphp
 <div class="alert-success hidden" id="alert">
@@ -25,9 +27,16 @@ $produitList = "";
             <div class="mx-auto max-w-2xl lg:mx-0">
                 <h2 class="text-4xl font-semibold tracking-tight text-pretty text-gray-900 sm:text-5xl">Vente {{$findVenteDetail->code}} Détails </h2>
                 
-                <p class="text-body text-blue-600 m-1"><a href="{{route('venteDepot',["depot"=>$depot->libele, "depot_id"=>$depot->id])}}" class="border border-gray-100 rounded-lg max-w-md p-2 inline-flex items-center font-medium text-fg-brand text-lg hover:underline">
-                    Retour à la liste
-                    <svg class="w-5 h-5 ms-1 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 12H5m14 0-4 4m4-4-4-4"/></svg>
+                <p class="text-body text-blue-600 m-1 gap-5 flex-wrap flex">
+                    <a href="{{route('venteDepot',["depot"=>$depot->libele, "depot_id"=>$depot->id])}}" class="gap-2 border border-gray-100 rounded-lg max-w-md p-2 flex justify-center items-center font-medium text-fg-brand text-lg hover:underline">
+                        <img src="{{asset('svg/list.svg')}}" class="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" aria-hidden="true" alt="">
+                        Aller à la liste
+                        <!-- <svg class="w-5 h-5 ms-1 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 12H5m14 0-4 4m4-4-4-4"/></svg> -->
+                    </a>
+                    <a href="{{route('venteCreate',["depot"=>$depot->libele, "depot_id"=>$depot->id])}}" class="gap-2 border border-gray-100 rounded-lg max-w-md p-2 flex justify-center items-center font-medium text-fg-brand text-lg hover:underline">
+                         <img src="{{asset('svg/add.svg')}}" class="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" aria-hidden="true" alt="">
+                        Ajouter une vente
+                        <!-- <svg class="w-5 h-5 ms-1 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 12H5m14 0-4 4m4-4-4-4"/></svg> -->
                     </a>
                 </p>
                 <p class="mt-2 text-lg/8 text-gray-600"> Description de la vente : <br>
@@ -41,13 +50,30 @@ $produitList = "";
                     $quantite = 0;
                     $netPaye = 0;
                     @endphp
-                    @foreach ( $findVenteDetail->venteProduit as $val)
-                        @php
-                            $quantite +=(float)$val->quantite;
-                            $netPaye+=(float)$val->prixT;
-                            $netPaye = ($cdfPrime) ? $netPaye : $netPaye / $findVenteDetail->updateTaux;
-                        @endphp
-                    @endforeach
+                    @if($findVenteDetail->compassassion->count() > 0)
+                        @foreach ( $findVenteDetail->compassassion as $val)
+                            @php
+                                $prix = ($findVenteDetail->paiement()->latest()->first()->reference_devise == null)
+                                            ? (float)$val->prixT * $findVenteDetail->updateTaux
+                                            : (float)$val->prixT;
+                                $quantite +=(float)$val->quantite;
+                                $netPaye+= $prix;
+                                $netPaye = ($cdfPrime) ? $netPaye : $netPaye / $findVenteDetail->updateTaux;
+                            
+                            @endphp
+                        @endforeach
+                    @else
+                        @foreach ( $findVenteDetail->venteProduit as $val)
+                            @php
+                                $prix = ($findVenteDetail->paiement()->first()->reference_devise == null)
+                                            ? (float)$val->prixT * $findVenteDetail->updateTaux
+                                            : (float)$val->prixT;
+                                $quantite +=(float)$val->quantite;
+                                $netPaye+= $prix;
+                                $netPaye = ($cdfPrime) ? $netPaye : $netPaye / $findVenteDetail->updateTaux;
+                            @endphp
+                        @endforeach
+                    @endif
                      {{$quantite}} pc{{ ($quantite > 1)?"s":"" }} au total et le prix net à payer @formaMille((float)$netPaye){{ $monnaie }} au taux d'échange de {{  $findVenteDetail->taux }} pour la monnaie locale.
                 </p>
                 <div class="flex flex-col justify-between sm:flex gap-2 sm:flex-row sm:flex-1">
@@ -134,10 +160,15 @@ $produitList = "";
                                         <!-- {{$item->produit->etat}} -->
                                     </th>
                                     <td class="px-3 py-2">
-                                    {{$item->quantite}} {{($val->quantite> 1 )?$item->produit->unite."s":$item->produit->unite }}
+                                    {{$item->quantite}} {{($item->quantite > 1 )?$item->produit->unite."s":$item->produit->unite }}
                                     </td>
                                     <td class="px-3 py-2">
-                                    @formaMille($cdfPrime ? (float)$item->prixT : (float)$item->prixT / (float)$findVenteDetail->updateTaux)  {{$monnaie}}
+                                        @php
+                                            $prix = ($findVenteDetail->paiement()->latest()->first()->reference_devise == null)
+                                                    ? (float)$item->prixT  * $findVenteDetail->updateTaux
+                                                    : (float)$item->prixT ;
+                                        @endphp
+                                    @formaMille($cdfPrime ? $prix : $prix / (float)$findVenteDetail->updateTaux)  {{$monnaie}}
                                     </td>
                                 </tr>
                             @endforeach
@@ -157,9 +188,13 @@ $produitList = "";
                                         @endphp
                                         </td>
                                         <td class="px-3 py-2">
-                                        <!-- @formaMille((float)$item->prixT)  {{$findVenteDetail->devise}} -->
-                                        @formaMille($cdfPrime ? (float)$item->prixT : (float)$item->prixT / (float)$findVenteDetail->updateTaux)  {{$monnaie}}
-                                        </td>
+                                            @php
+                                                $prix = ($findVenteDetail->paiement()->first()->reference_devise == null)
+                                                        ? (float)$item->prixT  * $findVenteDetail->updateTaux
+                                                        : (float)$item->prixT ;
+                                             @endphp
+                                         @formaMille($cdfPrime ? $prix : $prix / (float)$findVenteDetail->updateTaux)  {{$monnaie}}
+                                      </td>
                                     </tr>
                                 @endforeach
                             </tr>
@@ -191,13 +226,23 @@ $produitList = "";
                                 </div>
                                 
                                 @foreach($findVenteDetail->paiement as $cl=>$val)
+                                 @php
+                                    $avance = ($val->reference_devise == null)
+                                            ? (float)$val->avance   * $findVenteDetail->updateTaux
+                                            : (float)$val->avance  ;
+                                    $solde = ($val->reference_devise == null)
+                                            ? (float)$val->solde   * $findVenteDetail->updateTaux
+                                            : (float)$val->solde  ;
+                                @endphp
                                 <div class="grid grid-cols-4  py-5 text-sm text-gray-700 border-b border-gray-200 gap-x-3 dark:border-gray-700">
                                     <div class="text-gray-500 dark:text-gray-400">{{$val->created_at}}</div>
                                     <div>
-                                       {{$val->avance}} cdf
+                                       {{$avance}} cdf <br>
+                                       {{$avance/$taux}} {{$devise}}
                                     </div>
                                     <div>
-                                        {{$val->solde}} cdf
+                                        {{$solde}} cdf <br>
+                                        {{$solde/$taux}} {{$devise}} 
                                     </div>
                                     <div>
                                         @if($val->completed==false)
@@ -249,10 +294,15 @@ $produitList = "";
                             @endphp
                             </td>
                             <td class="px-3 py-2">
+                                @php
+                                    $prix = ($findVenteDetail->paiement()->first()->reference_devise == null)
+                                            ? $item->prixT * $findVenteDetail->updateTaux
+                                            : $item->prixT;
+                                @endphp
                                 @if ($cdfPrime)
-                                    @formaMille((float)$item->prixT) {{ $monnaie }}
+                                    @formaMille($prix) {{ $monnaie }}
                                 @else
-                                    @formaMille((float)$item->prixT /(float)$findVenteDetail->updateTaux)  {{$monnaie}}
+                                    @formaMille($prix /(float)$findVenteDetail->updateTaux)  {{$monnaie}}
                                 @endif
                             </td>
                         </tr>
@@ -292,12 +342,20 @@ $produitList = "";
                             <div class="text-gray-500 dark:text-gray-400">{{$val->created_at}}</div>
                             <div>
                                <!-- {{$val->avance}} cdf -->
-                                @formaMille($cdfPrime ? (float)$val->avance : (float)$val->avance / (float)$findVenteDetail->updateTaux)  {{$monnaie}}
+                                @php
+                                    $avance = ($val->reference_devise == null)
+                                            ? (float)$val->avance * $findVenteDetail->updateTaux
+                                            : (float)$val->avance  ;
+                                    $solde = ($val->reference_devise == null)
+                                            ? (float)$val->solde * $findVenteDetail->updateTaux
+                                            : (float)$val->solde ;
+                                @endphp
+                                @formaMille($cdfPrime ? $avance : $avance / (float)$findVenteDetail->updateTaux)  {{$monnaie}}
 
                             </div>
                             <div>
                                 <!-- {{$val->solde}}cdf -->
-                                @formaMille($cdfPrime ? (float)$val->solde : (float)$val->solde / (float)$findVenteDetail->updateTaux)  {{$monnaie}}
+                                @formaMille($cdfPrime ? $solde : $solde / (float)$findVenteDetail->updateTaux)  {{$monnaie}}
                             </div>
                             <div>
                                 @if($val->completed==false)
@@ -312,44 +370,45 @@ $produitList = "";
                             </div>
                         </div>
                         @endforeach  
-                        @if(Auth::user()->user_role->role->libele =='Administrateur' || Auth::user()->user_role->role->libele=='Super admin')
                         
-                        <div class="flex itmes-center justify-center py-5 text-sm text-gray-700 border-b border-gray-200 gap-x-3 dark:border-gray-700">
-                            
-                            <button title="Supprimer"
-                                role="button"
-                                type="button"
-                                data-item-name="{{ $produitList }}"
-                                data-delete-route="{{route('venteDelete', 56745264509*$findVenteDetail->id)}}"
-                                data-modal-target="popup-modal"
-                                data-modal-toggle="popup-modal"
-                                class="delete-button flex justify-center text-red-600 py-2 px-2 ms-3 text-sm font-medium text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm items-center text-center">
-                                <svg class="w-[26px] h-[26px] text-gray-800 text-white"
-                                    aria-hidden="true"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    width="24"
-                                    height="24"
-                                    fill="none"
-                                    viewBox="0 0 24 24">
-                                    <path stroke="currentColor"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="m15 9-6 6m0-6 6 6m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
-                                </svg>
-                                Supprimer
-                            </button>
-
-                            @include('composant.modalDelete')
-                        </div>
-
-                        @endif
                     </div>
                 </div>
 
             @endif
             </div>
             @endif
+            @if(Auth::user()->user_role->role->libele =='Administrateur' || Auth::user()->user_role->role->libele=='Super admin')
+                        
+                            <!-- <div class="flex itmes-center justify-center  text-sm text-gray-700 border-b border-gray-200 gap-x-3 dark:border-gray-700"> -->
+                                <div class="flex items-center justify-center">
+                                <button title="Supprimer"
+                                    role="button"
+                                    type="button"
+                                    data-item-name="{{ $produitList }}"
+                                    data-delete-route="{{route('venteDelete', 56745264509*$findVenteDetail->id)}}"
+                                    data-modal-target="popup-modal"
+                                    data-modal-toggle="popup-modal"
+                                    class="delete-button flex justify-center text-red-600 py-2 px-2 ms-3 text-sm font-medium text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm items-center text-center">
+                                    <svg class="w-[26px] h-[26px] text-gray-800 text-white"
+                                        aria-hidden="true"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="24"
+                                        height="24"
+                                        fill="none"
+                                        viewBox="0 0 24 24">
+                                        <path stroke="currentColor"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="m15 9-6 6m0-6 6 6m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+                                    </svg>
+                                    Supprimer
+                                </button>
+
+                                @include('composant.modalDelete')
+                            </div>
+
+                        @endif
             </div>
         </div>
     </section>

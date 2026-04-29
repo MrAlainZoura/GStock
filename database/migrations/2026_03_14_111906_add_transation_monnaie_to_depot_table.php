@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::table('depots', function (Blueprint $table) {
             $table->boolean('use_cdf')->nullable()->default(false);
-            $table->boolean('global_update')->nullable();
+            //$table->boolean('global_update')->nullable();
+            // $table->timestamp('day_update')->nullable();
         });
     }
 

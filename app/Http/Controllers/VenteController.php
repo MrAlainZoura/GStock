@@ -161,6 +161,7 @@ class VenteController extends Controller
                     "avance"=>($checkTranche==true)?(float)$request->trancheP:$netPayer,
                     "solde"=>($checkTranche==true)?$netPayer - (float)$request->trancheP:0,
                     "net"=>$netPayer,
+                    "reference_devise"=>$netPayer / $request->updateDevise,
                     "completed"=>($checkTranche==true)?false:true
                 ];
                 $createPaiement = Paiement::create($dataPaiement);

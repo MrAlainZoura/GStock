@@ -103,6 +103,7 @@
         $netPaye = 0;
         $cdfPrime = $findVenteDetail->depot->use_cdf;
         $monnaie = ($cdfPrime) ? "cdf": $findVenteDetail->devise;
+        $taux = $findVenteDetail->updateTaux;
     @endphp
 
         <div class="container">
@@ -169,11 +170,14 @@
             </thead>
             <tbody>
                 @if ($findVenteDetail->compassassion->count() > 0)
-                    @foreach ($findVenteDetail->compassassion as $item)
+                    @foreach($findVenteDetail->compassassion as $item)
                         @php
+                            // $prix = "";
+                             $prix = ($findVenteDetail->paiement()->latest()->first()->reference_devise == null)
+                                        ? (float)$item->prixT * $findVenteDetail->updateTaux
+                                        : (float)$item->prixT;
                             $quantite +=(float)$item->quantite;
-                            $netPaye+=(float) $item->prixT;
-                            $netPaye = $netPaye /(float) $findVenteDetail->updateTaux;
+                            $netPaye  += $prix;
                         @endphp
                         <tr class="tdDashed">
                             <th class="left pad">
@@ -185,12 +189,12 @@
                                 {{$item->quantite}}
                             </td>
                             <td >
-                                @formaMille((float)$item->prixT * (float)$findVenteDetail->taux ) cdf
+                                @formaMille((float)$prix) cdf
                             </td>
                         </tr>
                     @endforeach
                     <tr><td colspan="3" class="separated">Article vente précédente </td></tr>
-                    @foreach ($findVenteDetail->venteProduit as $item)
+                    @foreach($findVenteDetail->venteProduit as $item)
                         <tr class="tdDashed">
                             <th class="left pad">
                                 {{$item->produit->marque->libele}} 
@@ -201,16 +205,24 @@
                                 {{$item->quantite}}
                             </td>
                             <td >
-                                @formaMille((float)$item->prixT * (float)$findVenteDetail->taux ) cdf
+                                @php
+                                    $prix = ($findVenteDetail->paiement()->first()->reference_devise == null)
+                                            ? (float)$item->prixT * $findVenteDetail->updateTaux
+                                            : (float)$item->prixT;
+                                @endphp
+                                @formaMille((float)$prix) cdf
                             </td>
                         </tr>
                     @endforeach
                 @else
-                    @foreach ($findVenteDetail->venteProduit as $item)
+                    @foreach($findVenteDetail->venteProduit as $item)
                          @php
+                            $prix = ($findVenteDetail->paiement()->first()->reference_devise == null)
+                                    ? (float)$item->prixT * $findVenteDetail->updateTaux
+                                    : (float)$item->prixT;
+                            
                             $quantite +=(float) $item->quantite;
-                            $netPaye+=(float) $item->prixT;
-                            $netPaye = $netPaye /(float) $findVenteDetail->updateTaux;
+                            $netPaye += $prix;
                         @endphp
                         <tr class="tdDashed">
                             <th class="left pad">
@@ -222,7 +234,7 @@
                                 {{$item->quantite}}
                             </td>
                             <td >
-                                @formaMille((float)$item->prixT) cdf
+                                @formaMille((float)$prix) cdf
                             </td>
                         </tr>
                     @endforeach
@@ -240,9 +252,17 @@
                 @if($findVenteDetail->paiement != null)
 
                     @foreach($findVenteDetail->paiement as $cle=>$valeur)
+                        @php
+                            $versement = ($valeur->reference_devise == null)
+                                        ? $valeur->avance * $findVenteDetail->updateTaux
+                                        : $valeur->avance;
+                            $solde = ($valeur->reference_devise == null)
+                                        ? $valeur->solde * $findVenteDetail->updateTaux
+                                        : $valeur->solde;
+                        @endphp
                         <tr>
                             <td class="left">{{$valeur->created_at}}</td>
-                            <td colspan="2" class="center">@formaMille((float)$valeur->avance) cdf</td>
+                            <td colspan="2" class="center">@formaMille($versement) cdf</td>
                         </tr>
                     @endforeach
 
@@ -256,8 +276,8 @@
                 <tr class="footer-row trHead">
                     <th class="footer-cell" >Total</th>
                     <th class="footer-cell" colspan="2">
-                        (cdf) @formaMille((float)$netPaye * $findVenteDetail->updateTaux)<br>
-                        ({{ $findVenteDetail->devise }}) @formaMille((float)$netPaye)
+                        (cdf) @formaMille((float)$netPaye)<br>
+                        ({{ $findVenteDetail->devise }}) @formaMille((float)$netPaye/(float)$taux)
                     </th>
                 </tr>
             </tfoot>
@@ -270,7 +290,12 @@
             <!-- Les marchandises vendue sont ni reprises ni échangées!<br> -->
             <!-- 1 mois de garentie et celle-ci n'inclut pas le display et chargeur! -->
         </p>
-        <p class="imprime">Logiciel @copyright 2026 zouraCorp +243 812 995 373</p>
+        
+        <!-- <div class="logo">
+            <img src="data:image/jpeg;base64,{{ base64_encode(file_get_contents(public_path('img/codeQR.png'))) }}" alt="logo">
+        </div> -->
+        <p class="">https://gstockcd.com</p>
+        <!-- <p class="imprime">Logiciel @copyright 2026 zouraCorp +243 812 995 373</p> -->
         <!-- <p class="imprime"> Imprimer par {{Auth::user()->name ." ".Auth::user()->postnom ." ".Auth::user()->prenom}}</p> -->
     </div>
 </div>

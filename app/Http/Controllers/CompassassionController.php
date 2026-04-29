@@ -41,7 +41,13 @@ class CompassassionController extends Controller
         if($vente){
             $depot = $vente->depot;
             $cdfPrime = $depot->use_cdf;
-            $paiement = collect($vente->paiement)->sum('avance'); 
+            $paiement = 0 ;
+            foreach ($vente->paiement as $key => $val) {
+                $paiement += ( $val->reference_devise == null)
+                           ? (float) $val->avance * (float) $vente->updateTaux
+                           : (float) $val->avance;
+            }
+             // collect($vente->paiement)->sum('avance'); 
             $paiement = $cdfPrime ? $paiement : $paiement/$vente->updateTaux;
             $devise = $cdfPrime ? "cdf" : $vente->devise->libele;
             $produit = ProduitDepot::where("depot_id",$depot->id)->with("produit.marque","produit.marque.categorie")->get();
@@ -73,7 +79,13 @@ class CompassassionController extends Controller
             $needTrait =[];
             $onlyNewProduct =[];
             $newPaiement = 0;
-            $oldPaiement = ($vente->paiement->count() >0)? $vente->paiement[0]->net:null;
+            $oldPaiement = 0;
+            foreach ($vente->paiement as $key => $val) {
+                $oldPaiement += ( $val->reference_devise == null)
+                           ? (float) $val->avance * (float) $vente->updateTaux
+                           : (float) $val->avance;
+            }
+            // $oldPaiement = ($vente->paiement->count() > 0)?collect($vente->paiement)->sum('avance'):null;
             // dd($ancVenteIdQt, $oldPaiement);
             $tabDataVenteProduit = [];
             foreach($request->produits as $key=>$val){
@@ -184,8 +196,10 @@ class CompassassionController extends Controller
                     "avance" => $statusPaiement,
                     "solde" => ($getSoldeLast > 0) ? $getSoldeLast - $statusPaiement : 0,
                     "net" => $newPaiement,
+                    "reference_devise" => $newPaiement / $vente-> updateTaux,
                     "completed" => true
                 ];
+            
                 $addNewPaiement = Paiement::create($dataPaiement);
             }elseif($statusPaiement == 0){
                 //on bouge rien

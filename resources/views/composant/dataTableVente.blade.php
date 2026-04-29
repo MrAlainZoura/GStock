@@ -103,6 +103,9 @@
                        // $paiment +=(float)$val->prixT;
                         $prix = preg_replace('/[^\d.]/', '', $comp->prixT);
                         if (is_numeric($prix)) {
+                        $$prix = ($item->paiement()->latest()->first()->reference_devise == null)
+                                        ? $prix * (float)$item->updateTaux
+                                        : $prix ;
                             $paiment += (float) $prix;
                         }
                     @endphp
@@ -123,6 +126,9 @@
                         // $paiment +=(float)$val->prixT;
                             $prix = preg_replace('/[^\d.]/', '', $val->prixT);
                             if (is_numeric($prix)) {
+                                $prix = ($item->paiement()->first()->reference_devise == null)
+                                        ? $prix * (float)$item->updateTaux
+                                        : $prix ;
                                 $paiment += (float) $prix;
                             }
                         @endphp
@@ -147,7 +153,7 @@
             </td>
         </tr>
         @php
-            $recette +=$paiment;
+            // $recette +=$paiment;
             $recetteFc +=$paiment  ;
         @endphp
         @endforeach

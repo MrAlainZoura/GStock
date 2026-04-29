@@ -139,6 +139,9 @@
                                 @php
                                     $prix = preg_replace('/[^\d.]/', '', $comp->prixT);
                                     if (is_numeric($prix)) {
+                                        $prix = ($item->paiement()->latest()->first()->reference_devise == null)
+                                            ? $prix * (float)$item->updateTaux
+                                            : $prix ;
                                         $paiment += (float) $prix;
                                     }
                                 @endphp

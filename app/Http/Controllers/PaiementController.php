@@ -51,6 +51,7 @@ class PaiementController extends Controller
             "avance"=>$versement,
             "solde"=>$newSolde,
             "net"=>$getVente->net,
+            "reference_devise"=>$getVente->reference_devise,
             "completed"=>($newSolde == 0)? true : false
         ];
         if($versement <= $solde){
@@ -116,10 +117,26 @@ class PaiementController extends Controller
                     $prod[] = $val->produit->marque->libele.' '.$val->produit->libele;
                 }
                 foreach($v->paiement as $cl=>$vl){
+                    
+                        $avance =($vl->reference_devise == null)
+                                ? $vl->avance * $v->updateTaux
+                                : $vl->avance;
+                        $solde =($vl->reference_devise == null)
+                                ? $vl->solde * $v->updateTaux
+                                : $vl->solde;                    
+                        $net =($vl->reference_devise == null)
+                                ? $vl->net * $v->updateTaux
+                                : $vl->net;                    
+                    // dd($avance, $solde);
+                    
                     $tranche[]=($depot->use_cdf) 
-                        ? $vl->avance. " - ".$vl->solde 
-                        : $vl->avance/$v->updateTaux ." - ".$vl->solde/$v->updateTaux;
+                        ? $avance. " - ".$solde 
+                        : $avance/$v->updateTaux ." - ".$solde/$v->updateTaux;
                 }
+                $netapayer=($depot->use_cdf)
+                            ? $net 
+                            : $net/$v->updateTaux;
+
                 $dernierVersement = count($v->paiement)-1;
                 $completed = $v->paiement[$dernierVersement]->completed;
                 $tabSyntese[$v->id] = [
@@ -127,7 +144,7 @@ class PaiementController extends Controller
                     'client'=>['nom'=>$v->client->name.' '.$v->client->prenom.' '.$v->client->postnom,'tel'=> $v->client->tel,'date'=> $v->created_at] ,
                     'prod'=>$prod, 
                     'tranche'=>$tranche, 
-                    'net'=>($depot->use_cdf)? $v->paiement[0]->net : $v->paiement[0]->net/$v->updateTaux,
+                    'net'=>$netapayer,
                     'completed'=>$completed,
                     'devise'=>($depot->use_cdf)? "cdf" : $v->devise->libele,
                     'taux'=>$v->updateTaux

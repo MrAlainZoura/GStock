@@ -5,6 +5,7 @@ namespace App\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Auth;
 
 class Depot extends Model
 {
@@ -29,7 +30,8 @@ class Depot extends Model
         'lat',
         'type',
         'use_cdf',
-        'global_update'
+        // 'global_update',
+        // 'day_update'
     ];
 
     public function user(){
@@ -73,7 +75,11 @@ class Depot extends Model
     public function hasNewAdmin()
     {
         $user = $this->user;
-        return $user && $user->created_at->between(now()->subDays(4), now());
+        return $user && $user->created_at->between(now()->subDays(15), now());
+    }
+    public function hasSuperAdmin()
+    {
+        return Auth::user()->user_role->role->libele=='Super admin';
     }
 
 
@@ -88,7 +94,7 @@ class Depot extends Model
 
     public function abonnementCurrent()
     {
-        return $this->hasActiveSouscription() || $this->hasFullSouscription() || $this->hasNewAdmin();
+        return $this->hasActiveSouscription() || $this->hasFullSouscription() || $this->hasNewAdmin() || $this->hasSuperAdmin();
     }
     
     public function getActiveSouscription()

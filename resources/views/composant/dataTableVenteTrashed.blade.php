@@ -117,15 +117,21 @@
                         // $paiment +=(float)$val->prixT;
                             $prix = preg_replace('/[^\d.]/', '', $val->prixT);
                             if (is_numeric($prix)) {
+                            $prix = ($item->paiement[0]->reference_devise == null)
+                                        ? $prix * (float) $item->updateTaux
+                                        : $prix ;
                                 $paiment += (float) $prix;
                             }
                     @endphp
                 @endforeach
-                @formaMille($paiment)
-                @if($item->devise) 
-                    {{ $item->devise->libele }} 
+               @if ($depot->use_cdf)
+                    @formaMille($paiment) cdf
+                @else
+                    @formaMille($paiment/$item->updateTaux)
+                    @if($item->devise) 
+                        {{ $item->devise->libele }} 
+                    @endif
                 @endif
-                <input type="text" class="hidden totalPaie"  value="{{ $paiment *$item->updateTaux }}">
             </td>
 
             <td>
@@ -134,7 +140,7 @@
         </tr>
         @php
             $recette +=$paiment;
-            $recetteFc +=$paiment *$item->updateTaux ;
+            $recetteFc +=$paiment;
         @endphp
         @endforeach
     </tbody>
@@ -197,16 +203,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if(data.length > 0){
             const deviseList = @json($deviseList);
             let recette = 0;
-            let recetteFc = 0;
+            let recetteFc = @json($recetteFc);
             const ul = document.getElementById('listeDevise');
             const totalPaie = [...document.querySelectorAll('.totalPaie')];
-
-            if(totalPaie){
-                totalPaie.forEach(paie=>{
-                    recetteFc +=parseFloat(paie.value);
-                    // console.log(paie.value, recetteFc)
-                });
-            }
             
             if(ul){
                 deviseList.forEach(dev=>{
